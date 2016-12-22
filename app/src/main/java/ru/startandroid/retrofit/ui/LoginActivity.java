@@ -9,7 +9,6 @@ import android.widget.Toast;
 
 import org.jboss.aerogear.android.core.Callback;
 
-import ru.startandroid.retrofit.LaunchActivity;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.databinding.ActivityLoginBinding;
 import ru.startandroid.retrofit.utils.KeycloakHelper;
@@ -31,24 +30,31 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    public void Login(View view){
+    public void Login(View view) {
 
         String mLogin = activityLoginBinding.editTextUsername.getText().toString();
         String mPassword = activityLoginBinding.editTextPassword.getText().toString();
 
-        if(mLogin.isEmpty()){
-            Toast.makeText(this, "Пустое поле логин", Toast.LENGTH_SHORT).show();
+        if (mLogin.isEmpty()) {
+            activityLoginBinding.usernameWrapper.setError("Пустое поле логин");
             activityLoginBinding.editTextUsername.setText("");
-        } else if (mPassword.isEmpty()){
-            Toast.makeText(this, "Пустое поле пароль", Toast.LENGTH_SHORT).show();
+            activityLoginBinding.passwordWrapper.setErrorEnabled(false);
+
+        } else if (mPassword.isEmpty()) {
+            activityLoginBinding.usernameWrapper.setErrorEnabled(false);
+            activityLoginBinding.passwordWrapper.setError("Пустое поле пароль");
+
             activityLoginBinding.editTextPassword.setText("");
-        } else if (mLogin.equals("Demo") && mPassword.equals("1111")){
+        } else if (mLogin.equals("Demo") && mPassword.equals("1111")) {
             startActivity(new Intent(this, NavigationActivity.class));
             this.finish();
-        }else{
+        } else {
             Toast.makeText(this, "Неверный логин или пароль", Toast.LENGTH_SHORT).show();
-            activityLoginBinding.editTextPassword.setText("");
-            activityLoginBinding.editTextUsername.setText("");
+//            activityLoginBinding.editTextPassword.setText("");
+//            activityLoginBinding.editTextUsername.setText("");
+
+            activityLoginBinding.usernameWrapper.setErrorEnabled(false);
+            activityLoginBinding.passwordWrapper.setErrorEnabled(false);
 
         }
 

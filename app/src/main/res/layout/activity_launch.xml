@@ -10,8 +10,91 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="ru.startandroid.retrofit.LaunchActivity">
 
-    <fragment
-        android:name="ru.startandroid.retrofit.ui.LastActionsFragment"
+    <TableLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_weight="3">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:layout_weight="1"
+                android:text="Time" />
+
+            <TextView
+                android:id="@+id/textClock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="2"
+                android:layout_weight="1"
+                android:text="ОТКУДА" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="3"
+                android:layout_weight="1"
+                android:text="КУДА" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_weight="3">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:layout_weight="1"
+                android:text="First Name" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="2"
+                android:layout_weight="1"
+                android:text="Карагандинский" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="3"
+                android:layout_weight="1"
+                android:text="ОФС" />
+
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_weight="3">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:layout_weight="1"
+                android:text="First Name" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="2"
+                android:layout_weight="1"
+                android:text="ОФС" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="3"
+                android:layout_weight="1"
+                android:text="ОФС" />
+
+        </TableRow>
+
+    </TableLayout>
 </RelativeLayout>

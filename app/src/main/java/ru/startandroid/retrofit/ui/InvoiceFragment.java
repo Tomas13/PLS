@@ -14,10 +14,10 @@ import ru.startandroid.retrofit.R;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class NoteFragment extends Fragment {
+public class InvoiceFragment extends Fragment {
 
 
-    public NoteFragment() {
+    public InvoiceFragment() {
         // Required empty public constructor
     }
 
