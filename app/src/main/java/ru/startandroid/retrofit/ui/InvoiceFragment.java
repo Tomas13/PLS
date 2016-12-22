@@ -27,7 +27,7 @@ public class InvoiceFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        View viewRoot = inflater.inflate(R.layout.fragment_note, container, false);
+        View viewRoot = inflater.inflate(R.layout.fragment_invoice, container, false);
 
         ((AppCompatActivity) getActivity())
                 .getSupportActionBar()
