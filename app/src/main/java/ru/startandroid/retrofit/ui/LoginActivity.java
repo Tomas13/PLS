@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import org.jboss.aerogear.android.core.Callback;
 
+import ru.startandroid.retrofit.MainActivity;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.databinding.ActivityLoginBinding;
 import ru.startandroid.retrofit.utils.KeycloakHelper;
@@ -35,7 +36,7 @@ public class LoginActivity extends AppCompatActivity {
         String mLogin = activityLoginBinding.editTextUsername.getText().toString();
         String mPassword = activityLoginBinding.editTextPassword.getText().toString();
 
-        if (mLogin.isEmpty()) {
+        /*if (mLogin.isEmpty()) {
             activityLoginBinding.usernameWrapper.setError("Пустое поле логин");
             activityLoginBinding.editTextUsername.setText("");
             activityLoginBinding.passwordWrapper.setErrorEnabled(false);
@@ -56,13 +57,15 @@ public class LoginActivity extends AppCompatActivity {
             activityLoginBinding.usernameWrapper.setErrorEnabled(false);
             activityLoginBinding.passwordWrapper.setErrorEnabled(false);
 
-        }
+        }*/
 
-        /*if (!KeycloakHelper.isConnected()) {
-            KeycloakHelper.connect(LoginActivity.this, new Callback<String>() {
+        if (!KeycloakHelper.isConnected()) {
+            KeycloakHelper.connect(this, new Callback<String>() {
                 @Override
                 public void onSuccess(String data) {
                     Toast.makeText(getApplicationContext(), data, Toast.LENGTH_LONG).show();
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+
                 }
 
                 @Override
@@ -70,6 +73,6 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                 }
             });
-        }*/
+        }
     }
 }

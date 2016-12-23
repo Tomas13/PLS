@@ -19,6 +19,7 @@ import retrofit2.Response;
 import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.Contributor;
 import ru.startandroid.retrofit.Model.Edges;
+import ru.startandroid.retrofit.Model.LastActions;
 import ru.startandroid.retrofit.databinding.ActivityMainBinding;
 import rx.Observable;
 import rx.Subscriber;
@@ -92,21 +93,24 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void FetchEdges(View view){
-        GitHubService gitHubServ = GitHubService.retrofitEdges.create(GitHubService.class);
 
-        final Call<List<Edges>> callEdges =
-                gitHubServ.getEdges();
+        GitHubService gitHubServ = GitHubService.retrofitLastActions.create(GitHubService.class);
 
-        callEdges.enqueue(new Callback<List<Edges>>() {
+        final Call<List<LastActions>> callEdges =
+                gitHubServ.getLastActions();
+
+        callEdges.enqueue(new Callback<List<LastActions>>() {
             @Override
-            public void onResponse(Call<List<Edges>> call, Response<List<Edges>> response) {
-                activityMainBinding.textView.setText(response.body().get(0).getStart());//.toString());
+            public void onResponse(Call<List<LastActions>> call, Response<List<LastActions>> response) {
+//                activityMainBinding.textView.setText(response.body().toString());
 
+                Log.d("Main", "got here");
             }
 
             @Override
-            public void onFailure(Call<List<Edges>> call, Throwable t) {
-                activityMainBinding.textView.setText("Something went wrong: " + t.getMessage());
+            public void onFailure(Call<List<LastActions>> call, Throwable t) {
+//                activityMainBinding.textView.setText("Something went wrong: " + t.getMessage());
+//                Log.d("Main", t.getMessage());
 
             }
         });

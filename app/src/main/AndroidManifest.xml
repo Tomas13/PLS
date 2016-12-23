@@ -14,7 +14,10 @@
 
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="landscape" />
+            android:screenOrientation="landscape" >
+
+
+        </activity>
 
         <activity android:name=".ui.ScannerActivity" />
 
@@ -35,7 +38,9 @@
             </intent-filter>
         </activity>
 
-        <service android:name="org.jboss.aerogear.android.authorization.oauth2.OAuth2AuthzService" />
+        <service
+            android:name="org.jboss.aerogear.android.authorization.oauth2.OAuth2AuthzService" />
+
 
         <activity
             android:name=".ui.NavigationActivity"
