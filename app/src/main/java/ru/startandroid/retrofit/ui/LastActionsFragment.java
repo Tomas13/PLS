@@ -35,10 +35,15 @@ public class LastActionsFragment extends Fragment {
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Последние действия");
 
 
+        getHistory();
+
 
         return binding.getRoot();
     }
 
+    private void getHistory() {
+
+    }
 
 
 }

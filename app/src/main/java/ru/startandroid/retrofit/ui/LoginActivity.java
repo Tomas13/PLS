@@ -83,5 +83,14 @@ public class LoginActivity extends AppCompatActivity {
         }*/
 
 
+    /*    Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                KeycloakHelper.refresh();
+
+            }
+        };
+
+        runnable.run();*/
     }
 }

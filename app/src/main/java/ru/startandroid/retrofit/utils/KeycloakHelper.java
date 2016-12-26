@@ -68,10 +68,16 @@ public class KeycloakHelper {
                 callback.onFailure(e);
             }
         });
+
     }
 
     public static boolean isConnected() {
         Log.i(TAG, "check is connected!");
         return AuthorizationManager.getModule(MODULE_NAME).isAuthorized();
+    }
+
+    public static void refresh() {
+        Log.i(TAG, "check is connected!");
+        AuthorizationManager.getModule(MODULE_NAME).refreshAccess();
     }
 }
