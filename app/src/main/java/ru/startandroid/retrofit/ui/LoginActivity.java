@@ -25,16 +25,34 @@ public class LoginActivity extends AppCompatActivity {
         activityLoginBinding = DataBindingUtil.setContentView(this,
                 R.layout.activity_login);
 
-        activityLoginBinding.usernameWrapper.setHint("Username");
-        activityLoginBinding.passwordWrapper.setHint("Password");
+        startAuth();
 
+    }
+
+    private void startAuth() {
+
+        if (!KeycloakHelper.isConnected()) {
+            KeycloakHelper.connect(this, new Callback<String>() {
+                @Override
+                public void onSuccess(String data) {
+                    Toast.makeText(getApplicationContext(), data, Toast.LENGTH_LONG).show();
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
     }
 
 
     public void Login(View view) {
 
-        String mLogin = activityLoginBinding.editTextUsername.getText().toString();
-        String mPassword = activityLoginBinding.editTextPassword.getText().toString();
+//        String mLogin = activityLoginBinding.editTextUsername.getText().toString();
+//        String mPassword = activityLoginBinding.editTextPassword.getText().toString();
 
         /*if (mLogin.isEmpty()) {
             activityLoginBinding.usernameWrapper.setError("Пустое поле логин");
@@ -59,20 +77,6 @@ public class LoginActivity extends AppCompatActivity {
 
         }*/
 
-        if (!KeycloakHelper.isConnected()) {
-            KeycloakHelper.connect(this, new Callback<String>() {
-                @Override
-                public void onSuccess(String data) {
-                    Toast.makeText(getApplicationContext(), data, Toast.LENGTH_LONG).show();
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
 
-                }
-
-                @Override
-                public void onFailure(Exception e) {
-                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-                }
-            });
-        }
     }
 }

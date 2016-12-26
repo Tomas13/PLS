@@ -28,16 +28,18 @@ public class KeycloakHelper {
     private static final String MODULE_NAME = "KeyCloakAuthz";
     private static final String TAG = KeycloakHelper.class.getSimpleName();
 
-    private static final String ACCESS_TOKEN_ENDPOINT = "/realms/toolpar/tokens/access/codes";
-    private static final String REFRESH_TOKEN_ENDPOINT = "/realms/toolpar/tokens/refresh";
+//    private static final String ACCESS_TOKEN_ENDPOINT = "/realms/toolpar/tokens/access/codes";
+//    private static final String REFRESH_TOKEN_ENDPOINT = "/realms/toolpar/tokens/refresh";
 
+    private static final String ACCESS_TOKEN_ENDPOINT = "/realms/toolpar/protocol/openid-connect/token";
+    private static final String REFRESH_TOKEN_ENDPOINT = "/realms/toolpar/protocol/openid-connect/token";
     static {
         try {
             AuthorizationManager.config(MODULE_NAME, OAuth2AuthorizationConfiguration.class)
                     .setBaseURL(new URL(AUTHZ_URL))
                     .setAuthzEndpoint(AUTHZ_ENDPOINT)
-//                    .setAccessTokenEndpoint(ACCESS_TOKEN_ENDPOINT)
-//                    .setRefreshEndpoint(REFRESH_TOKEN_ENDPOINT)
+                    .setAccessTokenEndpoint(ACCESS_TOKEN_ENDPOINT)
+                    .setRefreshEndpoint(REFRESH_TOKEN_ENDPOINT)
                     .setAccountId(AUTHZ_ACCOUNT_ID)
                     .setClientId(AUTHZ_CLIENT_ID)
                     .setClientSecret(CLIENT_SECRET)
