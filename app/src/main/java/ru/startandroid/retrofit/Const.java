@@ -6,4 +6,7 @@ package ru.startandroid.retrofit;
 
 public class Const {
     public static final int ScannerSelectionBarcodeActivity = 1;
+    public static String Token = "Bearer ";
+
+
 }

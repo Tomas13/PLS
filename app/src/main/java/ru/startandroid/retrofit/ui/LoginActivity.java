@@ -4,11 +4,13 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import org.jboss.aerogear.android.core.Callback;
 
+import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.MainActivity;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.databinding.ActivityLoginBinding;
@@ -35,8 +37,11 @@ public class LoginActivity extends AppCompatActivity {
             KeycloakHelper.connect(this, new Callback<String>() {
                 @Override
                 public void onSuccess(String data) {
-                    Toast.makeText(getApplicationContext(), data, Toast.LENGTH_LONG).show();
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    Intent intent = new Intent(LoginActivity.this, NavigationActivity.class);
+                    Const.Token += data;
+
+                    Log.d("Login", Const.Token);
+                    startActivity(intent);
 
                 }
 

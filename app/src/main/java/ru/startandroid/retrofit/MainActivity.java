@@ -9,13 +9,22 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.facebook.stetho.Stetho;
+import com.facebook.stetho.okhttp3.StethoInterceptor;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.Contributor;
 import ru.startandroid.retrofit.Model.Edges;
@@ -41,11 +50,39 @@ public class MainActivity extends AppCompatActivity {
         activityMainBinding = DataBindingUtil.setContentView(this,
                 R.layout.activity_main);
 
+        Stetho.initializeWithDefaults(this);
+
         BackgroundThread backgroundThread = new BackgroundThread();
         backgroundThread.start();
         backgroundLooper = backgroundThread.getLooper();
 
     }
+
+
+    public static OkHttpClient getUserClient(final String credentials){
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addNetworkInterceptor(new StethoInterceptor()); //подключаю Stetho
+        httpClient.readTimeout(60, TimeUnit.SECONDS);
+        httpClient.connectTimeout(60, TimeUnit.SECONDS);
+        httpClient.addInterceptor(new Interceptor() {
+            @Override
+            public okhttp3.Response intercept(Interceptor.Chain chain) throws IOException {
+                Request original = chain.request();
+
+                Request request = original.newBuilder()
+                        .header("Authorization", credentials) //добавляю хедер
+                        .method(original.method(), original.body())
+                        .build();
+
+                return chain.proceed(request);
+            }
+        });
+
+        return httpClient.build();
+    }
+
+
+
 
     static class BackgroundThread extends HandlerThread {
         BackgroundThread() {
@@ -94,21 +131,36 @@ public class MainActivity extends AppCompatActivity {
 
     public void FetchEdges(View view){
 
-        GitHubService gitHubServ = GitHubService.retrofitLastActions.create(GitHubService.class);
 
-        final Call<List<LastActions>> callEdges =
+        Retrofit retrofitLastActions = new Retrofit.Builder()
+                .baseUrl("http://pls-test.kazpost.kz/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(getUserClient(Const.Token))
+                .build();
+
+
+        GitHubService gitHubServ = retrofitLastActions.create(GitHubService.class);
+
+        final Call<ResponseBody> callEdges =
                 gitHubServ.getLastActions();
 
-        callEdges.enqueue(new Callback<List<LastActions>>() {
+        callEdges.enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(Call<List<LastActions>> call, Response<List<LastActions>> response) {
-//                activityMainBinding.textView.setText(response.body().toString());
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    activityMainBinding.textView.setText(response.body().string().toString());
 
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+                Log.d("Main", Const.Token);
                 Log.d("Main", "got here");
             }
 
             @Override
-            public void onFailure(Call<List<LastActions>> call, Throwable t) {
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
 //                activityMainBinding.textView.setText("Something went wrong: " + t.getMessage());
 //                Log.d("Main", t.getMessage());
 
