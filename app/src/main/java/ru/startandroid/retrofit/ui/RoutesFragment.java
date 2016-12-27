@@ -65,8 +65,6 @@ public class RoutesFragment extends Fragment {
         getRoutesInfo();
 
 
-
-
         return viewRoot;
     }
 
@@ -88,16 +86,21 @@ public class RoutesFragment extends Fragment {
             public void onResponse(Call<Routes> call, Response<Routes> response) {
 
 
-                SharedPreferences pref = getActivity().getApplicationContext().getSharedPreferences("FLIGHT_PREF", 0); // 0 - for private mode
+                int pos = 0;
 
-                int pos = pref.getInt("FLIGHT_POS", 0);
+                if (isAdded()) {
 
-                Log.d("MainNav", "got to response" + response.body().getFlights().get(pos).getItineraryDTO().getEntries().size()  + " pos " + pos);
+                    SharedPreferences pref = getActivity().getApplicationContext().getSharedPreferences("FLIGHT_PREF", 0); // 0 - for private mode
+                    pos = pref.getInt("FLIGHT_POS", 0);
+                }
+
+
+                Log.d("MainNav", "got to response" + response.body().getFlights().get(pos).getItineraryDTO().getEntries().size() + " pos " + pos);
 
                 List<Entry> flights = new ArrayList<>();
 
 //                for (int i = 0; i < response.body().getFlights().size(); i++) {
-                    flights.addAll(response.body().getFlights().get(pos).getItineraryDTO().getEntries());
+                flights.addAll(response.body().getFlights().get(pos).getItineraryDTO().getEntries());
 //                }
 
 

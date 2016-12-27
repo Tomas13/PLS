@@ -20,6 +20,7 @@ import ru.startandroid.retrofit.Model.Contributor;
 import ru.startandroid.retrofit.Model.Edges;
 import ru.startandroid.retrofit.Model.LastActions;
 import ru.startandroid.retrofit.Model.Member;
+import ru.startandroid.retrofit.Model.geninvoice.InvoiceMain;
 import ru.startandroid.retrofit.Model.routes.Routes;
 
 /**
@@ -71,4 +72,16 @@ public interface GitHubService {
     Call<Routes> getRoutesInfo(
 
     );
+
+
+
+    @GET("api/mobile/general-invoices")
+    Call<InvoiceMain> getGeneralInvoice(
+
+    );
+
+//    @GET("api/mobile/list-for-vpn")
+//    Call<> getListForVPN(
+//
+//    );
 }
