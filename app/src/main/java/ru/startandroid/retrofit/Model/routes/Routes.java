@@ -36,4 +36,14 @@ public class Routes {
     public int getIndex(int i){
         return flights.get(i).getItineraryDTO().getEntries().get(i).getIndex();
     }
+
+    public String getArrival(int i){
+        return flights.get(i).getItineraryDTO().getEntries().get(i).getArrival();
+    }
+
+    public String getName(int i){
+        return flights.get(i).getItineraryDTO().getEntries().get(i).getDept().getName();
+    }
+
+
 }

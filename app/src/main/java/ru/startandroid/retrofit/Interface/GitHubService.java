@@ -20,6 +20,7 @@ import ru.startandroid.retrofit.Model.Contributor;
 import ru.startandroid.retrofit.Model.Edges;
 import ru.startandroid.retrofit.Model.LastActions;
 import ru.startandroid.retrofit.Model.Member;
+import ru.startandroid.retrofit.Model.routes.Routes;
 
 /**
  * Created by zhangali on 18.12.16.
@@ -66,4 +67,8 @@ public interface GitHubService {
     );
 
 
+    @GET("api/mobile/flights")
+    Call<Routes> getRoutesInfo(
+
+    );
 }
