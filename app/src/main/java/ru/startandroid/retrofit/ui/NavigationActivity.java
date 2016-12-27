@@ -2,6 +2,7 @@ package ru.startandroid.retrofit.ui;
 
 import android.app.FragmentManager;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -114,6 +115,13 @@ public class NavigationActivity extends AppCompatActivity
 //
                 //if one route then go to history fragment
                 if(response.body().getFlights().size() == 1){
+
+                    //Save Flight Id to shared preferences
+                    SharedPreferences pref = getApplicationContext().getSharedPreferences("FLIGHT_PREF", 0); // 0 - for private mode
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putString("FLIGHT_ID", response.body().getFlights().get(0).toString());
+                    editor.commit();
+
                     startFragment(new LastActionsFragment());
 
                 }else{

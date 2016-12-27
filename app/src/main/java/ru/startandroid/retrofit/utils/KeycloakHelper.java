@@ -9,6 +9,8 @@ import org.jboss.aerogear.android.authorization.oauth2.OAuth2AuthorizationConfig
 import org.jboss.aerogear.android.core.Callback;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by zhangali on 20.12.16.
@@ -35,6 +37,8 @@ public class KeycloakHelper {
     private static final String REFRESH_TOKEN_ENDPOINT = "/realms/toolpar/protocol/openid-connect/token";
     static {
         try {
+            List<String> scopes = new ArrayList<>();
+            scopes.add("offline_access");
             AuthorizationManager.config(MODULE_NAME, OAuth2AuthorizationConfiguration.class)
                     .setBaseURL(new URL(AUTHZ_URL))
                     .setAuthzEndpoint(AUTHZ_ENDPOINT)
@@ -43,6 +47,7 @@ public class KeycloakHelper {
                     .setAccountId(AUTHZ_ACCOUNT_ID)
                     .setClientId(AUTHZ_CLIENT_ID)
                     .setClientSecret(CLIENT_SECRET)
+                    .setScopes(scopes)
 
                     .setRedirectURL(AUTHZ_REDIRECT_URL)
                     .asModule();
