@@ -41,6 +41,8 @@ import ru.startandroid.retrofit.adapter.RoutesRVAdapter;
 import ru.startandroid.retrofit.databinding.ActivityNavigationBinding;
 import ru.startandroid.retrofit.databinding.NavHeaderNavigationBinding;
 
+import static ru.startandroid.retrofit.Const.FLIGHT_ROUTES;
+import static ru.startandroid.retrofit.Const.ROUTES;
 import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
 public class NavigationActivity extends AppCompatActivity
@@ -66,10 +68,23 @@ public class NavigationActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
 
-
 //        getMembershipInfo();
 
-        getRoutesInfo();
+
+        int position;
+
+        //If VPN didn't choose flight then getRoutesInfo
+        //TODO gotta remove shared pref value when needed (onLogout)
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("FLIGHT_PREF", 0); // 0 - for private mode
+
+
+        if (!pref.contains("FLIGHT_POS")) {
+            getRoutesInfo();
+
+        }else{
+            startFragment(new LastActionsFragment());
+
+        }
 
 
         tvFirstName = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_firstname);
@@ -97,8 +112,6 @@ public class NavigationActivity extends AppCompatActivity
                 .client(getUserClient(Const.Token))
                 .build();
 
-        Log.d("MainNav", "got to getRoutes");
-
         GitHubService gitHubServ = retrofitLastActions.create(GitHubService.class);
 
         final Call<Routes> callEdges =
@@ -112,19 +125,20 @@ public class NavigationActivity extends AppCompatActivity
 
 
                 routesList.add(response.body());
-//
+
                 //if one route then go to history fragment
-                if(response.body().getFlights().size() == 1){
+                if (response.body().getFlights().size() == 1) {
 
                     //Save Flight Id to shared preferences
                     SharedPreferences pref = getApplicationContext().getSharedPreferences("FLIGHT_PREF", 0); // 0 - for private mode
                     SharedPreferences.Editor editor = pref.edit();
-                    editor.putString("FLIGHT_ID", response.body().getFlights().get(0).toString());
-                    editor.commit();
+                    editor.putInt("FLIGHT_ID", response.body().getFlights().get(0).getId());
+                    editor.apply();
+
 
                     startFragment(new LastActionsFragment());
 
-                }else{
+                } else {
                     Toast.makeText(NavigationActivity.this, response.body().getFlights().get(0).getName(), Toast.LENGTH_SHORT).show();
 
                     ArrayList<String> flights = new ArrayList<String>();
@@ -136,16 +150,18 @@ public class NavigationActivity extends AppCompatActivity
                     bundle.putStringArrayList("flightsList", flights);
 
                     FlightFragment dialogFragment = new FlightFragment();
+
                     dialogFragment.setArguments(bundle);
 
-                    startFragment(dialogFragment);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.content_navigation_container,
+                            dialogFragment).commit();
+
+//                    startFragment(dialogFragment);
 
                 }
 //                String username = response.body().getData().get(0).getUserName();
 //                String firstname = response.body().getData().get(0).getFirstName();
 //                String lastname = response.body().getData().get(0).getLastName();
-
-                RoutesRVAdapter routesRVAdapter = new RoutesRVAdapter(routesList);
 
 
 //                navProgressBar.setVisibility(View.GONE);

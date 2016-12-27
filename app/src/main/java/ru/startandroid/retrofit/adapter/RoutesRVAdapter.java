@@ -9,7 +9,10 @@ import android.view.textservice.TextInfo;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import ru.startandroid.retrofit.Model.routes.Entry;
+import ru.startandroid.retrofit.Model.routes.Flight;
 import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.R;
 
@@ -18,7 +21,7 @@ import ru.startandroid.retrofit.R;
  */
 
 public class RoutesRVAdapter extends RecyclerView.Adapter<RoutesRVAdapter.RoutesHolder> {
-    private ArrayList<Routes> mRoutes;
+    private List<Entry> mRoutes;
 
     public static class RoutesHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -41,7 +44,7 @@ public class RoutesRVAdapter extends RecyclerView.Adapter<RoutesRVAdapter.Routes
     }
 
 
-    public RoutesRVAdapter(ArrayList<Routes> routes) {
+    public RoutesRVAdapter(List<Entry> routes) {
         mRoutes = routes;
     }
 
@@ -54,13 +57,13 @@ public class RoutesRVAdapter extends RecyclerView.Adapter<RoutesRVAdapter.Routes
 
     @Override
     public void onBindViewHolder(RoutesHolder holder, int position) {
-        Routes route = mRoutes.get(position);
+        Entry flight = mRoutes.get(position);
 
-        Log.d("Main", "onBIND " + route.getStatus() + " ");
-        holder.tvIndex.setText(route.getIndex(position) + "");
-        holder.tvArrival.setText(route.getArrival(position));
-        holder.tvDeparture.setText(route.getArrival(position));
-        holder.tvName.setText(route.getName(position));
+//        Log.d("Main", "onBIND " + route..getStatus() + " ");
+        holder.tvIndex.setText(flight.getDept().getName()) ;// getIndex(position) + "");
+        holder.tvArrival.setText(flight.getArrival());
+        holder.tvDeparture.setText(flight.getDeparture());
+        holder.tvName.setText(flight.getDept().getNameRu());
 
     }
 

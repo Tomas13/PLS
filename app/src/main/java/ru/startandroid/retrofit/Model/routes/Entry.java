@@ -23,6 +23,11 @@ public class Entry {
     @Expose
     private String arrival;
 
+    @SerializedName("departure")
+    @Expose
+    private String departure;
+
+
     public Dept getDept() {
         return dept;
     }
@@ -63,4 +68,11 @@ public class Entry {
         this.arrival = arrival;
     }
 
+    public String getDeparture() {
+        return departure;
+    }
+
+    public void setDeparture(String departure) {
+        this.departure = departure;
+    }
 }

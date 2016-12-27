@@ -3,6 +3,7 @@ package ru.startandroid.retrofit.ui;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -21,6 +22,9 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import ru.startandroid.retrofit.R;
+
+import static ru.startandroid.retrofit.Const.FLIGHT_ROUTES;
+import static ru.startandroid.retrofit.Const.ROUTES;
 
 
 /**
@@ -49,9 +53,11 @@ public class FlightFragment extends Fragment {
         btnOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                getActivity().startActivity(new Intent(getActivity(), NavigationActivity.class));
 
             }
         });
+
 
 
         listViewFlights = (ListView) view.findViewById(R.id.list_view_flight);
@@ -63,11 +69,14 @@ public class FlightFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+                Toast.makeText(getActivity().getApplicationContext(), "Saving " + flights.get(position), Toast.LENGTH_SHORT).show();
                 //Save Flight Id to shared preferences
                 SharedPreferences pref = getActivity().getApplicationContext().getSharedPreferences("FLIGHT_PREF", 0); // 0 - for private mode
                 SharedPreferences.Editor editor = pref.edit();
-                editor.putString("FLIGHT_ID", flights.get(position));
-                editor.commit();
+                editor.putInt("FLIGHT_POS", position);
+                editor.apply();
+
+
             }
         });
 

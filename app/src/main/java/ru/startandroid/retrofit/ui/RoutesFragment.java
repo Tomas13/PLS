@@ -1,6 +1,7 @@
 package ru.startandroid.retrofit.ui;
 
 
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +25,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.Member;
+import ru.startandroid.retrofit.Model.routes.Entry;
+import ru.startandroid.retrofit.Model.routes.Flight;
 import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.RoutesRVAdapter;
 
+import static ru.startandroid.retrofit.Const.ROUTES;
 import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
 
@@ -57,6 +62,8 @@ public class RoutesFragment extends Fragment {
                 .setTitle("Маршруты");
 
 
+        getRoutesInfo();
+
 
 
 
@@ -64,6 +71,52 @@ public class RoutesFragment extends Fragment {
     }
 
 
+    private void getRoutesInfo() {
+        Retrofit retrofitLastActions = new Retrofit.Builder()
+                .baseUrl("http://pls-test.kazpost.kz/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(getUserClient(Const.Token))
+                .build();
+
+        GitHubService gitHubServ = retrofitLastActions.create(GitHubService.class);
+
+        final Call<Routes> callEdges =
+                gitHubServ.getRoutesInfo();
+
+        callEdges.enqueue(new Callback<Routes>() {
+            @Override
+            public void onResponse(Call<Routes> call, Response<Routes> response) {
+
+
+                SharedPreferences pref = getActivity().getApplicationContext().getSharedPreferences("FLIGHT_PREF", 0); // 0 - for private mode
+
+                int pos = pref.getInt("FLIGHT_POS", 0);
+
+                Log.d("MainNav", "got to response" + response.body().getFlights().get(pos).getItineraryDTO().getEntries().size()  + " pos " + pos);
+
+                List<Entry> flights = new ArrayList<>();
+
+//                for (int i = 0; i < response.body().getFlights().size(); i++) {
+                    flights.addAll(response.body().getFlights().get(pos).getItineraryDTO().getEntries());
+//                }
+
+
+                Log.d("MainNav", flights.size() + " size");
+                RoutesRVAdapter routesRVAdapter = new RoutesRVAdapter(flights);
+
+                RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+                rvRoutes.setLayoutManager(mLayoutManager);
+                rvRoutes.setAdapter(routesRVAdapter);
+
+            }
+
+            @Override
+            public void onFailure(Call<Routes> call, Throwable t) {
+                Log.d("Main", t.getMessage());
+
+            }
+        });
+    }
 
 
 }
