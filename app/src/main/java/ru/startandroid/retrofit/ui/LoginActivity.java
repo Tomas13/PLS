@@ -83,6 +83,8 @@ public class LoginActivity extends AppCompatActivity {
         }*/
 
 
+        startAuth();
+
     /*    Runnable runnable = new Runnable() {
             @Override
             public void run() {

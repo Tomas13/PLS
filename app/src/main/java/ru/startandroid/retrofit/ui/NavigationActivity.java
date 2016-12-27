@@ -1,5 +1,6 @@
 package ru.startandroid.retrofit.ui;
 
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,8 +19,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.ResponseBody;
@@ -30,7 +34,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.Member;
+import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.R;
+import ru.startandroid.retrofit.adapter.RoutesRVAdapter;
 import ru.startandroid.retrofit.databinding.ActivityNavigationBinding;
 import ru.startandroid.retrofit.databinding.NavHeaderNavigationBinding;
 
@@ -44,6 +50,7 @@ public class NavigationActivity extends AppCompatActivity
     ProgressBar navProgressBar;
     TextView tvFirstName;
     TextView tvLastName;
+    private ArrayList<Routes> routesList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,10 +64,15 @@ public class NavigationActivity extends AppCompatActivity
         Toolbar toolbar = activityNavigationBinding.appBarNavigation.toolbar;
         setSupportActionBar(toolbar);
 
-        getMembershipInfo();
+
+
+//        getMembershipInfo();
+
+        getRoutesInfo();
+
 
         tvFirstName = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_firstname);
-        tvLastName= (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_lastname);
+        tvLastName = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_lastname);
 
 
         navProgressBar = (ProgressBar) findViewById(R.id.activity_navigation_progressbar);
@@ -75,6 +87,75 @@ public class NavigationActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
     }
+
+
+    private void getRoutesInfo() {
+        Retrofit retrofitLastActions = new Retrofit.Builder()
+                .baseUrl("http://pls-test.kazpost.kz/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(getUserClient(Const.Token))
+                .build();
+
+        Log.d("MainNav", "got to getRoutes");
+
+        GitHubService gitHubServ = retrofitLastActions.create(GitHubService.class);
+
+        final Call<Routes> callEdges =
+                gitHubServ.getRoutesInfo();
+
+        callEdges.enqueue(new Callback<Routes>() {
+            @Override
+            public void onResponse(Call<Routes> call, Response<Routes> response) {
+
+                Log.d("MainNav", "got to response" + response.body().getFlights().size());
+
+
+                routesList.add(response.body());
+//
+                //if one route then go to history fragment
+                if(response.body().getFlights().size() == 1){
+                    startFragment(new LastActionsFragment());
+
+                }else{
+                    Toast.makeText(NavigationActivity.this, response.body().getFlights().get(0).getName(), Toast.LENGTH_SHORT).show();
+
+                    ArrayList<String> flights = new ArrayList<String>();
+                    for (int i = 0; i < response.body().getFlights().size(); i++) {
+                        flights.add(i, response.body().getFlights().get(i).getName());
+                    }
+
+                    Bundle bundle = new Bundle();
+                    bundle.putStringArrayList("flightsList", flights);
+
+                    FlightFragment dialogFragment = new FlightFragment();
+                    dialogFragment.setArguments(bundle);
+
+                    startFragment(dialogFragment);
+
+                }
+//                String username = response.body().getData().get(0).getUserName();
+//                String firstname = response.body().getData().get(0).getFirstName();
+//                String lastname = response.body().getData().get(0).getLastName();
+
+                RoutesRVAdapter routesRVAdapter = new RoutesRVAdapter(routesList);
+
+
+//                navProgressBar.setVisibility(View.GONE);
+
+//                LastActionsFragment fragment = new LastActionsFragment();
+//                startFragment(fragment);
+
+                Log.d("Main", Const.Token);
+            }
+
+            @Override
+            public void onFailure(Call<Routes> call, Throwable t) {
+                Log.d("Main", t.getMessage());
+
+            }
+        });
+    }
+
 
     private void getMembershipInfo() {
         Retrofit retrofitLastActions = new Retrofit.Builder()
@@ -103,7 +184,7 @@ public class NavigationActivity extends AppCompatActivity
                 navProgressBar.setVisibility(View.GONE);
 
                 LastActionsFragment fragment = new LastActionsFragment();
-                startFragment(fragment);
+//                startFragment(fragment);
 
                 Log.d("Main", Const.Token);
                 Log.d("Main", "got here");

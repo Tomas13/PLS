@@ -11,22 +11,14 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="reverseLandscape" >
-
-
-        </activity>
-
+            android:screenOrientation="reverseLandscape"></activity>
         <activity android:name=".ui.ScannerActivity" />
-
         <activity
             android:name=".LaunchActivity"
             android:screenOrientation="reverseLandscape" />
-
         <activity android:name=".ui.ScannerSelectionBarcodeActivity" />
-
         <activity
             android:name=".ui.LoginActivity"
             android:screenOrientation="portrait"
@@ -38,15 +30,14 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name="org.jboss.aerogear.android.authorization.oauth2.OAuth2AuthzService" />
-
+        <service android:name="org.jboss.aerogear.android.authorization.oauth2.OAuth2AuthzService" />
 
         <activity
             android:name=".ui.NavigationActivity"
             android:label="@string/title_activity_navigation"
             android:screenOrientation="reverseLandscape"
             android:theme="@style/AppTheme.NoActionBar" />
+
     </application>
 
 </manifest>

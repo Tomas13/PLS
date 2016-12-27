@@ -57,7 +57,6 @@ public class RoutesFragment extends Fragment {
                 .setTitle("Маршруты");
 
 
-        getRoutesInfo();
 
 
 
@@ -65,51 +64,6 @@ public class RoutesFragment extends Fragment {
     }
 
 
-    private ArrayList<Routes> routesList = new ArrayList<>();
 
-    private void getRoutesInfo() {
-        Retrofit retrofitLastActions = new Retrofit.Builder()
-                .baseUrl("http://pls-test.kazpost.kz/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(getUserClient(Const.Token))
-                .build();
-
-
-        GitHubService gitHubServ = retrofitLastActions.create(GitHubService.class);
-
-        final Call<Routes> callEdges =
-                gitHubServ.getRoutesInfo();
-
-        callEdges.enqueue(new Callback<Routes>() {
-            @Override
-            public void onResponse(Call<Routes> call, Response<Routes> response) {
-
-                routesList.add(response.body());
-//
-//                String username = response.body().getData().get(0).getUserName();
-//                String firstname = response.body().getData().get(0).getFirstName();
-//                String lastname = response.body().getData().get(0).getLastName();
-
-                RoutesRVAdapter routesRVAdapter = new RoutesRVAdapter(routesList);
-                rvRoutes.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
-                rvRoutes.setAdapter(routesRVAdapter);
-
-
-
-//                navProgressBar.setVisibility(View.GONE);
-
-//                LastActionsFragment fragment = new LastActionsFragment();
-//                startFragment(fragment);
-
-                Log.d("Main", Const.Token);
-            }
-
-            @Override
-            public void onFailure(Call<Routes> call, Throwable t) {
-                Log.d("Main", t.getMessage());
-
-            }
-        });
-    }
 
 }
