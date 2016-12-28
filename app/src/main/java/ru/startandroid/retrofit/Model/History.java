@@ -1,5 +1,4 @@
 package ru.startandroid.retrofit.Model;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -14,9 +13,9 @@ public class History {
     @SerializedName("toDep")
     @Expose
     private ToDep toDep;
-    @SerializedName("invoiceId")
+    @SerializedName("listId")
     @Expose
-    private String invoiceId;
+    private String listId;
     @SerializedName("status")
     @Expose
     private String status;
@@ -45,12 +44,12 @@ public class History {
         this.toDep = toDep;
     }
 
-    public String getInvoiceId() {
-        return invoiceId;
+    public String getListId() {
+        return listId;
     }
 
-    public void setInvoiceId(String invoiceId) {
-        this.invoiceId = invoiceId;
+    public void setListId(String listId) {
+        this.listId = listId;
     }
 
     public String getStatus() {

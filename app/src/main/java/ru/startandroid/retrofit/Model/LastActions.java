@@ -4,7 +4,6 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class LastActions {
-
     @SerializedName("status")
     @Expose
     private String status;
@@ -27,5 +26,4 @@ public class LastActions {
     public void setHistory(List<History> history) {
         this.history = history;
     }
-
 }

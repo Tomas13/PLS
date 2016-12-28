@@ -1,25 +1,18 @@
 package ru.startandroid.retrofit.Interface;
 
-import java.io.IOException;
 import java.util.List;
 
-import okhttp3.Interceptor;
-import okhttp3.Request;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
-import retrofit2.http.Header;
-import retrofit2.http.Headers;
 import retrofit2.http.Path;
-import ru.startandroid.retrofit.Const;
-import ru.startandroid.retrofit.Const.*;
+import retrofit2.http.Query;
 import ru.startandroid.retrofit.Model.Contributor;
 import ru.startandroid.retrofit.Model.Edges;
 import ru.startandroid.retrofit.Model.LastActions;
 import ru.startandroid.retrofit.Model.Member;
+import ru.startandroid.retrofit.Model.acceptgen.Oinvoice;
 import ru.startandroid.retrofit.Model.geninvoice.InvoiceMain;
 import ru.startandroid.retrofit.Model.routes.Routes;
 
@@ -56,7 +49,7 @@ public interface GitHubService {
 
     @GET("api/mobile/history")
 //    @GET("api/security/membership-info")
-    Call<ResponseBody> getLastActions(
+    Call<LastActions> getLastActions(
 
     );
 
@@ -74,11 +67,30 @@ public interface GitHubService {
     );
 
 
-
+    //Принятие общей накладной
     @GET("api/mobile/general-invoices")
     Call<InvoiceMain> getGeneralInvoice(
 
     );
+
+
+//    Получение о накладных
+    //    /api/mobile/accept-general-invoice?id={id of general invoice}
+    @GET("/api/mobile/accept-general-invoice")
+    Call<Oinvoice> acceptGeneralInvoice(
+        @Query("id") Long genInvoiceID
+    );
+
+
+
+//
+//    //    Получение о накладных
+//    //    /api/mobile/accept-general-invoice?id={id of general invoice}
+//    @GET("/api/mobile/accept-general-invoice?id={general_invoice_id}")
+//    Call<InvoiceMain> acceptGeneralInvoice(
+//            @Path("general_invoice_id") String genInvoiceID
+//    );
+
 
 //    @GET("api/mobile/list-for-vpn")
 //    Call<> getListForVPN(

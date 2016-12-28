@@ -2,6 +2,8 @@ package ru.startandroid.retrofit.Model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 public class ToDep {
 
@@ -14,11 +16,8 @@ public class ToDep {
     @SerializedName("nameRu")
     @Expose
     private String nameRu;
-//    @SerializedName("longNameRu")
-//    @Expose
-//    private String longNameRu;
-//    @SerializedName("techindex")
-//    @Expose
+    @SerializedName("techindex")
+    @Expose
     private String techindex;
 
     public String getName() {
@@ -44,14 +43,6 @@ public class ToDep {
     public void setNameRu(String nameRu) {
         this.nameRu = nameRu;
     }
-
-//    public String getLongNameRu() {
-//        return longNameRu;
-//    }
-
-//    public void setLongNameRu(String longNameRu) {
-//        this.longNameRu = longNameRu;
-//    }
 
     public String getTechindex() {
         return techindex;

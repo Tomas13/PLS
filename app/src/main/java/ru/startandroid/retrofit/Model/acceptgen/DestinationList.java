@@ -1,4 +1,4 @@
-package ru.startandroid.retrofit.Model.geninvoice;
+package ru.startandroid.retrofit.Model.acceptgen;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -6,34 +6,20 @@ import com.google.gson.annotations.SerializedName;
 import ru.startandroid.retrofit.Model.FromDep;
 import ru.startandroid.retrofit.Model.ToDep;
 
-public class GeneralInvoice {
+public class DestinationList {
 
-    @SerializedName("generalInvoiceId")
-    @Expose
-    private String generalInvoiceId;
     @SerializedName("id")
     @Expose
     private Long id;
-    @SerializedName("createdDate")
+    @SerializedName("destinationListId")
     @Expose
-    private Long createdDate;
+    private String destinationListId;
     @SerializedName("fromDep")
     @Expose
     private FromDep fromDep;
     @SerializedName("toDep")
     @Expose
     private ToDep toDep;
-    @SerializedName("status")
-    @Expose
-    private String status;
-
-    public String getGeneralInvoiceId() {
-        return generalInvoiceId;
-    }
-
-    public void setGeneralInvoiceId(String generalInvoiceId) {
-        this.generalInvoiceId = generalInvoiceId;
-    }
 
     public Long getId() {
         return id;
@@ -43,12 +29,12 @@ public class GeneralInvoice {
         this.id = id;
     }
 
-    public Long getCreatedDate() {
-        return createdDate;
+    public String getDestinationListId() {
+        return destinationListId;
     }
 
-    public void setCreatedDate(Long createdDate) {
-        this.createdDate = createdDate;
+    public void setDestinationListId(String destinationListId) {
+        this.destinationListId = destinationListId;
     }
 
     public FromDep getFromDep() {
@@ -65,14 +51,6 @@ public class GeneralInvoice {
 
     public void setToDep(ToDep toDep) {
         this.toDep = toDep;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
 }

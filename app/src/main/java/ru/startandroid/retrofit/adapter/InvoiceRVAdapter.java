@@ -35,14 +35,6 @@ public class InvoiceRVAdapter extends RecyclerView.Adapter<InvoiceRVAdapter.Invo
 
         TextView tvGeneralInvoiceID, tvFromDeptName, tvFromDeptNameRu;
         Button btnRetreive;
-        public MyAdapterListener onClickListener;
-
-        public interface MyAdapterListener {
-
-            void iconBtnOnClick(View v, int position);
-            void iconImageViewOnClick(View v, int position);
-        }
-
 
         public InvoiceHolder(View view) {
             super(view);
@@ -53,13 +45,6 @@ public class InvoiceRVAdapter extends RecyclerView.Adapter<InvoiceRVAdapter.Invo
             tvFromDeptNameRu = (TextView) view.findViewById(R.id.tv_from_dept_name_ru);
             //view.setOnClickListener(this);
 
-           /* btnRetreive.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(v.getContext(), "" + v.getId(), Toast.LENGTH_SHORT).show();
-                    onClickListener.iconBtnOnClick(v, getAdapterPosition());
-                }
-            });*/
 //            btnRetreive.setOnClickListener(this);
         }
 
@@ -67,9 +52,7 @@ public class InvoiceRVAdapter extends RecyclerView.Adapter<InvoiceRVAdapter.Invo
         public void onClick(View v) {
             Log.d("Routes", "Click on " + getAdapterPosition() + " id " +v.getId());
 
-
-
-            v.getRootView().getContext().getApplicationContext().startActivity(new Intent(v.getContext(), NavigationActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+//            v.getRootView().getContext().getApplicationContext().startActivity(new Intent(v.getContext(), NavigationActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         }
     }
 
@@ -108,8 +91,6 @@ public class InvoiceRVAdapter extends RecyclerView.Adapter<InvoiceRVAdapter.Invo
         holder.tvGeneralInvoiceID.setText(generalInvoice.getGeneralInvoiceId());
         holder.tvFromDeptName.setText(generalInvoice.getFromDep().getName());
         holder.tvFromDeptNameRu.setText(generalInvoice.getFromDep().getNameRu());
-
-//        holder.btnRetreive.setText(generalInvoice.getDept().getNameRu());
 
         holder.btnRetreive.setOnClickListener(new View.OnClickListener(){
 

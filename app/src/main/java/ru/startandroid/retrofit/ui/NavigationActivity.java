@@ -87,8 +87,8 @@ public class NavigationActivity extends AppCompatActivity
         }
 
 
-        tvFirstName = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_firstname);
-        tvLastName = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_lastname);
+        tvFirstName = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_fname);
+        tvLastName = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_lname);
 
 
         navProgressBar = (ProgressBar) findViewById(R.id.activity_navigation_progressbar);
@@ -156,13 +156,8 @@ public class NavigationActivity extends AppCompatActivity
                     getSupportFragmentManager().beginTransaction().replace(R.id.content_navigation_container,
                             dialogFragment).commit();
 
-//                    startFragment(dialogFragment);
 
                 }
-//                String username = response.body().getData().get(0).getUserName();
-//                String firstname = response.body().getData().get(0).getFirstName();
-//                String lastname = response.body().getData().get(0).getLastName();
-
 
 //                navProgressBar.setVisibility(View.GONE);
 
@@ -293,5 +288,19 @@ public class NavigationActivity extends AppCompatActivity
 
         getSupportFragmentManager().beginTransaction().replace(R.id.content_navigation_container,
                 fragment).commit();
+    }
+
+
+    public void replaceFragments(Class fragmentClass) {
+        Fragment fragment = null;
+        try {
+            fragment = (Fragment) fragmentClass.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        // Insert the fragment by replacing any existing fragment
+        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.content_navigation_container, fragment)
+                .commit();
     }
 }

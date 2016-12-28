@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void FetchEdges(View view){
+    /*public void FetchEdges(View view){
 
 
         Retrofit retrofitLastActions = new Retrofit.Builder()
@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
+*/
 
     public void RunRX(View view){
         onRunSchedulerExampleButtonClicked();

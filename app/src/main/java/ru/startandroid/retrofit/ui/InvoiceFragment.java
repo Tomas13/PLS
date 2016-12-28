@@ -12,9 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -22,6 +24,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.Interface.GitHubService;
+import ru.startandroid.retrofit.Model.acceptgen.Oinvoice;
 import ru.startandroid.retrofit.Model.geninvoice.GeneralInvoice;
 import ru.startandroid.retrofit.Model.geninvoice.InvoiceMain;
 import ru.startandroid.retrofit.Model.routes.Routes;
@@ -78,28 +81,35 @@ public class InvoiceFragment extends Fragment {
             @Override
             public void onResponse(Call<InvoiceMain> call, Response<InvoiceMain> response) {
 
-                Log.d("MainInvo" , "got in onresponse");
+                Log.d("InvoiceFrag", "got in onresponse");
 
-                if (response.isSuccessful() && response.body().getStatus().equals("success")){
+                if (response.isSuccessful() && response.body().getStatus().equals("success")) {
 
-                    Log.d("Main", "success " + response.body().getGeneralInvoices().get(0).getFromDep().getNameRu());
-
-                    List<GeneralInvoice> generalInvoiceList = new ArrayList<GeneralInvoice>();
+                    final List<GeneralInvoice> generalInvoiceList = new ArrayList<GeneralInvoice>();
 
                     generalInvoiceList.addAll(response.body().getGeneralInvoices());
 
                     InvoiceRVAdapter invoiceRVAdapter = new InvoiceRVAdapter(getActivity(), generalInvoiceList, new InvoiceRVAdapter.OnItemClickListener() {
                         @Override
                         public void onItemClick(View childView, int childAdapterPosition) {
-                            Toast.makeText(getContext(), "SHIT OH " + childAdapterPosition , Toast.LENGTH_SHORT).show();
+
+                            Toast.makeText(getContext(), "SHIT OH " + generalInvoiceList.get(childAdapterPosition).getGeneralInvoiceId(), Toast.LENGTH_SHORT).show();
+
+
+                            Bundle bundle = new Bundle();
+                            bundle.putLong("generalInvoiceId", generalInvoiceList.get(childAdapterPosition).getId());
+                            Fragment fragment = new AcceptGenInvoiceFragment();
+                            fragment.setArguments(bundle);
+
+                            ((NavigationActivity) getActivity()).startFragment(fragment);
+
 
                         }
                     });
+
                     RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
                     rvInvoice.setLayoutManager(mLayoutManager);
-
                     rvInvoice.setAdapter(invoiceRVAdapter);
-
 
                   /*  rvInvoice.addOnItemTouchListener(new InvoiceRVAdapter(getActivity(), generalInvoiceList,
                             new InvoiceRVAdapter.OnItemClickListener() {
@@ -115,16 +125,15 @@ public class InvoiceFragment extends Fragment {
                                 }
                             }));*/
 
-
                 }
             }
 
             @Override
             public void onFailure(Call<InvoiceMain> call, Throwable t) {
                 Log.d("Main", t.getMessage());
-
             }
         });
     }
+
 
 }

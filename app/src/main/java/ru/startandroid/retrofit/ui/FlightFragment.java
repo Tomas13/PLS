@@ -69,6 +69,7 @@ public class FlightFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+
                 Toast.makeText(getActivity().getApplicationContext(), "Saving " + flights.get(position), Toast.LENGTH_SHORT).show();
                 //Save Flight Id to shared preferences
                 SharedPreferences pref = getActivity().getApplicationContext().getSharedPreferences("FLIGHT_PREF", 0); // 0 - for private mode

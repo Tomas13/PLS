@@ -31,5 +31,6 @@
     <string name="number_sign">№</string>
     <string name="of_karagandy">ОФ Карагандинский</string>
     <string name="retrieve">Принять</string>
+    <string name="no_data">Нет данных по вашему запросу</string>
 
 </resources>

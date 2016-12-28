@@ -5,18 +5,39 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import ru.startandroid.retrofit.Const;
+import ru.startandroid.retrofit.Interface.GitHubService;
+import ru.startandroid.retrofit.Model.History;
+import ru.startandroid.retrofit.Model.LastActions;
+import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.R;
-import ru.startandroid.retrofit.databinding.FragmentLastActionsBinding;
+import ru.startandroid.retrofit.adapter.HistoryRVAdapter;
+
+import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class LastActionsFragment extends Fragment {
 
+
+    private RecyclerView rvHistory;
+    private TextView tvNoDataHistory;
 
     public LastActionsFragment() {
         // Required empty public constructor
@@ -28,9 +49,12 @@ public class LastActionsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        FragmentLastActionsBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_last_actions,
-                container, false);
-//        View viewRoot = inflater.inflate(R.layout.fragment_last_actions, container, false);
+
+        View viewRoot = inflater.inflate(R.layout.fragment_last_actions, container, false);
+
+        rvHistory = (RecyclerView) viewRoot.findViewById(R.id.rv_fragment_history);
+        tvNoDataHistory = (TextView) viewRoot.findViewById(R.id.tv_no_data_history);
+
 
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Последние действия");
 
@@ -38,10 +62,51 @@ public class LastActionsFragment extends Fragment {
         getHistory();
 
 
-        return binding.getRoot();
+        return viewRoot;
     }
 
     private void getHistory() {
+        Retrofit retrofitLastActions = new Retrofit.Builder()
+                .baseUrl("http://pls-test.kazpost.kz/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(getUserClient(Const.Token))
+                .build();
+
+        GitHubService gitHubServ = retrofitLastActions.create(GitHubService.class);
+
+        final Call<LastActions> callEdges =
+                gitHubServ.getLastActions();
+
+
+        callEdges.enqueue(new Callback<LastActions>() {
+            @Override
+            public void onResponse(Call<LastActions> call, Response<LastActions> response) {
+
+                if (response.isSuccessful() && response.body().getStatus().equals("success")) {
+
+                    final List<History> lastActionsList = new ArrayList<>();
+
+                    for (int i = 0; i < response.body().getHistory().size(); i++) {
+
+                        lastActionsList.add(response.body().getHistory().get(i));
+                    }
+
+                    HistoryRVAdapter historyAdapter = new HistoryRVAdapter(lastActionsList);
+                    RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+                    rvHistory.setLayoutManager(mLayoutManager);
+                    rvHistory.setAdapter(historyAdapter);
+
+
+                } else if (response.body().getStatus().equals("list-empty")) {
+                    tvNoDataHistory.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<LastActions> call, Throwable t) {
+
+            }
+        });
 
     }
 
