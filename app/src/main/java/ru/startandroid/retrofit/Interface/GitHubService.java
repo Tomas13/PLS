@@ -13,6 +13,7 @@ import ru.startandroid.retrofit.Model.Edges;
 import ru.startandroid.retrofit.Model.LastActions;
 import ru.startandroid.retrofit.Model.Member;
 import ru.startandroid.retrofit.Model.acceptgen.Oinvoice;
+import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
 import ru.startandroid.retrofit.Model.geninvoice.InvoiceMain;
 import ru.startandroid.retrofit.Model.routes.Routes;
 
@@ -41,7 +42,6 @@ public interface GitHubService {
             .baseUrl("http://astrabus.otgroup.kz/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
-
 
 
 //    @GET("http://pls-test.kazpost.kz/api/mobile/history")
@@ -74,22 +74,18 @@ public interface GitHubService {
     );
 
 
-//    Получение о накладных
+    //    Получение о накладных
     //    /api/mobile/accept-general-invoice?id={id of general invoice}
     @GET("/api/mobile/accept-general-invoice")
     Call<Oinvoice> acceptGeneralInvoice(
-        @Query("id") Long genInvoiceID
+            @Query("id") Long genInvoiceID
     );
 
 
-
-//
-//    //    Получение о накладных
-//    //    /api/mobile/accept-general-invoice?id={id of general invoice}
-//    @GET("/api/mobile/accept-general-invoice?id={general_invoice_id}")
-//    Call<InvoiceMain> acceptGeneralInvoice(
-//            @Path("general_invoice_id") String genInvoiceID
-//    );
+    //    Получение списка s накладных, которые уже извлекли из О
+    @GET("/api/mobile/destination-lists")
+    Call<ResponseDestinationList> getDestionationLists(
+    );
 
 
 //    @GET("api/mobile/list-for-vpn")

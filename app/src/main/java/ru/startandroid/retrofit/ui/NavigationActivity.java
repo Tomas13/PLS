@@ -81,7 +81,7 @@ public class NavigationActivity extends AppCompatActivity
         if (!pref.contains("FLIGHT_POS")) {
             getRoutesInfo();
 
-        }else{
+        } else {
             startFragment(new LastActionsFragment());
 
         }
@@ -265,6 +265,9 @@ public class NavigationActivity extends AppCompatActivity
         } else if (id == R.id.nav_note) {
 
             startFragment(new InvoiceFragment());
+        } else if (id == R.id.nav_dest_list) {
+
+            startFragment(new AcceptGenInvoiceFragment());
 
         } else if (id == R.id.nav_routes) {
 

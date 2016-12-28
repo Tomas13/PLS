@@ -24,6 +24,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.acceptgen.Oinvoice;
+import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
 import ru.startandroid.retrofit.R;
 
 import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
@@ -56,14 +57,63 @@ public class AcceptGenInvoiceFragment extends Fragment {
         listViewAcceptGen = (ListView) view.findViewById(R.id.list_view_accept_gen);
         tvAcceptGen = (TextView) view.findViewById(R.id.tv_accept_gen);
 
-        Long id = getArguments().getLong("generalInvoiceId");
+        Long id;
 
-        Toast.makeText(getContext(), "id " + id, Toast.LENGTH_SHORT).show();
-        retrofitAcceptGeneralInvoice(id);
+
+        if (getArguments() != null) {
+
+            id = getArguments().getLong("generalInvoiceId");
+
+            Toast.makeText(getContext(), "id " + id, Toast.LENGTH_SHORT).show();
+            retrofitAcceptGeneralInvoice(id);
+        } else {
+
+            Toast.makeText(getContext(), "came from menu", Toast.LENGTH_SHORT).show();
+            retrofitDestinationList();
+
+        }
 
 
         return view;
     }
+
+
+    private void retrofitDestinationList() {
+        Retrofit retrofitDestList = new Retrofit.Builder()
+                .baseUrl("http://pls-test.kazpost.kz/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(getUserClient(Const.Token))
+                .build();
+
+        GitHubService gitHubServ = retrofitDestList.create(GitHubService.class);
+        gitHubServ.getDestionationLists().enqueue(new Callback<ResponseDestinationList>() {
+            @Override
+            public void onResponse(Call<ResponseDestinationList> call, Response<ResponseDestinationList> response) {
+                if (response.isSuccessful() && response.body().getStatus().equals("success")) {
+
+                    for (int i = 0; i < response.body().getDestinationLists().size(); i++) {
+
+                        generalInvoiceIdsList.add(response.body().getDestinationLists().get(i).getDestinationListId());
+                    }
+
+                    listAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, generalInvoiceIdsList);
+
+                    listViewAcceptGen.setAdapter(listAdapter);
+
+                } else {
+
+                    tvAcceptGen.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseDestinationList> call, Throwable t) {
+                Log.d("MainAcceptGen", t.getMessage());
+
+            }
+        });
+    }
+
 
 
     private void retrofitAcceptGeneralInvoice(final Long generalInvoiceId) {
@@ -81,7 +131,7 @@ public class AcceptGenInvoiceFragment extends Fragment {
             public void onResponse(Call<Oinvoice> call, Response<Oinvoice> response) {
 
 //                Log.d("InvoiceORespo", response.body().getDestinationLists().get(0).getDestinationListId());
-                Log.d("MaiInvoiceFra", response.message());
+                Log.d("MainAcceptGen", response.message());
 
                 if (response.isSuccessful() && response.body().getStatus().equals("success")) {
 
@@ -102,7 +152,7 @@ public class AcceptGenInvoiceFragment extends Fragment {
 
             @Override
             public void onFailure(Call<Oinvoice> call, Throwable t) {
-                Log.d("InvoiceFrag", t.getMessage());
+                Log.d("MainAcceptGen", t.getMessage());
             }
         });
     }
