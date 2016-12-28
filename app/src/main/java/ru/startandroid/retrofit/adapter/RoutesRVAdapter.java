@@ -1,11 +1,16 @@
 package ru.startandroid.retrofit.adapter;
 
+import android.app.Activity;
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.textservice.TextInfo;
+import android.widget.AdapterView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -20,8 +25,16 @@ import ru.startandroid.retrofit.R;
  * Created by root on 12/27/16.
  */
 
-public class RoutesRVAdapter extends RecyclerView.Adapter<RoutesRVAdapter.RoutesHolder> {
+public class RoutesRVAdapter extends RecyclerView.Adapter<RoutesRVAdapter.RoutesHolder> implements RecyclerView.OnItemTouchListener {
     private List<Entry> mRoutes;
+
+    //for on click
+
+    Context context;
+    Activity activity;
+    GestureDetector mGestureDetector;
+    private OnItemClickListener listener;
+
 
     public static class RoutesHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -48,6 +61,22 @@ public class RoutesRVAdapter extends RecyclerView.Adapter<RoutesRVAdapter.Routes
         mRoutes = routes;
     }
 
+
+    public RoutesRVAdapter(Activity activity, List<Entry> routes, OnItemClickListener listener) {
+        this.context = activity.getBaseContext();
+        this.activity = activity;
+        this.listener = listener;
+        this.mRoutes = routes;
+
+        mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) {
+                return true;
+            }
+        });
+    }
+
+
     @Override
     public RoutesHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View inflatedView = LayoutInflater.from(parent.getContext())
@@ -73,5 +102,30 @@ public class RoutesRVAdapter extends RecyclerView.Adapter<RoutesRVAdapter.Routes
         return mRoutes.size();
     }
 
+
+    @Override
+    public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+        View childView = rv.findChildViewUnder(e.getX(), e.getY());
+        if (childView != null && listener != null && mGestureDetector.onTouchEvent(e)) {
+            listener.onItemClick(childView, rv.getChildAdapterPosition(childView));
+        }
+        return false;
+
+    }
+
+    @Override
+    public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
+    }
+
+    @Override
+    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+    }
+
+    public interface OnItemClickListener {
+
+        void onItemClick(View childView, int childAdapterPosition);
+    }
 
 }

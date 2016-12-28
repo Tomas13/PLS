@@ -68,7 +68,7 @@ public class NavigationActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
 
-//        getMembershipInfo();
+        getMembershipInfo();
 
 
         int position;

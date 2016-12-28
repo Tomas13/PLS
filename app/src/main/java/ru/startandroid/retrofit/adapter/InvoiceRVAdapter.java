@@ -1,26 +1,48 @@
 package ru.startandroid.retrofit.adapter;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
 import ru.startandroid.retrofit.Model.geninvoice.GeneralInvoice;
 import ru.startandroid.retrofit.R;
+import ru.startandroid.retrofit.ui.NavigationActivity;
 
 
-public class InvoiceRVAdapter extends RecyclerView.Adapter<InvoiceRVAdapter.InvoiceHolder> {
+public class InvoiceRVAdapter extends RecyclerView.Adapter<InvoiceRVAdapter.InvoiceHolder> implements RecyclerView.OnItemTouchListener  {
     private List<GeneralInvoice> mGeneralInvoice;
+
+//for on click
+
+    Context context;
+    Activity activity;
+    GestureDetector mGestureDetector;
+    private OnItemClickListener listener;
 
     public static class InvoiceHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView tvGeneralInvoiceID, tvFromDeptName, tvFromDeptNameRu;
         Button btnRetreive;
+        public MyAdapterListener onClickListener;
+
+        public interface MyAdapterListener {
+
+            void iconBtnOnClick(View v, int position);
+            void iconImageViewOnClick(View v, int position);
+        }
+
 
         public InvoiceHolder(View view) {
             super(view);
@@ -29,18 +51,46 @@ public class InvoiceRVAdapter extends RecyclerView.Adapter<InvoiceRVAdapter.Invo
             tvGeneralInvoiceID = (TextView) view.findViewById(R.id.tv_general_invoice_id);
             tvFromDeptName = (TextView) view.findViewById(R.id.tv_from_dept_name);
             tvFromDeptNameRu = (TextView) view.findViewById(R.id.tv_from_dept_name_ru);
-            view.setOnClickListener(this);
+            //view.setOnClickListener(this);
+
+           /* btnRetreive.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(v.getContext(), "" + v.getId(), Toast.LENGTH_SHORT).show();
+                    onClickListener.iconBtnOnClick(v, getAdapterPosition());
+                }
+            });*/
+//            btnRetreive.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            Log.d("Routes", "Click on " + v.getId());
+            Log.d("Routes", "Click on " + getAdapterPosition() + " id " +v.getId());
+
+
+
+            v.getRootView().getContext().getApplicationContext().startActivity(new Intent(v.getContext(), NavigationActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         }
     }
 
 
     public InvoiceRVAdapter(List<GeneralInvoice> routes) {
         mGeneralInvoice = routes;
+    }
+
+
+    public InvoiceRVAdapter(Activity activity, List<GeneralInvoice> routes, InvoiceRVAdapter.OnItemClickListener listener) {
+        this.context = activity.getBaseContext();
+        this.activity = activity;
+        this.listener = listener;
+        this.mGeneralInvoice = routes;
+
+        mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) {
+                return true;
+            }
+        });
     }
 
     @Override
@@ -51,7 +101,7 @@ public class InvoiceRVAdapter extends RecyclerView.Adapter<InvoiceRVAdapter.Invo
     }
 
     @Override
-    public void onBindViewHolder(InvoiceHolder holder, int position) {
+    public void onBindViewHolder(InvoiceHolder holder, final int position) {
         GeneralInvoice generalInvoice = mGeneralInvoice.get(position);
 
 //        Log.d("Main", "onBIND " + route..getStatus() + " ");
@@ -61,6 +111,13 @@ public class InvoiceRVAdapter extends RecyclerView.Adapter<InvoiceRVAdapter.Invo
 
 //        holder.btnRetreive.setText(generalInvoice.getDept().getNameRu());
 
+        holder.btnRetreive.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                listener.onItemClick(v, position);
+            }
+        });
     }
 
 
@@ -69,5 +126,32 @@ public class InvoiceRVAdapter extends RecyclerView.Adapter<InvoiceRVAdapter.Invo
         return mGeneralInvoice.size();
     }
 
+
+
+    @Override
+    public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+        View childView = rv.findChildViewUnder(e.getX(), e.getY());
+        if (childView != null && listener != null && mGestureDetector.onTouchEvent(e)) {
+            listener.onItemClick(childView, rv.getChildAdapterPosition(childView));
+            return  true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
+    }
+
+    @Override
+    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+    }
+
+    public interface OnItemClickListener {
+
+        void onItemClick(View childView, int childAdapterPosition);
+    }
 
 }

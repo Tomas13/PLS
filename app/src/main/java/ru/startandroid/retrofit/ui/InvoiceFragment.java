@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,11 +88,32 @@ public class InvoiceFragment extends Fragment {
 
                     generalInvoiceList.addAll(response.body().getGeneralInvoices());
 
-                    InvoiceRVAdapter invoiceRVAdapter = new InvoiceRVAdapter(generalInvoiceList);
+                    InvoiceRVAdapter invoiceRVAdapter = new InvoiceRVAdapter(getActivity(), generalInvoiceList, new InvoiceRVAdapter.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(View childView, int childAdapterPosition) {
+                            Toast.makeText(getContext(), "SHIT OH " + childAdapterPosition , Toast.LENGTH_SHORT).show();
+
+                        }
+                    });
                     RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
                     rvInvoice.setLayoutManager(mLayoutManager);
 
                     rvInvoice.setAdapter(invoiceRVAdapter);
+
+
+                  /*  rvInvoice.addOnItemTouchListener(new InvoiceRVAdapter(getActivity(), generalInvoiceList,
+                            new InvoiceRVAdapter.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(View childView, int childAdapterPosition) {
+
+                                    Log.d("MainRoute", " pos is " + childAdapterPosition + " id " + childView.getId() + " btn " + R.id.btn_retrieve);
+//                                    Toast.makeText(getActivity(), " pos is " + childView.getId() + " id " + R.id.btn_retrieve, Toast.LENGTH_SHORT).show();
+
+                                    if (childView.getId() == R.id.btn_retrieve){
+                                        Toast.makeText(getActivity(), "btn number " + childAdapterPosition, Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            }));*/
 
 
                 }

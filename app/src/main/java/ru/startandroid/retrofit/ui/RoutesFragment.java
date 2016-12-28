@@ -111,6 +111,16 @@ public class RoutesFragment extends Fragment {
                 rvRoutes.setLayoutManager(mLayoutManager);
                 rvRoutes.setAdapter(routesRVAdapter);
 
+               /* rvRoutes.addOnItemTouchListener(new RoutesRVAdapter(getActivity(), flights,
+                        new RoutesRVAdapter.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(View childView, int childAdapterPosition) {
+
+                                Log.d("MainRoute", " pos is " + childAdapterPosition);
+                                Toast.makeText(getActivity(), " pos is " + childAdapterPosition, Toast.LENGTH_SHORT).show();
+
+                            }
+                        }));*/
             }
 
             @Override
