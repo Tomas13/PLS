@@ -10,7 +10,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TableRow;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,6 +43,9 @@ import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
  */
 public class InvoiceFragment extends Fragment {
 
+    TextView tvNoDataInvoice;
+
+    TableRow tableRowInvoice;
 
     public InvoiceFragment() {
         // Required empty public constructor
@@ -53,6 +60,9 @@ public class InvoiceFragment extends Fragment {
         // Inflate the layout for this fragment
 
         View viewRoot = inflater.inflate(R.layout.fragment_invoice, container, false);
+
+        tvNoDataInvoice = (TextView) viewRoot.findViewById(R.id.tv_no_data_invoice);
+        tableRowInvoice = (TableRow) viewRoot.findViewById(R.id.tablerow_invoice);
 
         ((AppCompatActivity) getActivity())
                 .getSupportActionBar()
@@ -111,20 +121,9 @@ public class InvoiceFragment extends Fragment {
                     rvInvoice.setLayoutManager(mLayoutManager);
                     rvInvoice.setAdapter(invoiceRVAdapter);
 
-                  /*  rvInvoice.addOnItemTouchListener(new InvoiceRVAdapter(getActivity(), generalInvoiceList,
-                            new InvoiceRVAdapter.OnItemClickListener() {
-                                @Override
-                                public void onItemClick(View childView, int childAdapterPosition) {
-
-                                    Log.d("MainRoute", " pos is " + childAdapterPosition + " id " + childView.getId() + " btn " + R.id.btn_retrieve);
-//                                    Toast.makeText(getActivity(), " pos is " + childView.getId() + " id " + R.id.btn_retrieve, Toast.LENGTH_SHORT).show();
-
-                                    if (childView.getId() == R.id.btn_retrieve){
-                                        Toast.makeText(getActivity(), "btn number " + childAdapterPosition, Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            }));*/
-
+                }else if (response.body().getStatus().equals("list-empty")) {
+                    tvNoDataInvoice.setVisibility(View.VISIBLE);
+                    tableRowInvoice.setVisibility(View.GONE);
                 }
             }
 
