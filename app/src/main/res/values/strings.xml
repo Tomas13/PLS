@@ -32,5 +32,6 @@
     <string name="of_karagandy">ОФ Карагандинский</string>
     <string name="retrieve">Принять</string>
     <string name="no_data">Нет данных по запросу</string>
+    <string name="collate">Сличить</string>
 
 </resources>

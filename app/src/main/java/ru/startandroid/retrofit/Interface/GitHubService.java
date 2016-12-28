@@ -3,16 +3,21 @@ package ru.startandroid.retrofit.Interface;
 import java.util.List;
 
 import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import ru.startandroid.retrofit.Model.Contributor;
 import ru.startandroid.retrofit.Model.Edges;
+import ru.startandroid.retrofit.Model.IdsCollate;
 import ru.startandroid.retrofit.Model.LastActions;
 import ru.startandroid.retrofit.Model.Member;
 import ru.startandroid.retrofit.Model.acceptgen.Oinvoice;
+import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
 import ru.startandroid.retrofit.Model.geninvoice.InvoiceMain;
 import ru.startandroid.retrofit.Model.routes.Routes;
@@ -87,6 +92,11 @@ public interface GitHubService {
     Call<ResponseDestinationList> getDestionationLists(
     );
 
+
+    @POST("/api/mobile/collate-destination-lists")
+    Call<CollateResponse> postCollateDestinationLists(
+            @Body IdsCollate idsCollate
+            );
 
 //    @GET("api/mobile/list-for-vpn")
 //    Call<> getListForVPN(

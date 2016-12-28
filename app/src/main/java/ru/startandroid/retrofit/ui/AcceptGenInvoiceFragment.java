@@ -8,9 +8,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.facebook.stetho.Stetho;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,12 +26,13 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.Interface.GitHubService;
+import ru.startandroid.retrofit.Model.IdsCollate;
 import ru.startandroid.retrofit.Model.acceptgen.Oinvoice;
+import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
-import ru.startandroid.retrofit.R;
 
 import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
-
+import ru.startandroid.retrofit.R;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -39,6 +43,11 @@ public class AcceptGenInvoiceFragment extends Fragment {
     private ListView listViewAcceptGen;
 
     private TextView tvAcceptGen;
+
+    private Button btnCollate;
+
+    List<Long> ids;
+
 
     private ArrayAdapter<String> listAdapter;
     private List<String> generalInvoiceIdsList = new ArrayList<>();
@@ -56,9 +65,13 @@ public class AcceptGenInvoiceFragment extends Fragment {
 
         listViewAcceptGen = (ListView) view.findViewById(R.id.list_view_accept_gen);
         tvAcceptGen = (TextView) view.findViewById(R.id.tv_accept_gen);
+        btnCollate = (Button) view.findViewById(R.id.btn_collate);
 
         Long id;
 
+        Stetho.initializeWithDefaults(getContext());
+
+        ids = new ArrayList<Long>();
 
         if (getArguments() != null) {
 
@@ -73,6 +86,13 @@ public class AcceptGenInvoiceFragment extends Fragment {
 
         }
 
+
+        btnCollate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                retrofitPostCollate();
+            }
+        });
 
         return view;
     }
@@ -94,6 +114,9 @@ public class AcceptGenInvoiceFragment extends Fragment {
                     for (int i = 0; i < response.body().getDestinationLists().size(); i++) {
 
                         generalInvoiceIdsList.add(response.body().getDestinationLists().get(i).getDestinationListId());
+
+                        ids.add(response.body().getDestinationLists().get(i).getId());
+
                     }
 
                     listAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, generalInvoiceIdsList);
@@ -113,7 +136,6 @@ public class AcceptGenInvoiceFragment extends Fragment {
             }
         });
     }
-
 
 
     private void retrofitAcceptGeneralInvoice(final Long generalInvoiceId) {
@@ -138,6 +160,8 @@ public class AcceptGenInvoiceFragment extends Fragment {
                     for (int i = 0; i < response.body().getDestinationLists().size(); i++) {
 
                         generalInvoiceIdsList.add(response.body().getDestinationLists().get(i).getDestinationListId());
+
+                        ids.add(response.body().getDestinationLists().get(i).getId());
                     }
 
                     listAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, generalInvoiceIdsList);
@@ -157,4 +181,33 @@ public class AcceptGenInvoiceFragment extends Fragment {
         });
     }
 
+
+
+
+    private void retrofitPostCollate() {
+        Retrofit retrofitDestList = new Retrofit.Builder()
+                .baseUrl("http://pls-test.kazpost.kz/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(getUserClient(Const.Token))
+                .build();
+
+        IdsCollate idsCol = new IdsCollate(ids);
+
+        GitHubService gitHubServ = retrofitDestList.create(GitHubService.class);
+        gitHubServ.postCollateDestinationLists(idsCol).enqueue(new Callback<CollateResponse>() {
+            @Override
+            public void onResponse(Call<CollateResponse> call, Response<CollateResponse> response) {
+
+                Log.d("MainAccept", "got response");
+
+//                Log.d("MainAccept", response.body().getStatus());
+            }
+
+            @Override
+            public void onFailure(Call<CollateResponse> call, Throwable t) {
+                Log.d("MainAccept", t.getMessage());
+
+            }
+        });
+    }
 }
