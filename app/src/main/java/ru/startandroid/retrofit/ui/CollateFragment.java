@@ -10,6 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
+import io.realm.Realm;
+import io.realm.RealmQuery;
+import ru.startandroid.retrofit.Model.collatedestination.Label;
+import ru.startandroid.retrofit.Model.collatedestination.Packet;
 import ru.startandroid.retrofit.R;
 
 
@@ -21,6 +27,8 @@ public class CollateFragment extends Fragment {
 
     private TextView tvNoDataCollate;
     private RecyclerView rvCollate;
+
+    private Realm realm;
 
     public CollateFragment() {
         // Required empty public constructor
@@ -35,6 +43,30 @@ public class CollateFragment extends Fragment {
 
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("G и B накладные");
 
+
+        // Create the Realm instance
+        realm = Realm.getDefaultInstance();
+
+        // Build the query looking at all users:
+        RealmQuery<Packet> queryPackets = realm.where(Packet.class);
+
+        ArrayList<Packet> packetArrayList = new ArrayList<>();
+
+        for (int i = 0; i < queryPackets.findAll().size(); i++) {
+            packetArrayList.add(queryPackets.findAll().get(i));
+        }
+
+
+        RealmQuery<Label> queryLabels = realm.where(Label.class);
+        ArrayList<Label> labelArrayList = new ArrayList<>();
+
+        for (int i = 0; i < queryLabels.findAll().size(); i++) {
+            labelArrayList.add(queryLabels.findAll().get(i));
+        }
+
+
+
+
         tvNoDataCollate = (TextView) view.findViewById(R.id.tv_no_data_collate);
         rvCollate = (RecyclerView) view.findViewById(R.id.rv_fragment_collate);
 
@@ -42,4 +74,9 @@ public class CollateFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        realm.close();
+    }
 }

@@ -3,7 +3,9 @@ package ru.startandroid.retrofit.Model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Datum {
+import io.realm.RealmObject;
+
+public class Datum extends RealmObject {
 
     @SerializedName("userName")
     @Expose
@@ -19,7 +21,7 @@ public class Datum {
     private String displayName;
     @SerializedName("email")
     @Expose
-    private Object email;
+    private String email;
     @SerializedName("roleName")
     @Expose
     private String roleName;
@@ -31,7 +33,7 @@ public class Datum {
     private String groupType;
     @SerializedName("current")
     @Expose
-    private Object current;
+    private String current;
 
     public String getUserName() {
         return userName;
@@ -69,7 +71,7 @@ public class Datum {
         return email;
     }
 
-    public void setEmail(Object email) {
+    public void setEmail(String email) {
         this.email = email;
     }
 
@@ -101,7 +103,7 @@ public class Datum {
         return current;
     }
 
-    public void setCurrent(Object current) {
+    public void setCurrent(String current) {
         this.current = current;
     }
 

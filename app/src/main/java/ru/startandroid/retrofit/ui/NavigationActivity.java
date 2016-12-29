@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmQuery;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -34,7 +36,9 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.Interface.GitHubService;
+import ru.startandroid.retrofit.Model.Datum;
 import ru.startandroid.retrofit.Model.Member;
+import ru.startandroid.retrofit.Model.collatedestination.Packet;
 import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.RoutesRVAdapter;
@@ -55,6 +59,9 @@ public class NavigationActivity extends AppCompatActivity
     TextView tvLastName;
     private ArrayList<Routes> routesList = new ArrayList<>();
 
+
+    private Realm realm;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +75,36 @@ public class NavigationActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
 
-        getMembershipInfo();
+
+        navProgressBar = (ProgressBar) findViewById(R.id.activity_navigation_progressbar);
+
+        tvFirstName = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_fname);
+        tvLastName = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_lname);
+
+
+        // Create the Realm instance
+        realm = Realm.getDefaultInstance();
+        // Build the query looking at all users:
+        RealmQuery<Datum> queryData = realm.where(Datum.class);
+
+        Datum memberData = new Datum();
+
+        //if we don't have data of user
+        if(queryData.findAll().size() == 0){
+            Log.d("Main", "fetching membership info");
+            getMembershipInfo();
+        }else{
+
+            Log.d("Main", "no fetching " + "size = " + queryData.findAll().size());
+
+            memberData = queryData.findFirst();
+            tvFirstName.setText(memberData.getRoleName());//.getFirstName());
+            tvLastName.setText(memberData.getLastName());
+
+           /* for (int i = 0; i < queryData.findAll().size(); i++) {
+                memberData = queryData.findAll().get(i)
+            }*/
+        }
 
 
         int position;
@@ -87,11 +123,6 @@ public class NavigationActivity extends AppCompatActivity
         }
 
 
-        tvFirstName = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_fname);
-        tvLastName = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_lname);
-
-
-        navProgressBar = (ProgressBar) findViewById(R.id.activity_navigation_progressbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -197,6 +228,14 @@ public class NavigationActivity extends AppCompatActivity
                 String firstname = response.body().getData().get(0).getFirstName();
                 String lastname = response.body().getData().get(0).getLastName();
 
+
+
+
+                realm.beginTransaction();
+                realm.insert(response.body().getData());
+                realm.commitTransaction();
+
+
                 tvFirstName.setText(firstname);
                 tvLastName.setText(lastname);
 
@@ -293,6 +332,12 @@ public class NavigationActivity extends AppCompatActivity
                 fragment).commit();
     }
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!realm.isClosed()) realm.close();
+    }
 
     public void replaceFragments(Class fragmentClass) {
         Fragment fragment = null;

@@ -50,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
         activityMainBinding = DataBindingUtil.setContentView(this,
                 R.layout.activity_main);
 
-        Stetho.initializeWithDefaults(this);
 
         BackgroundThread backgroundThread = new BackgroundThread();
         backgroundThread.start();

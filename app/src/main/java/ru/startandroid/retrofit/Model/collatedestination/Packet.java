@@ -3,10 +3,11 @@ package ru.startandroid.retrofit.Model.collatedestination;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import io.realm.RealmObject;
 import ru.startandroid.retrofit.Model.FromDep;
 import ru.startandroid.retrofit.Model.ToDep;
 
-public class Packet {
+public class Packet extends RealmObject{
 
     @SerializedName("id")
     @Expose

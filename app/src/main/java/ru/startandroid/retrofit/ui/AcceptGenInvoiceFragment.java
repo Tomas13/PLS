@@ -18,6 +18,7 @@ import com.facebook.stetho.Stetho;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -34,6 +35,7 @@ import ru.startandroid.retrofit.Model.collatedestination.Packet;
 import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
 
 import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
+
 import ru.startandroid.retrofit.R;
 
 /**
@@ -71,7 +73,6 @@ public class AcceptGenInvoiceFragment extends Fragment {
 
         Long id;
 
-        Stetho.initializeWithDefaults(getContext());
 
         ids = new ArrayList<Long>();
 
@@ -184,7 +185,8 @@ public class AcceptGenInvoiceFragment extends Fragment {
     }
 
 
-
+    ArrayList<Label> collateLabelList;
+    List<Packet> collatePacketList;
 
     private void retrofitPostCollate() {
         Retrofit retrofitDestList = new Retrofit.Builder()
@@ -207,15 +209,36 @@ public class AcceptGenInvoiceFragment extends Fragment {
                 Log.d("MainAccept", response.body().getPackets().size() + " ");
 
 
-                ArrayList<Label> collateLabelList = new ArrayList<>();
+                collateLabelList = new ArrayList<>();
 
                 collateLabelList.addAll(response.body().getLabels());
 
 
-                List<Packet> collatePacketList = new ArrayList<>();
+                collatePacketList = new ArrayList<>();
 
                 collatePacketList.addAll(response.body().getPackets());
 
+
+                ArrayList<CollateResponse> collateResponsesArrayList = new ArrayList<CollateResponse>();
+//                collateResponsesArrayList.addAll(response)
+
+                // Create the Realm instance
+                realm = Realm.getDefaultInstance();
+
+                realm.beginTransaction();
+
+                realm.insert(collateLabelList);
+                realm.insert(collatePacketList);
+//                realm.executeTransaction(new Realm.Transaction() {
+//                    @Override
+//                    public void execute(Realm realm) {
+//                        realm.insert(collateLabelList);
+//                        realm.insert(collatePacketList);
+//                    }
+//                });
+
+
+                realm.commitTransaction();
 
 
             }
@@ -227,4 +250,14 @@ public class AcceptGenInvoiceFragment extends Fragment {
             }
         });
     }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        realm.close();
+    }
+
+    private Realm realm;
+
 }

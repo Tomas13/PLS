@@ -5,7 +5,9 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class ToDep {
+import io.realm.RealmObject;
+
+public class ToDep extends RealmObject {
 
     @SerializedName("name")
     @Expose
