@@ -200,6 +200,12 @@ public class AcceptGenInvoiceFragment extends Fragment {
 
                 Log.d("MainAccept", "got response");
 
+                Log.d("MainAccept", response.body().getStatus());
+                Log.d("MainAccept", response.body().getLabels().size() + " ");
+                Log.d("MainAccept", response.body().getPackets().size() + " ");
+
+
+
 //                Log.d("MainAccept", response.body().getStatus());
             }
 
