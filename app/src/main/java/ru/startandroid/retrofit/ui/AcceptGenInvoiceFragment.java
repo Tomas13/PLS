@@ -29,6 +29,8 @@ import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.IdsCollate;
 import ru.startandroid.retrofit.Model.acceptgen.Oinvoice;
 import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
+import ru.startandroid.retrofit.Model.collatedestination.Label;
+import ru.startandroid.retrofit.Model.collatedestination.Packet;
 import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
 
 import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
@@ -205,8 +207,17 @@ public class AcceptGenInvoiceFragment extends Fragment {
                 Log.d("MainAccept", response.body().getPackets().size() + " ");
 
 
+                ArrayList<Label> collateLabelList = new ArrayList<>();
 
-//                Log.d("MainAccept", response.body().getStatus());
+                collateLabelList.addAll(response.body().getLabels());
+
+
+                List<Packet> collatePacketList = new ArrayList<>();
+
+                collatePacketList.addAll(response.body().getPackets());
+
+
+
             }
 
             @Override

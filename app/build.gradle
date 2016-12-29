@@ -64,13 +64,10 @@ dependencies {
 
     compile 'org.jboss.aerogear:aerogear-android-authz:3.0.0'
     compile 'org.jboss.aerogear:aerogear-android-pipe:3.1.0'
-
     compile 'com.android.support:appcompat-v7:25.1.0'
     compile 'com.android.support:support-v4:25.1.0'
     compile 'com.android.support:recyclerview-v7:25.1.0'
     compile 'com.android.support:design:25.1.0'
-
-
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
     compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
