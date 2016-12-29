@@ -56,7 +56,7 @@ public class NavigationActivity extends AppCompatActivity
 
     ProgressBar navProgressBar;
     TextView tvFirstName;
-    TextView tvLastName;
+    TextView tvLastName, tvRoleName;
     private ArrayList<Routes> routesList = new ArrayList<>();
 
 
@@ -75,11 +75,11 @@ public class NavigationActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
 
-
         navProgressBar = (ProgressBar) findViewById(R.id.activity_navigation_progressbar);
 
         tvFirstName = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_fname);
         tvLastName = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_lname);
+        tvRoleName = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_role_name);
 
 
         // Create the Realm instance
@@ -90,17 +90,17 @@ public class NavigationActivity extends AppCompatActivity
         Datum memberData = new Datum();
 
         //if we don't have data of user
-        if(queryData.findAll().size() == 0){
+        if (queryData.findAll().size() == 0) {
             Log.d("Main", "fetching membership info");
             getMembershipInfo();
-        }else{
+        } else {
 
             Log.d("Main", "no fetching " + "size = " + queryData.findAll().size());
 
             memberData = queryData.findFirst();
-            tvFirstName.setText(memberData.getRoleName());//.getFirstName());
+            tvFirstName.setText(memberData.getFirstName());
             tvLastName.setText(memberData.getLastName());
-
+            tvRoleName.setText(memberData.getRoleName());
            /* for (int i = 0; i < queryData.findAll().size(); i++) {
                 memberData = queryData.findAll().get(i)
             }*/
@@ -121,7 +121,6 @@ public class NavigationActivity extends AppCompatActivity
             startFragment(new LastActionsFragment());
 
         }
-
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -227,8 +226,6 @@ public class NavigationActivity extends AppCompatActivity
                 String username = response.body().getData().get(0).getUserName();
                 String firstname = response.body().getData().get(0).getFirstName();
                 String lastname = response.body().getData().get(0).getLastName();
-
-
 
 
                 realm.beginTransaction();

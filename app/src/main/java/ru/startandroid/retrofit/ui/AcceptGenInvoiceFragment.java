@@ -51,6 +51,7 @@ public class AcceptGenInvoiceFragment extends Fragment {
     private Button btnCollate;
 
     List<Long> ids;
+    private Realm realm;
 
 
     private ArrayAdapter<String> listAdapter;
@@ -68,7 +69,7 @@ public class AcceptGenInvoiceFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_accept_gen_invoice, container, false);
 
         listViewAcceptGen = (ListView) view.findViewById(R.id.list_view_accept_gen);
-        tvAcceptGen = (TextView) view.findViewById(R.id.tv_accept_gen);
+        tvAcceptGen = (TextView) view.findViewById(R.id.tv_no_data_accept_gen);
         btnCollate = (Button) view.findViewById(R.id.btn_collate);
 
         Long id;
@@ -202,33 +203,35 @@ public class AcceptGenInvoiceFragment extends Fragment {
             @Override
             public void onResponse(Call<CollateResponse> call, Response<CollateResponse> response) {
 
-                Log.d("MainAccept", "got response");
 
-                Log.d("MainAccept", response.body().getStatus());
-                Log.d("MainAccept", response.body().getLabels().size() + " ");
-                Log.d("MainAccept", response.body().getPackets().size() + " ");
+                if (response.isSuccessful() && response.body().getStatus().equals("success")) {
+                    Log.d("MainAccept", "got response");
 
-
-                collateLabelList = new ArrayList<>();
-
-                collateLabelList.addAll(response.body().getLabels());
+                    Log.d("MainAccept", response.body().getStatus());
+                    Log.d("MainAccept", response.body().getLabels().size() + " ");
+                    Log.d("MainAccept", response.body().getPackets().size() + " ");
 
 
-                collatePacketList = new ArrayList<>();
+                    collateLabelList = new ArrayList<>();
 
-                collatePacketList.addAll(response.body().getPackets());
+                    collateLabelList.addAll(response.body().getLabels());
 
 
-                ArrayList<CollateResponse> collateResponsesArrayList = new ArrayList<CollateResponse>();
+                    collatePacketList = new ArrayList<>();
+
+                    collatePacketList.addAll(response.body().getPackets());
+
+
+                    ArrayList<CollateResponse> collateResponsesArrayList = new ArrayList<CollateResponse>();
 //                collateResponsesArrayList.addAll(response)
 
-                // Create the Realm instance
-                realm = Realm.getDefaultInstance();
+                    // Create the Realm instance
+                    realm = Realm.getDefaultInstance();
 
-                realm.beginTransaction();
+                    realm.beginTransaction();
 
-                realm.insert(collateLabelList);
-                realm.insert(collatePacketList);
+                    realm.insert(collateLabelList);
+                    realm.insert(collatePacketList);
 //                realm.executeTransaction(new Realm.Transaction() {
 //                    @Override
 //                    public void execute(Realm realm) {
@@ -238,7 +241,12 @@ public class AcceptGenInvoiceFragment extends Fragment {
 //                });
 
 
-                realm.commitTransaction();
+                    realm.commitTransaction();
+
+                } else {
+
+                    tvAcceptGen.setVisibility(View.VISIBLE);
+                }
 
 
             }
@@ -255,9 +263,7 @@ public class AcceptGenInvoiceFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        realm.close();
     }
 
-    private Realm realm;
 
 }

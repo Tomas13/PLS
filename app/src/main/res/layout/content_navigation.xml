@@ -19,6 +19,7 @@
             android:id="@+id/activity_navigation_progressbar"
             android:layout_width="50dp"
             android:layout_height="50dp"
+            android:visibility="gone"
             android:layout_centerHorizontal="true"
             android:indeterminate="false" />
 
