@@ -100,6 +100,15 @@ public interface GitHubService {
             @Body IdsCollate idsCollate
             );
 
+
+
+
+    //    Получение списка s накладных, которые уже извлекли из О
+    @GET("/api/mobile/list-for-vpn")
+    Call<CollateResponse> getListForVpn(
+
+    );
+
 //    @GET("api/mobile/list-for-vpn")
 //    Call<> getListForVPN(
 //

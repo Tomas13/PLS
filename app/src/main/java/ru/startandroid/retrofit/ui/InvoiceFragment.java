@@ -124,6 +124,9 @@ public class InvoiceFragment extends Fragment {
                 }else if (response.body().getStatus().equals("list-empty")) {
                     tvNoDataInvoice.setVisibility(View.VISIBLE);
                     tableRowInvoice.setVisibility(View.GONE);
+                } else {
+                    tvNoDataInvoice.setVisibility(View.VISIBLE);
+                    tableRowInvoice.setVisibility(View.GONE);
                 }
             }
 

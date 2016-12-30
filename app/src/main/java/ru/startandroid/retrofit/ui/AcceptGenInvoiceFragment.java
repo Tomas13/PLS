@@ -30,6 +30,7 @@ import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.IdsCollate;
 import ru.startandroid.retrofit.Model.acceptgen.Oinvoice;
 import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
+import ru.startandroid.retrofit.Model.collatedestination.Dto;
 import ru.startandroid.retrofit.Model.collatedestination.Label;
 import ru.startandroid.retrofit.Model.collatedestination.Packet;
 import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
@@ -127,6 +128,10 @@ public class AcceptGenInvoiceFragment extends Fragment {
 
                     listViewAcceptGen.setAdapter(listAdapter);
 
+
+                    Log.d("acceptGen", generalInvoiceIdsList.get(0).toString());
+                    listViewAcceptGen.notify();
+
                 } else {
 
                     tvAcceptGen.setVisibility(View.VISIBLE);
@@ -186,8 +191,7 @@ public class AcceptGenInvoiceFragment extends Fragment {
     }
 
 
-    ArrayList<Label> collateLabelList;
-    List<Packet> collatePacketList;
+    Dto collateDtoObject;
 
     private void retrofitPostCollate() {
         Retrofit retrofitDestList = new Retrofit.Builder()
@@ -208,18 +212,13 @@ public class AcceptGenInvoiceFragment extends Fragment {
                     Log.d("MainAccept", "got response");
 
                     Log.d("MainAccept", response.body().getStatus());
-                    Log.d("MainAccept", response.body().getLabels().size() + " ");
-                    Log.d("MainAccept", response.body().getPackets().size() + " ");
+                    Log.d("MainAccept labels", response.body().getDto().getLabels().size() + " ");
+                    Log.d("MainAccept packets", response.body().getDto().getPackets().size() + " ");
 
 
-                    collateLabelList = new ArrayList<>();
+                    collateDtoObject = new Dto();
 
-                    collateLabelList.addAll(response.body().getLabels());
-
-
-                    collatePacketList = new ArrayList<>();
-
-                    collatePacketList.addAll(response.body().getPackets());
+                    collateDtoObject = response.body().getDto();
 
 
                     ArrayList<CollateResponse> collateResponsesArrayList = new ArrayList<CollateResponse>();
@@ -229,19 +228,73 @@ public class AcceptGenInvoiceFragment extends Fragment {
                     realm = Realm.getDefaultInstance();
 
                     realm.beginTransaction();
-
-                    realm.insert(collateLabelList);
-                    realm.insert(collatePacketList);
-//                realm.executeTransaction(new Realm.Transaction() {
-//                    @Override
-//                    public void execute(Realm realm) {
-//                        realm.insert(collateLabelList);
-//                        realm.insert(collatePacketList);
-//                    }
-//                });
-
-
+                    realm.insert(collateDtoObject);
                     realm.commitTransaction();
+                    Log.d("MainAccept", "got response");
+
+
+                } else {
+
+
+                    retrogitGetListForVpn();
+                    tvAcceptGen.setVisibility(View.VISIBLE);
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call<CollateResponse> call, Throwable t) {
+                Log.d("MainAccept", t.getMessage());
+
+            }
+        });
+    }
+
+
+    private void retrogitGetListForVpn() {
+        Retrofit retrofitDestList = new Retrofit.Builder()
+                .baseUrl("http://pls-test.kazpost.kz/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(getUserClient(Const.Token))
+                .build();
+
+
+        GitHubService gitHubServ = retrofitDestList.create(GitHubService.class);
+        gitHubServ.getListForVpn().enqueue(new Callback<CollateResponse>() {
+            @Override
+            public void onResponse(Call<CollateResponse> call, Response<CollateResponse> response) {
+
+
+                if (response.isSuccessful() && response.body().getStatus().equals("success")) {
+                    Log.d("MainAccept", "got response");
+
+                    Log.d("MainAccept", response.body().getStatus());
+                    Log.d("MainAccept labels", response.body().getDto().getLabels().size() + " ");
+                    Log.d("MainAccept packets", response.body().getDto().getPackets().size() + " ");
+
+
+
+                    ArrayList<Packet> packetsArrayList = new ArrayList<>();
+                    packetsArrayList.addAll(response.body().getDto().getPackets());
+
+                    ArrayList<Label> labelsArrayList = new ArrayList<>();
+                    labelsArrayList.addAll(response.body().getDto().getLabels());
+
+
+
+
+                    // Create the Realm instance
+                    realm = Realm.getDefaultInstance();
+
+                    realm.beginTransaction();
+                    realm.insert(labelsArrayList);
+                    realm.insert(packetsArrayList);
+                    realm.commitTransaction();
+                    Log.d("MainAccept", "got response");
+
+                    ((NavigationActivity) getActivity()).startFragment(new CollateFragment());
+
 
                 } else {
 
@@ -258,7 +311,6 @@ public class AcceptGenInvoiceFragment extends Fragment {
             }
         });
     }
-
 
     @Override
     public void onDestroy() {

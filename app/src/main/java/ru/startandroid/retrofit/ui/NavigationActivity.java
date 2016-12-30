@@ -56,7 +56,7 @@ public class NavigationActivity extends AppCompatActivity
 
     ProgressBar navProgressBar;
     TextView tvFirstName;
-    TextView tvLastName, tvRoleName;
+    TextView tvLastName, tvRoleName, tvRouteHeader;
     private ArrayList<Routes> routesList = new ArrayList<>();
 
 
@@ -80,6 +80,8 @@ public class NavigationActivity extends AppCompatActivity
         tvFirstName = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_fname);
         tvLastName = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_lname);
         tvRoleName = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_role_name);
+        tvRouteHeader = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_route_header);
+
 
 
         // Create the Realm instance
@@ -87,7 +89,7 @@ public class NavigationActivity extends AppCompatActivity
         // Build the query looking at all users:
         RealmQuery<Datum> queryData = realm.where(Datum.class);
 
-        Datum memberData = new Datum();
+        Datum memberData;
 
         //if we don't have data of user
         if (queryData.findAll().size() == 0) {
@@ -100,7 +102,7 @@ public class NavigationActivity extends AppCompatActivity
             memberData = queryData.findFirst();
             tvFirstName.setText(memberData.getFirstName());
             tvLastName.setText(memberData.getLastName());
-            tvRoleName.setText(memberData.getRoleName());
+//            tvRoleName.setText(memberData.getRoleName());
            /* for (int i = 0; i < queryData.findAll().size(); i++) {
                 memberData = queryData.findAll().get(i)
             }*/
@@ -113,6 +115,13 @@ public class NavigationActivity extends AppCompatActivity
         //TODO gotta remove shared pref value when needed (onLogout)
         SharedPreferences pref = getApplicationContext().getSharedPreferences("FLIGHT_PREF", 0); // 0 - for private mode
 
+
+
+        SharedPreferences pref1 = getApplicationContext().getSharedPreferences("NAV_PREF", 0); // 0 - for private mode
+        if (pref1.contains("FLIGHT_NAME")){
+            tvRouteHeader.setText(pref1.getString("FLIGHT_NAME", "Путь"));
+
+        }
 
         if (!pref.contains("FLIGHT_POS")) {
             getRoutesInfo();
@@ -151,10 +160,23 @@ public class NavigationActivity extends AppCompatActivity
             @Override
             public void onResponse(Call<Routes> call, Response<Routes> response) {
 
-                Log.d("MainNav", "got to response" + response.body().getFlights().size());
+                Log.d("MainNav", "got to response RoutesInfo" + response.body().getFlights().size());
 
 
                 routesList.add(response.body());
+
+
+                Log.d("MainNav", "Routes get name" + response.body().getFlights().get(0).getName());
+
+
+                //Save Flight Id to shared preferences
+                SharedPreferences pref1 = getApplicationContext().getSharedPreferences("NAV_PREF", 0); // 0 - for private mode
+                SharedPreferences.Editor editor1 = pref1.edit();
+                editor1.putString("FLIGHT_NAME", response.body().getFlights().get(0).getName());
+                editor1.apply();
+
+
+                tvRouteHeader.setText(response.body().getFlights().get(0).getName());
 
                 //if one route then go to history fragment
                 if (response.body().getFlights().size() == 1) {
@@ -178,6 +200,8 @@ public class NavigationActivity extends AppCompatActivity
 
                     Bundle bundle = new Bundle();
                     bundle.putStringArrayList("flightsList", flights);
+
+
 
                     FlightFragment dialogFragment = new FlightFragment();
 
