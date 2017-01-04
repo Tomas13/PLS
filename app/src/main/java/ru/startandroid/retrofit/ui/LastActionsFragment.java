@@ -97,7 +97,8 @@ public class LastActionsFragment extends Fragment {
                     rvHistory.setAdapter(historyAdapter);
 
 
-                } else if (response.body().getStatus().equals("list-empty")) {
+//                } else if (response.body().getStatus().equals("list-empty")) {
+                } else {
                     tvNoDataHistory.setVisibility(View.VISIBLE);
                 }
             }

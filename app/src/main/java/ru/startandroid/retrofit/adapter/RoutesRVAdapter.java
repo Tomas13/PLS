@@ -38,11 +38,12 @@ public class RoutesRVAdapter extends RecyclerView.Adapter<RoutesRVAdapter.Routes
 
     public static class RoutesHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        TextView tvIndex, tvName, tvDeparture, tvArrival;
+        TextView tvNumber, tvIndex, tvName, tvDeparture, tvArrival;
 
         public RoutesHolder(View view) {
             super(view);
 
+            tvNumber = (TextView) view.findViewById(R.id.tv_number_routes);
             tvIndex = (TextView) view.findViewById(R.id.tv_index);
             tvName = (TextView) view.findViewById(R.id.tv_name);
             tvDeparture = (TextView) view.findViewById(R.id.tv_departure_time);
@@ -88,7 +89,7 @@ public class RoutesRVAdapter extends RecyclerView.Adapter<RoutesRVAdapter.Routes
     public void onBindViewHolder(RoutesHolder holder, int position) {
         Entry flight = mRoutes.get(position);
 
-//        Log.d("Main", "onBIND " + route..getStatus() + " ");
+        holder.tvNumber.setText(String.valueOf(position + 1));
         holder.tvIndex.setText(flight.getDept().getName()) ;// getIndex(position) + "");
         holder.tvArrival.setText(flight.getArrival());
         holder.tvDeparture.setText(flight.getDeparture());
