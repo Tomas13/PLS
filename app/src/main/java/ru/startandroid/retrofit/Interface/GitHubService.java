@@ -2,6 +2,7 @@ package ru.startandroid.retrofit.Interface;
 
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
@@ -12,6 +13,7 @@ import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import ru.startandroid.retrofit.Model.BodyForCreateInvoice;
 import ru.startandroid.retrofit.Model.Contributor;
 import ru.startandroid.retrofit.Model.Edges;
 import ru.startandroid.retrofit.Model.IdsCollate;
@@ -35,17 +37,6 @@ public interface GitHubService {
 
     Retrofit retrofit = new Retrofit.Builder()
             .baseUrl("https://api.github.com/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build();
-
-
-    @GET("/api/edges/")
-    Call<List<Edges>> getEdges(
-
-    );
-
-    Retrofit retrofitEdges = new Retrofit.Builder()
-            .baseUrl("http://astrabus.otgroup.kz/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 
@@ -103,14 +94,16 @@ public interface GitHubService {
 
 
 
+    @POST("/api/mobile/create-general-invoice")
+    @Headers("Content-Type: text/plain")
+    Call<ResponseBody> createGeneralInvoice(
+            @Body BodyForCreateInvoice bodyForCreateInvoice
+    );
+
     //    Получение списка s накладных, которые уже извлекли из О
     @GET("/api/mobile/list-for-vpn")
     Call<CollateResponse> getListForVpn(
 
     );
 
-//    @GET("api/mobile/list-for-vpn")
-//    Call<> getListForVPN(
-//
-//    );
 }
