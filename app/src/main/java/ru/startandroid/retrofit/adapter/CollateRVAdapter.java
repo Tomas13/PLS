@@ -41,7 +41,6 @@ public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public CollateRVAdapter(Activity activity, List<Object> items, CollateRVAdapter.OnItemClickListener listener) {
         this.context = activity.getBaseContext();
         this.activity = activity;
-        this.mGestureDetector = mGestureDetector;
         this.listener = listener;
         this.items = items;
 
@@ -93,7 +92,7 @@ public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             viewHolder1.tvFromDeptName1.setText(label.getFromDep().getName());
             viewHolder1.tvFromDeptNameRu1.setText(label.getFromDep().getNameRu());
             viewHolder1.tvToDeptName1.setText(label.getToDep().getName());
-            viewHolder1.tvToDeptName1.setText(label.getToDep().getNameRu());
+            viewHolder1.tvToDeptNameRu1.setText(label.getToDep().getNameRu());
 
         } else if (viewType == PACKET) {
 
@@ -104,7 +103,7 @@ public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             viewHolder1.tvFromDeptName1.setText(packet.getFromDep().getName());
             viewHolder1.tvFromDeptNameRu1.setText(packet.getFromDep().getNameRu());
             viewHolder1.tvToDeptName1.setText(packet.getToDep().getName());
-            viewHolder1.tvToDeptName1.setText(packet.getToDep().getNameRu());
+            viewHolder1.tvToDeptNameRu1.setText(packet.getToDep().getNameRu());
 
         }
 
