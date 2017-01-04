@@ -38,6 +38,7 @@ import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
 import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
 import ru.startandroid.retrofit.R;
+import ru.startandroid.retrofit.adapter.CollateRVAdapter;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -236,7 +237,7 @@ public class AcceptGenInvoiceFragment extends Fragment {
                 } else {
 
 
-                    retrogitGetListForVpn();
+                    retrofitGetListForVpn();
                     tvAcceptGen.setVisibility(View.VISIBLE);
                 }
 
@@ -252,7 +253,7 @@ public class AcceptGenInvoiceFragment extends Fragment {
     }
 
 
-    private void retrogitGetListForVpn() {
+    private void retrofitGetListForVpn() {
         Retrofit retrofitDestList = new Retrofit.Builder()
                 .baseUrl("http://pls-test.kazpost.kz/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -282,6 +283,11 @@ public class AcceptGenInvoiceFragment extends Fragment {
                     labelsArrayList.addAll(response.body().getDto().getLabels());
 
 
+                    ArrayList<Object> objects = new ArrayList<Object>();
+                    objects.addAll(packetsArrayList);
+                    objects.addAll(labelsArrayList);
+
+                    CollateRVAdapter collateRVAdapter = new CollateRVAdapter(objects);
 
 
                     // Create the Realm instance

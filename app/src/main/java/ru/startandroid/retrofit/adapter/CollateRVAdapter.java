@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import ru.startandroid.retrofit.Model.collatedestination.Dto;
 import ru.startandroid.retrofit.Model.collatedestination.Label;
@@ -17,84 +18,110 @@ import ru.startandroid.retrofit.R;
  * Created by root on 12/29/16.
  */
 
-public class CollateRVAdapter extends RecyclerView.Adapter<CollateRVAdapter.BGHolder>{
+public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-//    private ArrayList<Dto> labelArrayList = new ArrayList<>();
+    // The items to display in your RecyclerView
+    private List<Object> items;
+
+    private final int LABEL = 0, PACKET = 1;
 
     private Dto dtoObject;
 
-    public CollateRVAdapter(Dto dto) {
-        this.dtoObject = dto;
+    public CollateRVAdapter(ArrayList<Object> objects) {
+
+        items = objects;
+
     }
 
-    public static class BGHolder extends RecyclerView.ViewHolder{
 
-        private TextView tvListId, tvFromDeptName, tvFromDeptNameRu, tvToDeptName, tvToDeptNameRu;
-
-        public BGHolder(View itemView) {
-            super(itemView);
-
-            tvListId = (TextView) itemView.findViewById(R.id.tv_list_id);
-            tvFromDeptName = (TextView) itemView.findViewById(R.id.tv_from_dept_name);
-            tvFromDeptNameRu = (TextView) itemView.findViewById(R.id.tv_from_dept_name_ru);
-            tvToDeptName = (TextView) itemView.findViewById(R.id.tv_to_dept_name);
-            tvToDeptNameRu = (TextView) itemView.findViewById(R.id.tv_to_dept_name_ru);
-
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        if (viewType == LABEL) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_rv_history, parent, false);
+            return new ViewHolder1(view);
+        } else {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_rv_history, parent, false);
+            return new ViewHolder1(view);
         }
     }
 
+    public class ViewHolder1 extends RecyclerView.ViewHolder {
+
+        private TextView tvListId1, tvFromDeptName1, tvFromDeptNameRu1, tvToDeptName1, tvToDeptNameRu1;
+
+
+        public ViewHolder1(View v) {
+            super(v);
+            tvListId1 = (TextView) itemView.findViewById(R.id.tv_list_id);
+            tvFromDeptName1 = (TextView) itemView.findViewById(R.id.tv_from_dept_name);
+            tvFromDeptNameRu1 = (TextView) itemView.findViewById(R.id.tv_from_dept_name_ru);
+            tvToDeptName1 = (TextView) itemView.findViewById(R.id.tv_to_dept_name);
+            tvToDeptNameRu1 = (TextView) itemView.findViewById(R.id.tv_to_dept_name_ru);
+        }
+    }
+
+    public class ViewHolder2 extends RecyclerView.ViewHolder {
+
+        private TextView tvListId2, tvFromDeptName2, tvFromDeptNameRu2, tvToDeptName2, tvToDeptNameRu2;
+
+
+        public ViewHolder2(View v) {
+            super(v);
+            tvListId2 = (TextView) itemView.findViewById(R.id.tv_list_id);
+            tvFromDeptName2 = (TextView) itemView.findViewById(R.id.tv_from_dept_name);
+            tvFromDeptNameRu2 = (TextView) itemView.findViewById(R.id.tv_from_dept_name_ru);
+            tvToDeptName2 = (TextView) itemView.findViewById(R.id.tv_to_dept_name);
+            tvToDeptNameRu2 = (TextView) itemView.findViewById(R.id.tv_to_dept_name_ru);
+        }
+
+    }
 
 
     @Override
-    public BGHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View inflatedView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_rv_history, parent, false);
-        return new BGHolder(inflatedView);
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+
+        int viewType = holder.getItemViewType();
+
+        if (viewType == LABEL){
+            ViewHolder1 viewHolder1 = (ViewHolder1) holder;
+
+            Label label = (Label) items.get(position);
+            viewHolder1.tvListId1.setText(label.getLabelListid());
+            viewHolder1.tvFromDeptName1.setText(label.getFromDep().getName());
+            viewHolder1.tvFromDeptNameRu1.setText(label.getFromDep().getNameRu());
+            viewHolder1.tvToDeptName1.setText(label.getToDep().getName());
+            viewHolder1.tvToDeptName1.setText(label.getToDep().getNameRu());
+
+        } else if (viewType == PACKET){
+
+            ViewHolder1 viewHolder1 = (ViewHolder1) holder;
+
+            Packet packet = (Packet) items.get(position);
+            viewHolder1.tvListId1.setText(packet.getPacketListId());
+            viewHolder1.tvFromDeptName1.setText(packet.getFromDep().getName());
+            viewHolder1.tvFromDeptNameRu1.setText(packet.getFromDep().getNameRu());
+            viewHolder1.tvToDeptName1.setText(packet.getToDep().getName());
+            viewHolder1.tvToDeptName1.setText(packet.getToDep().getNameRu());
+
+        }
+
     }
 
-    @Override
-    public void onBindViewHolder(BGHolder holder, int position) {
-
-        holder.tvListId.setText(dtoObject.getLabels().get(position).getLabelListid());
-        holder.tvFromDeptName.setText(dtoObject.getLabels().get(position).getFromDep().getName());
-        holder.tvFromDeptNameRu.setText(dtoObject.getLabels().get(position).getFromDep().getNameRu());
-        holder.tvToDeptName.setText(dtoObject.getLabels().get(position).getToDep().getName());
-        holder.tvToDeptNameRu.setText(dtoObject.getLabels().get(position).getToDep().getNameRu());
-
-
-        holder.tvListId.setText(dtoObject.getPackets().get(position).getPacketListId());
-        holder.tvFromDeptName.setText(dtoObject.getPackets().get(position).getFromDep().getName());
-        holder.tvFromDeptNameRu.setText(dtoObject.getPackets().get(position).getFromDep().getNameRu());
-        holder.tvToDeptName.setText(dtoObject.getPackets().get(position).getToDep().getName());
-        holder.tvToDeptNameRu.setText(dtoObject.getPackets().get(position).getToDep().getNameRu());
-
-
-//
-//        for (int i = position; i < dtoObject.getPackets().size(); i++) {
-//
-//            holder.tvListId.setText(dtoObject.getPackets().get(i).getPacketListId());
-//            holder.tvFromDeptName.setText(dtoObject.getPackets().get(i).getFromDep().getName());
-//            holder.tvFromDeptNameRu.setText(dtoObject.getPackets().get(i).getFromDep().getNameRu());
-//            holder.tvToDeptName.setText(dtoObject.getPackets().get(i).getToDep().getName());
-//            holder.tvToDeptNameRu.setText(dtoObject.getPackets().get(i).getToDep().getNameRu());
-//
-//        }
-
-
-//        for (int j = position; j < dtoObject.getLabels().size(); j++) {
-//
-//            holder.tvListId.setText(dtoObject.getPackets().get(j).getPacketListId());
-//            holder.tvFromDeptName.setText(dtoObject.getPackets().get(j).getFromDep().getName());
-//            holder.tvFromDeptNameRu.setText(dtoObject.getPackets().get(j).getFromDep().getNameRu());
-//            holder.tvToDeptName.setText(dtoObject.getPackets().get(j).getToDep().getName());
-//            holder.tvToDeptNameRu.setText(dtoObject.getPackets().get(j).getToDep().getNameRu());
-//
-//        }
-    }
 
     @Override
     public int getItemCount() {
-        return dtoObject.getLabels().size() + dtoObject.getPackets().size();
+        return items.size();
     }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (items.get(position) instanceof Label) {
+            return LABEL;
+        } else if (items.get(position) instanceof String) {
+            return PACKET;
+        }
+        return -1;
+    }
+
 
 }

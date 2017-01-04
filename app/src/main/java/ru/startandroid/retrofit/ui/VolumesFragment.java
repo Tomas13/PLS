@@ -6,6 +6,9 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,21 +16,39 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
+import io.realm.Realm;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import ru.startandroid.retrofit.Const;
+import ru.startandroid.retrofit.Interface.GitHubService;
+import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
+import ru.startandroid.retrofit.Model.collatedestination.Label;
+import ru.startandroid.retrofit.Model.collatedestination.Packet;
 import ru.startandroid.retrofit.R;
+import ru.startandroid.retrofit.adapter.CollateRVAdapter;
+
+import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class VolumesFragment extends Fragment implements View.OnClickListener {
+public class VolumesFragment extends Fragment {
 
 
     Button btnSendInvoice;
-    TextView tvHeaderHint, ftv_ll_first, stv_ll_first, ttv_ll_first,
+    TextView tvHeaderHint, tvNoDataVolumes, ftv_ll_first, stv_ll_first, ttv_ll_first,
             ftv_ll_second, stv_ll_second, ttv_ll_second,
             ftv_ll_third, stv_ll_third, ttv_ll_third;
 
     LinearLayout firstLL, secondLL, thirdLL;
+
+    RecyclerView recyclerViewVolumes;
 
     public VolumesFragment() {
         // Required empty public constructor
@@ -45,67 +66,83 @@ public class VolumesFragment extends Fragment implements View.OnClickListener {
                 .setTitle("Ёмкости");
 
 
+        tvNoDataVolumes = (TextView) rootView.findViewById(R.id.tv_no_data_volumes);
+        recyclerViewVolumes = (RecyclerView) rootView.findViewById(R.id.rv_fragment_volumes);
         btnSendInvoice = (Button) rootView.findViewById(R.id.btn_send_invoice);
         tvHeaderHint = (TextView) rootView.findViewById(R.id.tv_header_hint);
 
-        firstLL = (LinearLayout) rootView.findViewById(R.id.ll_first);
-        secondLL = (LinearLayout) rootView.findViewById(R.id.ll_second);
-        thirdLL = (LinearLayout) rootView.findViewById(R.id.ll_third);
-
-        ftv_ll_first = (TextView) rootView.findViewById(R.id.ftv_ll_first);
-        stv_ll_first = (TextView) rootView.findViewById(R.id.stv_ll_first);
-        ttv_ll_first = (TextView) rootView.findViewById(R.id.ttv_ll_first);
-
-        ftv_ll_second = (TextView) rootView.findViewById(R.id.ftv_ll_second);
-        stv_ll_second = (TextView) rootView.findViewById(R.id.stv_ll_second);
-        ttv_ll_second = (TextView) rootView.findViewById(R.id.ttv_ll_second);
-
-
-        ftv_ll_third = (TextView) rootView.findViewById(R.id.ftv_ll_third);
-        stv_ll_third = (TextView) rootView.findViewById(R.id.stv_ll_third);
-        ttv_ll_third = (TextView) rootView.findViewById(R.id.ttv_ll_third);
-
-        firstLL.setOnClickListener(this);
-        secondLL.setOnClickListener(this);
-        thirdLL.setOnClickListener(this);
-
+        retrofitGetListForVpn();
 
         return rootView;
     }
 
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.ll_first:
-                tvHeaderHint.setVisibility(View.GONE);
-                btnSendInvoice.setVisibility(View.VISIBLE);
 
-                ftv_ll_first.setTextColor(Color.GREEN);
-                stv_ll_first.setTextColor(Color.GREEN);
-                ttv_ll_first.setTextColor(Color.GREEN);
+    private void retrofitGetListForVpn() {
+        Retrofit retrofitDestList = new Retrofit.Builder()
+                .baseUrl("http://pls-test.kazpost.kz/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(getUserClient(Const.Token))
+                .build();
 
-                break;
 
-            case R.id.ll_second:
-                tvHeaderHint.setVisibility(View.GONE);
-                btnSendInvoice.setVisibility(View.VISIBLE);
+        GitHubService gitHubServ = retrofitDestList.create(GitHubService.class);
+        gitHubServ.getListForVpn().enqueue(new Callback<CollateResponse>() {
+            @Override
+            public void onResponse(Call<CollateResponse> call, Response<CollateResponse> response) {
 
-                ftv_ll_second.setTextColor(Color.GREEN);
-                stv_ll_second.setTextColor(Color.GREEN);
-                ttv_ll_second.setTextColor(Color.GREEN);
 
-                break;
+                if (response.isSuccessful() && response.body().getStatus().equals("success")) {
+                    Log.d("MainVolumes", "got response");
 
-            case R.id.ll_third:
-                tvHeaderHint.setVisibility(View.GONE);
-                btnSendInvoice.setVisibility(View.VISIBLE);
+                    Log.d("MainVolumes", response.body().getStatus());
+                    Log.d("MainVolumes labels", response.body().getDto().getLabels().size() + " ");
+                    Log.d("MainVolumes packets", response.body().getDto().getPackets().size() + " ");
 
-                ftv_ll_third.setTextColor(Color.GREEN);
-                stv_ll_third.setTextColor(Color.GREEN);
-                ttv_ll_third.setTextColor(Color.GREEN);
+                    Log.d("MainVolumes la", response.body().getDto().getLabels().get(0).getLabelListid());
 
-                break;
+                    ArrayList<Packet> packetsArrayList = new ArrayList<>();
+                    packetsArrayList.addAll(response.body().getDto().getPackets());
 
-        }
+                    ArrayList<Label> labelsArrayList = new ArrayList<>();
+                    labelsArrayList.addAll(response.body().getDto().getLabels());
+
+
+                    ArrayList<Object> objects = new ArrayList<Object>();
+                    objects.addAll(packetsArrayList);
+                    objects.addAll(labelsArrayList);
+
+                    CollateRVAdapter collateRVAdapter = new CollateRVAdapter(objects);
+
+                    RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+                    recyclerViewVolumes.setLayoutManager(mLayoutManager);
+                    recyclerViewVolumes.setAdapter(collateRVAdapter);
+
+
+                    // Create the Realm instance
+//                    realm = Realm.getDefaultInstance();
+//                    realm.beginTransaction();
+//                    realm.insert(labelsArrayList);
+//                    realm.insert(packetsArrayList);
+//                    realm.commitTransaction();
+                    Log.d("MainAccept", "got response");
+
+//                    ((NavigationActivity) getActivity()).startFragment(new CollateFragment());
+
+
+                } else {
+
+                    tvNoDataVolumes.setVisibility(View.VISIBLE);
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call<CollateResponse> call, Throwable t) {
+                Log.d("MainAccept", t.getMessage());
+
+            }
+        });
     }
+
 }

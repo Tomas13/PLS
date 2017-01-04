@@ -12,9 +12,9 @@
 
         <TextView
             android:id="@+id/tv_header_hint"
-            android:layout_gravity="center_horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:layout_marginBottom="8dp"
             android:text="Для создания Общей накладной просканируйте штрихкод емкости или выберите емкость из списка"
             android:textAlignment="center" />
@@ -22,9 +22,9 @@
         <Button
             android:id="@+id/btn_send_invoice"
             android:layout_width="wrap_content"
-            android:layout_gravity="center_horizontal"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
             android:text="Сформировать общую накладную"
             android:textColorHighlight="@color/colorAccent"
             android:visibility="gone" />
@@ -71,110 +71,24 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/ll_first"
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_fragment_volumes"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:orientation="horizontal"
-            android:weightSum="3">
-
-
-            <!-- TODO: Update blank fragment layout -->
-            <TextView
-                android:id="@+id/ftv_ll_first"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/number" />
-
-            <TextView
-                android:id="@+id/stv_ll_first"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/from" />
-
-            <TextView
-                android:id="@+id/ttv_ll_first"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/where" />
-
-
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:id="@+id/ll_second"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:orientation="horizontal"
-            android:weightSum="3">
-
-
-            <!-- TODO: Update blank fragment layout -->
-            <TextView
-                android:id="@+id/ftv_ll_second"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/number" />
-
-            <TextView
-                android:id="@+id/stv_ll_second"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/from" />
-
-            <TextView
-                android:id="@+id/ttv_ll_second"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/where" />
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/ll_third"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:orientation="horizontal"
-            android:weightSum="3">
-
-
-            <!-- TODO: Update blank fragment layout -->
-            <TextView
-                android:id="@+id/ftv_ll_third"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/number" />
-
-            <TextView
-                android:id="@+id/stv_ll_third"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/from" />
-
-            <TextView
-                android:id="@+id/ttv_ll_third"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/where" />
-
-
-        </LinearLayout>
+            android:layout_height="match_parent"
+            android:layout_below="@id/ll" />
 
 
     </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/tv_no_data_volumes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="@string/no_data"
+        android:textSize="22sp"
+        android:visibility="gone" />
 
 </RelativeLayout>
