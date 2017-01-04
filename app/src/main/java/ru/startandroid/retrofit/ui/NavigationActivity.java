@@ -117,9 +117,8 @@ public class NavigationActivity extends AppCompatActivity
 
         }
 
-        getRoutesInfo();
 
-        if (pref.contains("FLIGHT_POS")) {
+        if (!pref.contains("FLIGHT_POS")) {
             getRoutesInfo();
 
         } else {
