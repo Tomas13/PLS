@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import io.realm.Realm;
 import retrofit2.Call;
@@ -41,6 +42,11 @@ import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
  */
 public class VolumesFragment extends Fragment {
 
+
+    List<Long> packetsList = new ArrayList<>();
+    List<Long> labelsList = new ArrayList<>();
+
+    List<Object> finalObjects;
 
     Button btnSendInvoice;
     TextView tvHeaderHint, tvNoDataVolumes, ftv_ll_first, stv_ll_first, ttv_ll_first,
@@ -115,10 +121,44 @@ public class VolumesFragment extends Fragment {
                     final CollateRVAdapter collateRVAdapter = new CollateRVAdapter(getActivity(), objects, new CollateRVAdapter.OnItemCheckedListener() {
                         @Override
                         public void onCheckedChanged(View childView, boolean isChecked, int childPosition) {
-                            Toast.makeText(getContext(), "YEY " + isChecked + " pos " +  childPosition, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), " pos " + childPosition, Toast.LENGTH_SHORT).show();
+
+                            if (isChecked) {
+                                if (objects.get(childPosition) instanceof Packet) {
+                                    packetsList.add(((Packet) objects.get(childPosition)).getId());
+
+                                } else if (objects.get(childPosition) instanceof Label){
+                                    labelsList.add(((Label) objects.get(childPosition)).getId());
+                                }
+
+                                if (labelsList.isEmpty() && packetsList.isEmpty()) {
+                                    btnSendInvoice.setVisibility(View.GONE);
+                                    tvHeaderHint.setVisibility(View.VISIBLE);
+                                } else {
+                                    btnSendInvoice.setVisibility(View.VISIBLE);
+                                    tvHeaderHint.setVisibility(View.GONE);
+                                }
+
+                            } else {
+
+                                if (objects.get(childPosition) instanceof Packet) {
+                                    packetsList.remove(((Packet) objects.get(childPosition)).getId());
+                                } else {
+                                    labelsList.remove(((Label) objects.get(childPosition)).getId());
+                                }
+
+                                if (labelsList.isEmpty() && packetsList.isEmpty()) {
+                                    btnSendInvoice.setVisibility(View.GONE);
+                                    tvHeaderHint.setVisibility(View.VISIBLE);
+                                } else {
+                                    btnSendInvoice.setVisibility(View.VISIBLE);
+                                    tvHeaderHint.setVisibility(View.GONE);
+                                }
 
 
 
+
+                            }
 
                         }
 
@@ -129,52 +169,6 @@ public class VolumesFragment extends Fragment {
                     recyclerViewVolumes.setAdapter(collateRVAdapter);
 
 
-
-                    /*recyclerViewVolumes.addOnItemTouchListener(new CollateRVAdapter(getActivity(), objects, new CollateRVAdapter.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(View childView, int childAdapterPosition) {
-
-
-                            if (objects.get(childAdapterPosition) instanceof Label) {
-
-                                if (((Label) objects.get(childAdapterPosition)).getClickStatus().equals("Click")) {
-
-                                    ((Label) objects.get(childAdapterPosition)).setClickStatus("UnClick");
-
-                                    Toast.makeText(getContext(), ((Label) objects.get(childAdapterPosition)).getClickStatus()
-                                            , Toast.LENGTH_SHORT).show();
-
-                                } else {
-
-                                    ((Label) objects.get(childAdapterPosition)).setClickStatus("Click");
-
-                                    Toast.makeText(getContext(), ((Label) objects.get(childAdapterPosition)).getClickStatus()
-                                            , Toast.LENGTH_SHORT).show();
-
-
-                                }
-
-                            } else if (objects.get(childAdapterPosition) instanceof Packet) {
-                                if (((Packet) objects.get(childAdapterPosition)).getClickStatus().equals("Click")) {
-
-                                    ((Packet) objects.get(childAdapterPosition)).setClickStatus("UnClick");
-
-                                    Toast.makeText(getContext(), ((Packet) objects.get(childAdapterPosition)).getClickStatus()
-                                            , Toast.LENGTH_SHORT).show();
-                                } else {
-                                    ((Packet) objects.get(childAdapterPosition)).setClickStatus("Click");
-
-                                    Toast.makeText(getContext(), ((Packet) objects.get(childAdapterPosition)).getClickStatus()
-                                            , Toast.LENGTH_SHORT).show();
-                                }
-                            }
-
-                            collateRVAdapter.notifyDataSetChanged();
-
-
-                        }
-                    }));
-*/
                     // Create the Realm instance
 //                    realm = Realm.getDefaultInstance();
 //                    realm.beginTransaction();
