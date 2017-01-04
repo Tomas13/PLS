@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -21,16 +22,20 @@ public class HistoryRVAdapter extends RecyclerView.Adapter<HistoryRVAdapter.Hist
 
     private List<History> historyList = new ArrayList<>();
 
-    public HistoryRVAdapter(List<History> histories){
+    public HistoryRVAdapter(List<History> histories) {
         this.historyList = histories;
     }
 
-    public static class HistoryHolder extends RecyclerView.ViewHolder{
+    public static class HistoryHolder extends RecyclerView.ViewHolder {
 
         private TextView tvListId, tvFromDeptName, tvFromDeptNameRu, tvToDeptName, tvToDeptNameRu;
 
+        private ImageView tvImage;
+
         public HistoryHolder(View itemView) {
             super(itemView);
+
+            tvImage = (ImageView) itemView.findViewById(R.id.image_item_rv);
 
             tvListId = (TextView) itemView.findViewById(R.id.tv_list_id);
             tvFromDeptName = (TextView) itemView.findViewById(R.id.tv_from_dept_name);
@@ -58,6 +63,18 @@ public class HistoryRVAdapter extends RecyclerView.Adapter<HistoryRVAdapter.Hist
         holder.tvFromDeptNameRu.setText(history.getFromDep().getNameRu());
         holder.tvToDeptName.setText(history.getToDep().getName());
         holder.tvToDeptNameRu.setText(history.getToDep().getNameRu());
+
+        switch (history.getStatus()) {
+            case "ACCEPT_GENERAL_INVOICE":
+                holder.tvImage.setImageResource(R.drawable.ic_cloud_download_black_24dp);
+                break;
+
+            case "COLLATE_DESTINATION_LIST":
+                holder.tvImage.setImageResource(R.drawable.ic_cached_black_24dp);
+                break;
+
+
+        }
     }
 
     @Override
