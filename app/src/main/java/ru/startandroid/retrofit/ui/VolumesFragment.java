@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -111,12 +112,23 @@ public class VolumesFragment extends Fragment {
                     objects.addAll(packetsArrayList);
                     objects.addAll(labelsArrayList);
 
-                    CollateRVAdapter collateRVAdapter = new CollateRVAdapter(objects);
+                    CollateRVAdapter collateRVAdapter = new CollateRVAdapter(getActivity(), objects, new CollateRVAdapter.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(View childView, int childAdapterPosition) {
+                        }
+                    });
 
                     RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
                     recyclerViewVolumes.setLayoutManager(mLayoutManager);
                     recyclerViewVolumes.setAdapter(collateRVAdapter);
 
+                    recyclerViewVolumes.addOnItemTouchListener(new CollateRVAdapter(getActivity(), objects, new CollateRVAdapter.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(View childView, int childAdapterPosition) {
+                            Toast.makeText(getContext(), "HI "  + childAdapterPosition, Toast.LENGTH_SHORT).show();
+
+                        }
+                    }));
 
                     // Create the Realm instance
 //                    realm = Realm.getDefaultInstance();
