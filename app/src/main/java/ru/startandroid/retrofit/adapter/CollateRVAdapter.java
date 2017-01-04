@@ -8,7 +8,11 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +32,9 @@ public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     Activity activity;
     GestureDetector mGestureDetector;
     private CollateRVAdapter.OnItemClickListener listener;
+
+    private OnItemCheckedListener listener1;
+
 
     // The items to display in your RecyclerView
     private List<Object> items;
@@ -52,13 +59,28 @@ public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         });
     }
 
+    public CollateRVAdapter(Activity activity, List<Object> items, CollateRVAdapter.OnItemCheckedListener listener) {
+        this.context = activity.getBaseContext();
+        this.activity = activity;
+        this.listener1 = listener;
+        this.items = items;
+
+        mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) {
+                return true;
+            }
+        });
+    }
+
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == LABEL) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_rv_history, parent, false);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_rv_volumes, parent, false);
             return new ViewHolder1(view);
         } else {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_rv_history, parent, false);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_rv_volumes, parent, false);
             return new ViewHolder1(view);
         }
     }
@@ -67,20 +89,24 @@ public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         private TextView tvListId1, tvFromDeptName1, tvFromDeptNameRu1, tvToDeptName1, tvToDeptNameRu1;
 
+        private CheckBox checkBox;
+
 
         public ViewHolder1(View v) {
             super(v);
-            tvListId1 = (TextView) itemView.findViewById(R.id.tv_list_id);
-            tvFromDeptName1 = (TextView) itemView.findViewById(R.id.tv_from_dept_name);
-            tvFromDeptNameRu1 = (TextView) itemView.findViewById(R.id.tv_from_dept_name_ru);
-            tvToDeptName1 = (TextView) itemView.findViewById(R.id.tv_to_dept_name);
-            tvToDeptNameRu1 = (TextView) itemView.findViewById(R.id.tv_to_dept_name_ru);
+            tvListId1 = (TextView) itemView.findViewById(R.id.tv_list_id_volumes);
+            tvFromDeptName1 = (TextView) itemView.findViewById(R.id.tv_from_dept_name_volumes);
+            tvFromDeptNameRu1 = (TextView) itemView.findViewById(R.id.tv_from_dept_name_ru_volumes);
+            tvToDeptName1 = (TextView) itemView.findViewById(R.id.tv_to_dept_name_volumes);
+            tvToDeptNameRu1 = (TextView) itemView.findViewById(R.id.tv_to_dept_name_ru_volumes);
+            checkBox = (CheckBox) itemView.findViewById(R.id.checkbox_volumes);
+
         }
     }
 
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
 
         int viewType = holder.getItemViewType();
 
@@ -93,6 +119,13 @@ public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             viewHolder1.tvFromDeptNameRu1.setText(label.getFromDep().getNameRu());
             viewHolder1.tvToDeptName1.setText(label.getToDep().getName());
             viewHolder1.tvToDeptNameRu1.setText(label.getToDep().getNameRu());
+
+            viewHolder1.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    listener1.onCheckedChanged(buttonView, isChecked, position);
+                }
+            });
 
         } else if (viewType == PACKET) {
 
@@ -152,6 +185,12 @@ public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public interface OnItemClickListener {
 
         void onItemClick(View childView, int childAdapterPosition);
+    }
+
+
+
+    public interface OnItemCheckedListener {
+        void onCheckedChanged(View childView, boolean isChecked, int childPosition);
     }
 
 }

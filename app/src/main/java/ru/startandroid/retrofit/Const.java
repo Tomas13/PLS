@@ -17,4 +17,9 @@ public class Const {
 
     public static List<Flight> ROUTES;
 
+    public static final String ACCEPT_HISTORY_STATUS = "ACCEPT_GENERAL_INVOICE";
+    public static final String COLLATE_HISTORY_STATUS = "COLLATE_DESTINATION_LIST";
+    public static final String CREATED_HISTORY_STATUS = "CREATED";
+
+
 }

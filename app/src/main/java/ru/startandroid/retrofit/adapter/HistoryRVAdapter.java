@@ -11,8 +11,13 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.Model.History;
 import ru.startandroid.retrofit.R;
+
+import static ru.startandroid.retrofit.Const.ACCEPT_HISTORY_STATUS;
+import static ru.startandroid.retrofit.Const.COLLATE_HISTORY_STATUS;
+import static ru.startandroid.retrofit.Const.CREATED_HISTORY_STATUS;
 
 /**
  * Created by root on 12/28/16.
@@ -65,11 +70,15 @@ public class HistoryRVAdapter extends RecyclerView.Adapter<HistoryRVAdapter.Hist
         holder.tvToDeptNameRu.setText(history.getToDep().getNameRu());
 
         switch (history.getStatus()) {
-            case "ACCEPT_GENERAL_INVOICE":
+            case ACCEPT_HISTORY_STATUS:
                 holder.tvImage.setImageResource(R.drawable.ic_cloud_download_black_24dp);
                 break;
 
-            case "COLLATE_DESTINATION_LIST":
+            case COLLATE_HISTORY_STATUS:
+                holder.tvImage.setImageResource(R.drawable.ic_cached_black_24dp);
+                break;
+
+            case CREATED_HISTORY_STATUS:
                 holder.tvImage.setImageResource(R.drawable.ic_cached_black_24dp);
                 break;
 

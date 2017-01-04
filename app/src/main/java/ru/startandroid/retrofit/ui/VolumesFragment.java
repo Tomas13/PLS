@@ -108,28 +108,71 @@ public class VolumesFragment extends Fragment {
                     labelsArrayList.addAll(response.body().getDto().getLabels());
 
 
-                    ArrayList<Object> objects = new ArrayList<Object>();
+                    final ArrayList<Object> objects = new ArrayList<Object>();
                     objects.addAll(packetsArrayList);
                     objects.addAll(labelsArrayList);
 
-                    CollateRVAdapter collateRVAdapter = new CollateRVAdapter(getActivity(), objects, new CollateRVAdapter.OnItemClickListener() {
+                    final CollateRVAdapter collateRVAdapter = new CollateRVAdapter(getActivity(), objects, new CollateRVAdapter.OnItemCheckedListener() {
                         @Override
-                        public void onItemClick(View childView, int childAdapterPosition) {
+                        public void onCheckedChanged(View childView, boolean isChecked, int childPosition) {
+                            Toast.makeText(getContext(), "YEY " + isChecked + " pos " +  childPosition, Toast.LENGTH_SHORT).show();
+
+
                         }
+
                     });
 
                     RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
                     recyclerViewVolumes.setLayoutManager(mLayoutManager);
                     recyclerViewVolumes.setAdapter(collateRVAdapter);
 
-                    recyclerViewVolumes.addOnItemTouchListener(new CollateRVAdapter(getActivity(), objects, new CollateRVAdapter.OnItemClickListener() {
+
+
+                    /*recyclerViewVolumes.addOnItemTouchListener(new CollateRVAdapter(getActivity(), objects, new CollateRVAdapter.OnItemClickListener() {
                         @Override
                         public void onItemClick(View childView, int childAdapterPosition) {
-                            Toast.makeText(getContext(), "HI "  + childAdapterPosition, Toast.LENGTH_SHORT).show();
+
+
+                            if (objects.get(childAdapterPosition) instanceof Label) {
+
+                                if (((Label) objects.get(childAdapterPosition)).getClickStatus().equals("Click")) {
+
+                                    ((Label) objects.get(childAdapterPosition)).setClickStatus("UnClick");
+
+                                    Toast.makeText(getContext(), ((Label) objects.get(childAdapterPosition)).getClickStatus()
+                                            , Toast.LENGTH_SHORT).show();
+
+                                } else {
+
+                                    ((Label) objects.get(childAdapterPosition)).setClickStatus("Click");
+
+                                    Toast.makeText(getContext(), ((Label) objects.get(childAdapterPosition)).getClickStatus()
+                                            , Toast.LENGTH_SHORT).show();
+
+
+                                }
+
+                            } else if (objects.get(childAdapterPosition) instanceof Packet) {
+                                if (((Packet) objects.get(childAdapterPosition)).getClickStatus().equals("Click")) {
+
+                                    ((Packet) objects.get(childAdapterPosition)).setClickStatus("UnClick");
+
+                                    Toast.makeText(getContext(), ((Packet) objects.get(childAdapterPosition)).getClickStatus()
+                                            , Toast.LENGTH_SHORT).show();
+                                } else {
+                                    ((Packet) objects.get(childAdapterPosition)).setClickStatus("Click");
+
+                                    Toast.makeText(getContext(), ((Packet) objects.get(childAdapterPosition)).getClickStatus()
+                                            , Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            collateRVAdapter.notifyDataSetChanged();
+
 
                         }
                     }));
-
+*/
                     // Create the Realm instance
 //                    realm = Realm.getDefaultInstance();
 //                    realm.beginTransaction();

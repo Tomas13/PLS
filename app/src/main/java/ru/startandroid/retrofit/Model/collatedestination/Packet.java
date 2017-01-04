@@ -21,6 +21,19 @@ public class Packet extends RealmObject{
     @SerializedName("toDep")
     @Expose
     private ToDep toDep;
+/*
+
+    private String ClickStatus = "UnClick";
+
+    public String getClickStatus() {
+        return ClickStatus;
+    }
+
+    public void setClickStatus(String clickStatus) {
+        ClickStatus = clickStatus;
+    }
+*/
+
 
     public Long getId() {
         return id;
