@@ -1,6 +1,6 @@
 package ru.startandroid.retrofit.ui;
 
-import android.app.FragmentManager;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
@@ -11,24 +11,23 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -38,15 +37,10 @@ import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.Datum;
 import ru.startandroid.retrofit.Model.Member;
-import ru.startandroid.retrofit.Model.collatedestination.Packet;
 import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.R;
-import ru.startandroid.retrofit.adapter.RoutesRVAdapter;
 import ru.startandroid.retrofit.databinding.ActivityNavigationBinding;
-import ru.startandroid.retrofit.databinding.NavHeaderNavigationBinding;
 
-import static ru.startandroid.retrofit.Const.FLIGHT_ROUTES;
-import static ru.startandroid.retrofit.Const.ROUTES;
 import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
 public class NavigationActivity extends AppCompatActivity
@@ -123,10 +117,14 @@ public class NavigationActivity extends AppCompatActivity
 
         }
 
-        if (!pref.contains("FLIGHT_POS")) {
+        getRoutesInfo();
+
+        if (pref.contains("FLIGHT_POS")) {
             getRoutesInfo();
 
         } else {
+
+            Log.d("MainNav", "no request getroutesinfo");
             startFragment(new LastActionsFragment());
 
         }
@@ -193,7 +191,7 @@ public class NavigationActivity extends AppCompatActivity
                 } else {
                     Toast.makeText(NavigationActivity.this, response.body().getFlights().get(0).getName(), Toast.LENGTH_SHORT).show();
 
-                    ArrayList<String> flights = new ArrayList<String>();
+                    flights = new ArrayList<String>();
                     for (int i = 0; i < response.body().getFlights().size(); i++) {
                         flights.add(i, response.body().getFlights().get(i).getName());
                     }
@@ -201,6 +199,8 @@ public class NavigationActivity extends AppCompatActivity
                     Bundle bundle = new Bundle();
                     bundle.putStringArrayList("flightsList", flights);
 
+
+//                    createDialog();
 
 
                     FlightFragment dialogFragment = new FlightFragment();
@@ -278,6 +278,42 @@ public class NavigationActivity extends AppCompatActivity
     }
 
 
+    ArrayAdapter<String> adapter;
+    ArrayList<String> flights;
+    private void createDialog(){
+        final Dialog flightDialog = new Dialog(getApplicationContext());
+        flightDialog.setContentView(R.layout.fragment_flight);
+
+        ListView listView = (ListView) flightDialog.findViewById(R.id.list_view_flight);
+        adapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.list_view_item, flights);
+        listView.setAdapter(adapter);
+
+        flightDialog.show();
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Toast.makeText(getApplicationContext(), "Saving " + flights.get(position), Toast.LENGTH_SHORT).show();
+                //Save Flight Id to shared preferences
+                SharedPreferences pref = getApplicationContext().getSharedPreferences("FLIGHT_PREF", 0); // 0 - for private mode
+                SharedPreferences.Editor editor = pref.edit();
+                editor.putInt("FLIGHT_POS", position);
+                editor.apply();
+
+
+            }
+        });
+
+        Button btnOk = (Button) flightDialog.findViewById(R.id.btn_ok_flight);
+        btnOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                flightDialog.dismiss();
+            }
+        });
+
+    }
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
