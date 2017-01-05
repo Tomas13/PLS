@@ -31,6 +31,8 @@ import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.RoutesRVAdapter;
 
+import static ru.startandroid.retrofit.Const.FLIGHT_POS;
+import static ru.startandroid.retrofit.Const.FLIGHT_SHARED_PREF;
 import static ru.startandroid.retrofit.Const.ROUTES;
 import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
@@ -90,8 +92,8 @@ public class RoutesFragment extends Fragment {
 
                 if (isAdded()) {
 
-                    SharedPreferences pref = getActivity().getApplicationContext().getSharedPreferences("FLIGHT_PREF", 0); // 0 - for private mode
-                    pos = pref.getInt("FLIGHT_POS", 0);
+                    SharedPreferences pref = getActivity().getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
+                    pos = pref.getInt(FLIGHT_POS, 0);
                 }
 
 

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import ru.startandroid.retrofit.R;
 
 import static ru.startandroid.retrofit.Const.FLIGHT_ROUTES;
+import static ru.startandroid.retrofit.Const.FLIGHT_SHARED_PREF;
 import static ru.startandroid.retrofit.Const.ROUTES;
 
 
@@ -75,7 +76,7 @@ public class FlightFragment extends Fragment {
 
                 Toast.makeText(getActivity().getApplicationContext(), "Saving " + flights.get(position), Toast.LENGTH_SHORT).show();
                 //Save Flight Id to shared preferences
-                SharedPreferences pref = getActivity().getApplicationContext().getSharedPreferences("FLIGHT_PREF", 0); // 0 - for private mode
+                SharedPreferences pref = getActivity().getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
                 SharedPreferences.Editor editor = pref.edit();
                 editor.putInt("FLIGHT_POS", position);
                 editor.apply();

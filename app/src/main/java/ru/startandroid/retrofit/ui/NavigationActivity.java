@@ -41,6 +41,11 @@ import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.databinding.ActivityNavigationBinding;
 
+import static ru.startandroid.retrofit.Const.FLIGHT_ID;
+import static ru.startandroid.retrofit.Const.FLIGHT_NAME;
+import static ru.startandroid.retrofit.Const.FLIGHT_POS;
+import static ru.startandroid.retrofit.Const.FLIGHT_SHARED_PREF;
+import static ru.startandroid.retrofit.Const.NAV_SHARED_PREF;
 import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
 public class NavigationActivity extends AppCompatActivity
@@ -107,18 +112,18 @@ public class NavigationActivity extends AppCompatActivity
 
         //If VPN didn't choose flight then getRoutesInfo
         //TODO gotta remove shared pref value when needed (onLogout)
-        SharedPreferences pref = getApplicationContext().getSharedPreferences("FLIGHT_PREF", 0); // 0 - for private mode
+        SharedPreferences pref = getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
 
 
 
-        SharedPreferences pref1 = getApplicationContext().getSharedPreferences("NAV_PREF", 0); // 0 - for private mode
-        if (pref1.contains("FLIGHT_NAME")){
-            tvRouteHeader.setText(pref1.getString("FLIGHT_NAME", "Путь"));
+        SharedPreferences pref1 = getApplicationContext().getSharedPreferences(NAV_SHARED_PREF, 0); // 0 - for private mode
+        if (pref1.contains(FLIGHT_NAME)){
+            tvRouteHeader.setText(pref1.getString(FLIGHT_NAME, "Путь"));
 
         }
 
 
-        if (!pref.contains("FLIGHT_POS")) {
+        if (!pref.contains(FLIGHT_POS)) {
             getRoutesInfo();
 
         } else {
@@ -165,25 +170,23 @@ public class NavigationActivity extends AppCompatActivity
 
                 Log.d("MainNav", "Routes get name" + response.body().getFlights().get(0).getName());
 
-
-                //Save Flight Id to shared preferences
-                SharedPreferences pref1 = getApplicationContext().getSharedPreferences("NAV_PREF", 0); // 0 - for private mode
-                SharedPreferences.Editor editor1 = pref1.edit();
-                editor1.putString("FLIGHT_NAME", response.body().getFlights().get(0).getName());
-                editor1.apply();
-
-
+                
                 tvRouteHeader.setText(response.body().getFlights().get(0).getName());
 
                 //if one route then go to history fragment
                 if (response.body().getFlights().size() == 1) {
 
                     //Save Flight Id to shared preferences
-                    SharedPreferences pref = getApplicationContext().getSharedPreferences("FLIGHT_PREF", 0); // 0 - for private mode
+                    SharedPreferences pref = getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
                     SharedPreferences.Editor editor = pref.edit();
-                    editor.putInt("FLIGHT_ID", response.body().getFlights().get(0).getId());
+                    editor.putInt(FLIGHT_ID, response.body().getFlights().get(0).getId());
                     editor.apply();
 
+                    //Save Flight Id to shared preferences
+                    SharedPreferences pref1 = getApplicationContext().getSharedPreferences(NAV_SHARED_PREF, 0); // 0 - for private mode
+                    SharedPreferences.Editor editor1 = pref1.edit();
+                    editor1.putString(FLIGHT_NAME, response.body().getFlights().get(0).getName());
+                    editor1.apply();
 
                     startFragment(new LastActionsFragment());
 
@@ -199,15 +202,15 @@ public class NavigationActivity extends AppCompatActivity
                     bundle.putStringArrayList("flightsList", flights);
 
 
-//                    createDialog();
+                    createDialog();
 
 
-                    FlightFragment dialogFragment = new FlightFragment();
-
-                    dialogFragment.setArguments(bundle);
-
-                    getSupportFragmentManager().beginTransaction().replace(R.id.content_navigation_container,
-                            dialogFragment).commit();
+//                    FlightFragment dialogFragment = new FlightFragment();
+//
+//                    dialogFragment.setArguments(bundle);
+//
+//                    getSupportFragmentManager().beginTransaction().replace(R.id.content_navigation_container,
+//                            dialogFragment).commit();
 
 
                 }
@@ -279,8 +282,9 @@ public class NavigationActivity extends AppCompatActivity
 
     ArrayAdapter<String> adapter;
     ArrayList<String> flights;
+
     private void createDialog(){
-        final Dialog flightDialog = new Dialog(getApplicationContext());
+        final Dialog flightDialog = new Dialog(this);
         flightDialog.setContentView(R.layout.fragment_flight);
 
         ListView listView = (ListView) flightDialog.findViewById(R.id.list_view_flight);
@@ -293,13 +297,22 @@ public class NavigationActivity extends AppCompatActivity
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Toast.makeText(getApplicationContext(), "Saving " + flights.get(position), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Сохраняем " + flights.get(position), Toast.LENGTH_SHORT).show();
                 //Save Flight Id to shared preferences
-                SharedPreferences pref = getApplicationContext().getSharedPreferences("FLIGHT_PREF", 0); // 0 - for private mode
+                SharedPreferences pref = getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
                 SharedPreferences.Editor editor = pref.edit();
-                editor.putInt("FLIGHT_POS", position);
+                editor.putInt(FLIGHT_POS, position);
                 editor.apply();
 
+                //Save Flight Id to shared preferences
+                SharedPreferences pref1 = getApplicationContext().getSharedPreferences(NAV_SHARED_PREF, 0); // 0 - for private mode
+                SharedPreferences.Editor editor1 = pref1.edit();
+                editor1.putString(FLIGHT_NAME, flights.get(position));
+                editor1.apply();
+
+                tvRouteHeader.setText(pref1.getString(FLIGHT_NAME, "Путь"));
+
+                Toast.makeText(NavigationActivity.this, "Готово, можете нажать кнопку ОК для закрытия диалога", Toast.LENGTH_SHORT).show();
 
             }
         });

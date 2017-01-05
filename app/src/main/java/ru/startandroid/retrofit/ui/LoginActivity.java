@@ -40,9 +40,12 @@ public class LoginActivity extends AppCompatActivity {
                     Intent intent = new Intent(LoginActivity.this, NavigationActivity.class);
                     Const.Token += data;
 
+
+
                     Log.d("Login", Const.Token);
                     startActivity(intent);
 
+                    finish();
                 }
 
                 @Override

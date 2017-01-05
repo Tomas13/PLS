@@ -30,9 +30,6 @@ public class KeycloakHelper {
     private static final String MODULE_NAME = "KeyCloakAuthz";
     private static final String TAG = KeycloakHelper.class.getSimpleName();
 
-//    private static final String ACCESS_TOKEN_ENDPOINT = "/realms/toolpar/tokens/access/codes";
-//    private static final String REFRESH_TOKEN_ENDPOINT = "/realms/toolpar/tokens/refresh";
-
     private static final String ACCESS_TOKEN_ENDPOINT = "/realms/toolpar/protocol/openid-connect/token";
     private static final String REFRESH_TOKEN_ENDPOINT = "/realms/toolpar/protocol/openid-connect/token";
     static {
@@ -82,7 +79,7 @@ public class KeycloakHelper {
     }
 
     public static void refresh() {
-        Log.i(TAG, "check is connected!");
+        Log.i(TAG, "refresh is called!");
         AuthorizationManager.getModule(MODULE_NAME).refreshAccess();
     }
 }
