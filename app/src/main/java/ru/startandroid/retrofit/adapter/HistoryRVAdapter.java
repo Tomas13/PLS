@@ -1,17 +1,16 @@
 package ru.startandroid.retrofit.adapter;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.Model.History;
 import ru.startandroid.retrofit.R;
 
@@ -71,15 +70,33 @@ public class HistoryRVAdapter extends RecyclerView.Adapter<HistoryRVAdapter.Hist
 
         switch (history.getStatus()) {
             case ACCEPT_HISTORY_STATUS:
-                holder.tvImage.setImageResource(R.drawable.ic_cloud_download_black_24dp);
+                holder.tvImage.setImageResource(R.drawable.ic_cloud_download_black_18dp);
+                holder.tvImage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(v.getContext(), "Статус - Принят", Toast.LENGTH_SHORT).show();
+                    }
+                });
                 break;
 
             case COLLATE_HISTORY_STATUS:
-                holder.tvImage.setImageResource(R.drawable.ic_cached_black_24dp);
+                holder.tvImage.setImageResource(R.drawable.ic_cached_black_18dp);
+                holder.tvImage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(v.getContext(), "Статус - В процессе сличения", Toast.LENGTH_SHORT).show();
+                    }
+                });
                 break;
 
             case CREATED_HISTORY_STATUS:
-                holder.tvImage.setImageResource(R.drawable.ic_cached_black_24dp);
+                holder.tvImage.setImageResource(R.drawable.ic_done_black_18dp);
+                holder.tvImage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(v.getContext(), "Статус - Создан", Toast.LENGTH_SHORT).show();
+                    }
+                });
                 break;
 
 

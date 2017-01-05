@@ -30,6 +30,15 @@ public class BodyForCreateInvoice {
     @Expose
     private List<Long> packetIds = null;
 
+    public BodyForCreateInvoice(Long flightId, Boolean isDepIndex, String toDepIndex, String fromDepIndex, List<Long> labelIds, List<Long> packetIds) {
+        this.flightId = flightId;
+        this.isDepIndex = isDepIndex;
+        this.toDepIndex = toDepIndex;
+        this.fromDepIndex = fromDepIndex;
+        this.labelIds = labelIds;
+        this.packetIds = packetIds;
+    }
+
     public Long getFlightId() {
         return flightId;
     }

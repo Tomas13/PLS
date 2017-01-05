@@ -14,7 +14,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="reverseLandscape"></activity>
+            android:screenOrientation="reverseLandscape" />
         <activity android:name=".ui.ScannerActivity" />
         <activity
             android:name=".LaunchActivity"
@@ -24,11 +24,13 @@
             android:name=".ui.LoginActivity"
             android:screenOrientation="portrait"
             android:theme="@style/LoginTheme">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
 
         <service android:name="org.jboss.aerogear.android.authorization.oauth2.OAuth2AuthzService" />
@@ -38,7 +40,9 @@
             android:label="@string/title_activity_navigation"
             android:screenOrientation="reverseLandscape"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".ui.TEST">
 
+        </activity>
     </application>
 
 </manifest>

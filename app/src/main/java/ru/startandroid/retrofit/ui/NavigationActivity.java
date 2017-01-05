@@ -187,7 +187,7 @@ public class NavigationActivity extends AppCompatActivity
                     //Save Flight Id to shared preferences
                     SharedPreferences pref = getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
                     SharedPreferences.Editor editor = pref.edit();
-                    editor.putInt(FLIGHT_ID, response.body().getFlights().get(0).getId());
+                    editor.putLong(FLIGHT_ID, response.body().getFlights().get(0).getId());
                     editor.apply();
 
                     //Save Flight Id to shared preferences
@@ -213,12 +213,10 @@ public class NavigationActivity extends AppCompatActivity
                     bundle.putStringArrayList("flightsList", flights);
 
 
-                    createDialog();
-
-
                     flightArrayList = response.body().getFlights();
 
 
+                    createDialog();
 
 
 //                    FlightFragment dialogFragment = new FlightFragment();
@@ -328,6 +326,7 @@ public class NavigationActivity extends AppCompatActivity
                 SharedPreferences pref = getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
                 SharedPreferences.Editor editor = pref.edit();
                 editor.putInt(FLIGHT_POS, position);
+                editor.putLong(FLIGHT_ID, flightArrayList.get(position).getId()); // ;.getItineraryDTO().getEntries().get(0).getDept().getName());
                 editor.apply();
 
                 //Save Flight Id to shared preferences
@@ -335,6 +334,8 @@ public class NavigationActivity extends AppCompatActivity
                 SharedPreferences.Editor editor1 = pref1.edit();
                 editor1.putString(FLIGHT_NAME, flights.get(position));
                 editor1.apply();
+
+
 
                 tvRouteHeader.setText(pref1.getString(FLIGHT_NAME, "Путь"));
 

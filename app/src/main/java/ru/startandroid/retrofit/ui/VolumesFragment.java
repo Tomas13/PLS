@@ -2,6 +2,7 @@ package ru.startandroid.retrofit.ui;
 
 
 import android.app.Dialog;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -21,11 +22,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -33,6 +36,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.Interface.GitHubService;
+import ru.startandroid.retrofit.Model.BodyForCreateInvoice;
 import ru.startandroid.retrofit.Model.Datum;
 import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.Model.collatedestination.Label;
@@ -41,6 +45,9 @@ import ru.startandroid.retrofit.Model.routes.Entry;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.CollateRVAdapter;
 
+import static ru.startandroid.retrofit.Const.FLIGHT_ID;
+import static ru.startandroid.retrofit.Const.FLIGHT_SHARED_PREF;
+import static ru.startandroid.retrofit.Const.NAV_SHARED_PREF;
 import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
 
@@ -100,18 +107,16 @@ public class VolumesFragment extends Fragment {
         queryData = realm.where(Entry.class);
 
 
-        if (!queryData.findAll().isEmpty()){
+        if (!queryData.findAll().isEmpty()) {
             for (int i = 0; i < queryData.findAll().size(); i++) {
                 entries.add(queryData.findAll().get(i));
             }
         }
 
 
-        for (int i = 0; i < entries.size(); i++) {
+        for (int i = 1; i < entries.size(); i++) {
             flightName.add(entries.get(i).getDept().getNameRu());
         }
-
-
 
 
         tvNoDataVolumes = (TextView) rootView.findViewById(R.id.tv_no_data_volumes);
@@ -132,14 +137,9 @@ public class VolumesFragment extends Fragment {
     }
 
 
-
     private void showDialog() {
         final Dialog pointDialog = new Dialog(getContext());
         pointDialog.setContentView(R.layout.fragment_flight);
-
-
-
-
 
         ListView listView = (ListView) pointDialog.findViewById(R.id.list_view_flight);
         adapter = new ArrayAdapter<String>(getContext(), R.layout.list_view_item, flightName);
@@ -150,6 +150,23 @@ public class VolumesFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+
+                SharedPreferences pref1 = getActivity().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
+
+                if (pref1.contains(FLIGHT_ID)) {
+
+                    Long flightId = pref1.getLong(FLIGHT_ID, 1L);
+                    Boolean isDepIndex = true;
+                    String toDeptIndex = entries.get(position).getDept().getName();
+                    String fromDeptIndex = entries.get(0).getDept().getName();
+                    body = new BodyForCreateInvoice(flightId, isDepIndex, toDeptIndex, fromDeptIndex, labelsList, packetsList);
+
+
+
+                } else {
+                    Toast.makeText(getContext(), "Ошибка. Нет flightID", Toast.LENGTH_SHORT).show();
+                }
 
 
                 Toast.makeText(getContext(), "Готово, можете нажать кнопку ОК для закрытия диалога", Toast.LENGTH_SHORT).show();
@@ -163,11 +180,48 @@ public class VolumesFragment extends Fragment {
             public void onClick(View v) {
                 pointDialog.dismiss();
 
+                retrofitPostCreateInvoice();
+
             }
         });
 
     }
 
+    BodyForCreateInvoice body;
+
+    private void retrofitPostCreateInvoice() {
+        Retrofit retrofitDestList = new Retrofit.Builder()
+                .baseUrl("http://pls-test.kazpost.kz/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(getUserClient(Const.Token))
+                .build();
+
+        GitHubService gitHubServ = retrofitDestList.create(GitHubService.class);
+        gitHubServ.postCreateGeneralInvoice(body).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+                try {
+                    if (response.isSuccessful()) {//&& response.body().string()
+//                            .equals("\"{status: success\"}")){
+
+                        Log.d("MainVolumes", response.body().toString());
+                        Toast.makeText(getContext(), response.body().string(), Toast.LENGTH_SHORT).show();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+    }
+
+    ArrayList<Object> objects;
+    CollateRVAdapter collateRVAdapter;
 
     private void retrofitGetListForVpn() {
         Retrofit retrofitDestList = new Retrofit.Builder()
@@ -199,22 +253,41 @@ public class VolumesFragment extends Fragment {
                     labelsArrayList.addAll(response.body().getDto().getLabels());
 
 
-                    final ArrayList<Object> objects = new ArrayList<Object>();
+                    objects = new ArrayList<Object>();
                     objects.addAll(packetsArrayList);
                     objects.addAll(labelsArrayList);
 
-                    final CollateRVAdapter collateRVAdapter = new CollateRVAdapter(getActivity(), objects, new CollateRVAdapter.OnItemCheckedListener() {
+                    collateRVAdapter = new CollateRVAdapter(getActivity(), objects, new CollateRVAdapter.OnItemCheckedListener() {
                         @Override
                         public void onCheckedChanged(View childView, boolean isChecked, int childPosition) {
                             Toast.makeText(getContext(), " pos " + childPosition, Toast.LENGTH_SHORT).show();
 
                             if (isChecked) {
+/*
+                                Object tempPacket = objects.get(childPosition);
+                                objects.remove(childPosition);
+                                objects.add(0, tempPacket);
+                                collateRVAdapter.notifyDataSetChanged();*/
+
+
                                 if (objects.get(childPosition) instanceof Packet) {
                                     packetsList.add(((Packet) objects.get(childPosition)).getId());
 
+
+
+
+//                                    collateRVAdapter.notifyItemMoved(childPosition, 0);
                                 } else if (objects.get(childPosition) instanceof Label) {
                                     labelsList.add(((Label) objects.get(childPosition)).getId());
+
+                               /*     Label tempLabel = (Label) objects.get(childPosition);
+                                    objects.remove(childPosition);
+                                    objects.add(0, tempLabel);*/
+
                                 }
+
+                                collateRVAdapter.notifyItemMoved(childPosition, 0);
+
 
                                 if (labelsList.isEmpty() && packetsList.isEmpty()) {
                                     btnSendInvoice.setVisibility(View.GONE);
@@ -239,7 +312,6 @@ public class VolumesFragment extends Fragment {
                                     btnSendInvoice.setVisibility(View.VISIBLE);
                                     tvHeaderHint.setVisibility(View.GONE);
                                 }
-
 
                             }
 

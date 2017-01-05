@@ -77,8 +77,8 @@ public class KeycloakHelper {
         return AuthorizationManager.getModule(MODULE_NAME).isAuthorized();
     }
 
-    public static void deleteAccount() {
+    public static void refresh() {
         Log.i(TAG, "refresh is called!");
-        AuthorizationManager.getModule(MODULE_NAME).deleteAccount();
+        AuthorizationManager.getModule(MODULE_NAME).refreshAccess();
     }
 }
