@@ -102,37 +102,42 @@ public class InvoiceFragment extends Fragment {
                 progressInvoice.setVisibility(View.GONE);
 
 
-                if (response.isSuccessful() && response.body().getStatus().equals("success")) {
-
-                    final List<GeneralInvoice> generalInvoiceList = new ArrayList<GeneralInvoice>();
-
-                    generalInvoiceList.addAll(response.body().getGeneralInvoices());
-
-                    InvoiceRVAdapter invoiceRVAdapter = new InvoiceRVAdapter(getActivity(), generalInvoiceList, new InvoiceRVAdapter.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(View childView, int childAdapterPosition) {
-
-                            Toast.makeText(getContext(), "SHIT OH " + generalInvoiceList.get(childAdapterPosition).getGeneralInvoiceId(), Toast.LENGTH_SHORT).show();
+                if (response.body() != null) {
 
 
-                            Bundle bundle = new Bundle();
-                            bundle.putLong("generalInvoiceId", generalInvoiceList.get(childAdapterPosition).getId());
-                            Fragment fragment = new AcceptGenInvoiceFragment();
-                            fragment.setArguments(bundle);
+                    if (response.isSuccessful() && response.body().getStatus().equals("success")) {
 
-                            ((NavigationActivity) getActivity()).startFragment(fragment);
+                        final List<GeneralInvoice> generalInvoiceList = new ArrayList<GeneralInvoice>();
+
+                        generalInvoiceList.addAll(response.body().getGeneralInvoices());
+
+                        InvoiceRVAdapter invoiceRVAdapter = new InvoiceRVAdapter(getActivity(), generalInvoiceList, new InvoiceRVAdapter.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(View childView, int childAdapterPosition) {
+
+                                Toast.makeText(getContext(), "SHIT OH " + generalInvoiceList.get(childAdapterPosition).getGeneralInvoiceId(), Toast.LENGTH_SHORT).show();
 
 
-                        }
-                    });
+                                Bundle bundle = new Bundle();
+                                bundle.putLong("generalInvoiceId", generalInvoiceList.get(childAdapterPosition).getId());
+                                Fragment fragment = new AcceptGenInvoiceFragment();
+                                fragment.setArguments(bundle);
 
-                    RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-                    rvInvoice.setLayoutManager(mLayoutManager);
-                    rvInvoice.setAdapter(invoiceRVAdapter);
+                                ((NavigationActivity) getActivity()).startFragment(fragment);
 
-                } else {
-                    tvNoDataInvoice.setVisibility(View.VISIBLE);
-                    tableRowInvoice.setVisibility(View.GONE);
+
+                            }
+                        });
+
+                        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+                        rvInvoice.setLayoutManager(mLayoutManager);
+                        rvInvoice.setAdapter(invoiceRVAdapter);
+
+                    } else {
+                        tvNoDataInvoice.setVisibility(View.VISIBLE);
+                        tableRowInvoice.setVisibility(View.GONE);
+                    }
+
                 }
             }
 

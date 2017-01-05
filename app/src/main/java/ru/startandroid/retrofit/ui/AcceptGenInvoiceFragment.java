@@ -122,30 +122,33 @@ public class AcceptGenInvoiceFragment extends Fragment {
         gitHubServ.getDestionationLists().enqueue(new Callback<ResponseDestinationList>() {
             @Override
             public void onResponse(Call<ResponseDestinationList> call, Response<ResponseDestinationList> response) {
-                if (response.isSuccessful() && response.body().getStatus().equals("success")) {
+                if (response.body() != null) {
 
-                    progressAccept.setVisibility(View.GONE);
+                    if (response.isSuccessful() && response.body().getStatus().equals("success")) {
 
-                    for (int i = 0; i < response.body().getDestinationLists().size(); i++) {
+                        progressAccept.setVisibility(View.GONE);
 
-                        generalInvoiceIdsList.add(response.body().getDestinationLists().get(i).getDestinationListId());
+                        for (int i = 0; i < response.body().getDestinationLists().size(); i++) {
 
-                        ids.add(response.body().getDestinationLists().get(i).getId());
+                            generalInvoiceIdsList.add(response.body().getDestinationLists().get(i).getDestinationListId());
 
-                    }
+                            ids.add(response.body().getDestinationLists().get(i).getId());
 
-                    listAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, generalInvoiceIdsList);
+                        }
 
-                    listViewAcceptGen.setAdapter(listAdapter);
+                        listAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, generalInvoiceIdsList);
+
+                        listViewAcceptGen.setAdapter(listAdapter);
 
 
-                    Log.d("acceptGen", generalInvoiceIdsList.get(0).toString());
+                        Log.d("acceptGen", generalInvoiceIdsList.get(0).toString());
 //                    listViewAcceptGen.notify();
 
-                } else {
-                    progressAccept.setVisibility(View.GONE);
+                    } else {
+                        progressAccept.setVisibility(View.GONE);
 
-                    tvAcceptGen.setVisibility(View.VISIBLE);
+                        tvAcceptGen.setVisibility(View.VISIBLE);
+                    }
                 }
             }
 
@@ -177,23 +180,27 @@ public class AcceptGenInvoiceFragment extends Fragment {
 //                Log.d("InvoiceORespo", response.body().getDestinationLists().get(0).getDestinationListId());
                 Log.d("MainAcceptGen", response.message());
 
-                if (response.isSuccessful() && response.body().getStatus().equals("success")) {
+                if (response.body() != null) {
 
-                    for (int i = 0; i < response.body().getDestinationLists().size(); i++) {
 
-                        generalInvoiceIdsList.add(response.body().getDestinationLists().get(i).getDestinationListId());
+                    if (response.isSuccessful() && response.body().getStatus().equals("success")) {
 
-                        ids.add(response.body().getDestinationLists().get(i).getId());
+                        for (int i = 0; i < response.body().getDestinationLists().size(); i++) {
+
+                            generalInvoiceIdsList.add(response.body().getDestinationLists().get(i).getDestinationListId());
+
+                            ids.add(response.body().getDestinationLists().get(i).getId());
+                        }
+
+                        listAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, generalInvoiceIdsList);
+
+                        listViewAcceptGen.setAdapter(listAdapter);
+
+                    } else {
+                        progressAccept.setVisibility(View.GONE);
+
+                        tvAcceptGen.setVisibility(View.VISIBLE);
                     }
-
-                    listAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, generalInvoiceIdsList);
-
-                    listViewAcceptGen.setAdapter(listAdapter);
-
-                } else {
-                    progressAccept.setVisibility(View.GONE);
-
-                    tvAcceptGen.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -223,49 +230,51 @@ public class AcceptGenInvoiceFragment extends Fragment {
 
                 progressAccept.setVisibility(View.GONE);
 
-                if (response.isSuccessful() && response.body().getStatus().equals("success")) {
-                    Log.d("MainAccept", "got response");
+                if (response.body() != null) {
 
-                    Log.d("MainAccept", response.body().getStatus());
-                    Log.d("MainAccept labels", response.body().getDto().getLabels().size() + " ");
-                    Log.d("MainAccept packets", response.body().getDto().getPackets().size() + " ");
+                    if (response.isSuccessful() && response.body().getStatus().equals("success")) {
+                        Log.d("MainAccept", "got response");
+
+                        Log.d("MainAccept", response.body().getStatus());
+                        Log.d("MainAccept labels", response.body().getDto().getLabels().size() + " ");
+                        Log.d("MainAccept packets", response.body().getDto().getPackets().size() + " ");
 
 
-                    collateDtoObject = new Dto();
+                        collateDtoObject = new Dto();
 
-                    collateDtoObject = response.body().getDto();
+                        collateDtoObject = response.body().getDto();
 
-                    ArrayList<Label> labels = new ArrayList<Label>();
-                    labels.addAll(collateDtoObject.getLabels());
+                        ArrayList<Label> labels = new ArrayList<Label>();
+                        labels.addAll(collateDtoObject.getLabels());
 
-                    ArrayList<Packet> packets = new ArrayList<>();
-                    packets.addAll(collateDtoObject.getPackets());
+                        ArrayList<Packet> packets = new ArrayList<>();
+                        packets.addAll(collateDtoObject.getPackets());
 
-                    ArrayList<CollateResponse> collateResponsesArrayList = new ArrayList<CollateResponse>();
+                        ArrayList<CollateResponse> collateResponsesArrayList = new ArrayList<CollateResponse>();
 //                collateResponsesArrayList.addAll(response)
 
-                    // Create the Realm instance
-                    realm = Realm.getDefaultInstance();
+                        // Create the Realm instance
+                        realm = Realm.getDefaultInstance();
 
-                    realm.beginTransaction();
-                    realm.insert(packets);
-                    realm.insert(labels);
+                        realm.beginTransaction();
+                        realm.insert(packets);
+                        realm.insert(labels);
 //                    realm.insert(collateDtoObject);
-                    realm.commitTransaction();
-                    Log.d("MainAccept", "got response");
+                        realm.commitTransaction();
+                        Log.d("MainAccept", "got response");
 
-                    ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
+                        ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
 
 
-                } else {
+                    } else {
 
-                    progressAccept.setVisibility(View.VISIBLE);
+                        progressAccept.setVisibility(View.VISIBLE);
 
-                    retrofitGetListForVpn();
-                    tvAcceptGen.setVisibility(View.VISIBLE);
+                        retrofitGetListForVpn();
+                        tvAcceptGen.setVisibility(View.VISIBLE);
+                    }
+
                 }
-
-
             }
 
             @Override
@@ -293,44 +302,47 @@ public class AcceptGenInvoiceFragment extends Fragment {
 
                 progressAccept.setVisibility(View.GONE);
 
-                if (response.isSuccessful() && response.body().getStatus().equals("success")) {
-                    Log.d("MainAccept", "got response");
+                if (response.body() != null) {
 
-                    Log.d("MainAccept", response.body().getStatus());
-                    Log.d("MainAccept labels", response.body().getDto().getLabels().size() + " ");
-                    Log.d("MainAccept packets", response.body().getDto().getPackets().size() + " ");
+                    if (response.isSuccessful() && response.body().getStatus().equals("success")) {
+                        Log.d("MainAccept", "got response");
 
-
-                    ArrayList<Packet> packetsArrayList = new ArrayList<>();
-                    packetsArrayList.addAll(response.body().getDto().getPackets());
-
-                    ArrayList<Label> labelsArrayList = new ArrayList<>();
-                    labelsArrayList.addAll(response.body().getDto().getLabels());
+                        Log.d("MainAccept", response.body().getStatus());
+                        Log.d("MainAccept labels", response.body().getDto().getLabels().size() + " ");
+                        Log.d("MainAccept packets", response.body().getDto().getPackets().size() + " ");
 
 
-                    ArrayList<Object> objects = new ArrayList<Object>();
-                    objects.addAll(packetsArrayList);
-                    objects.addAll(labelsArrayList);
+                        ArrayList<Packet> packetsArrayList = new ArrayList<>();
+                        packetsArrayList.addAll(response.body().getDto().getPackets());
+
+                        ArrayList<Label> labelsArrayList = new ArrayList<>();
+                        labelsArrayList.addAll(response.body().getDto().getLabels());
+
+
+                        ArrayList<Object> objects = new ArrayList<Object>();
+                        objects.addAll(packetsArrayList);
+                        objects.addAll(labelsArrayList);
 
 //                    CollateRVAdapter collateRVAdapter = new CollateRVAdapter(objects);
 
 
-                    // Create the Realm instance
-                    realm = Realm.getDefaultInstance();
+                        // Create the Realm instance
+                        realm = Realm.getDefaultInstance();
 
-                    realm.beginTransaction();
-                    realm.insert(labelsArrayList);
-                    realm.insert(packetsArrayList);
-                    realm.commitTransaction();
-                    Log.d("MainAccept", "got response");
+                        realm.beginTransaction();
+                        realm.insert(labelsArrayList);
+                        realm.insert(packetsArrayList);
+                        realm.commitTransaction();
+                        Log.d("MainAccept", "got response");
 
-                    ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
+                        ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
 
 
-                } else {
-                    progressAccept.setVisibility(View.GONE);
+                    } else {
+                        progressAccept.setVisibility(View.GONE);
 
-                    tvAcceptGen.setVisibility(View.VISIBLE);
+                        tvAcceptGen.setVisibility(View.VISIBLE);
+                    }
                 }
 
 

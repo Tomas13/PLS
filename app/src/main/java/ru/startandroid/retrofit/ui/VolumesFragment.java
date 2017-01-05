@@ -279,11 +279,14 @@ public class VolumesFragment extends Fragment {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
 
                 try {
-                    if (response.isSuccessful()) {//&& response.body().string()
+                    if (response.body() != null) {
+
+                        if (response.isSuccessful()) {//&& response.body().string()
 //                            .equals("\"{status: success\"}")){
 
-                        Log.d("MainVolumes", response.body().toString());
-                        Toast.makeText(getContext(), response.body().string(), Toast.LENGTH_SHORT).show();
+                            Log.d("MainVolumes", response.body().toString());
+                            Toast.makeText(getContext(), response.body().string(), Toast.LENGTH_SHORT).show();
+                        }
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -315,7 +318,7 @@ public class VolumesFragment extends Fragment {
             @Override
             public void onResponse(Call<CollateResponse> call, Response<CollateResponse> response) {
 
-                if (response.isSuccessful() && response.body() != null){
+                if (response.isSuccessful() && response.body() != null) {
                     if (response.isSuccessful() && response.body().getStatus().equals("success")) {
 
                         ArrayList<Packet> packetsArrayList = new ArrayList<>();

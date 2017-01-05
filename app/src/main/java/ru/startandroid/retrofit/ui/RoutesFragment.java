@@ -75,16 +75,12 @@ public class RoutesFragment extends Fragment {
                 .setTitle("Маршруты");
 
 
-
-
         progressBar.setVisibility(View.VISIBLE);
         getRoutesInfo();
 
 
         return viewRoot;
     }
-
-
 
 
     private void getRoutesInfo() {
@@ -105,36 +101,35 @@ public class RoutesFragment extends Fragment {
 
                 progressBar.setVisibility(View.GONE);
 
-                if (response.isSuccessful() && response.body().getStatus().equals("success")){
+                if (response.body() != null) {
+
+                    if (response.isSuccessful() && response.body().getStatus().equals("success")) {
 
 
-                    int pos = 0;
-                    if (isAdded()) {
-                        SharedPreferences pref = getActivity().getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
-                        pos = pref.getInt(FLIGHT_POS, 0);
+                        int pos = 0;
+                        if (isAdded()) {
+                            SharedPreferences pref = getActivity().getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
+                            pos = pref.getInt(FLIGHT_POS, 0);
+                        }
+
+
+                        Log.d("MainNav", "got to response" + response.body().getFlights().get(pos).getItineraryDTO().getEntries().size() + " pos " + pos);
+
+                        List<Entry> flights = new ArrayList<>();
+
+                        flights.addAll(response.body().getFlights().get(pos).getItineraryDTO().getEntries());
+
+
+                        Log.d("MainNav", flights.size() + " size");
+                        RoutesRVAdapter routesRVAdapter = new RoutesRVAdapter(flights);
+
+                        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+                        rvRoutes.setLayoutManager(mLayoutManager);
+                        rvRoutes.setAdapter(routesRVAdapter);
+
+                    } else {
+                        tvNoData.setVisibility(View.VISIBLE);
                     }
-
-
-                    Log.d("MainNav", "got to response" + response.body().getFlights().get(pos).getItineraryDTO().getEntries().size() + " pos " + pos);
-
-                    List<Entry> flights = new ArrayList<>();
-
-                    flights.addAll(response.body().getFlights().get(pos).getItineraryDTO().getEntries());
-
-
-
-
-
-
-                    Log.d("MainNav", flights.size() + " size");
-                    RoutesRVAdapter routesRVAdapter = new RoutesRVAdapter(flights);
-
-                    RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-                    rvRoutes.setLayoutManager(mLayoutManager);
-                    rvRoutes.setAdapter(routesRVAdapter);
-
-                }else{
-                    tvNoData.setVisibility(View.VISIBLE);
                 }
 
             }

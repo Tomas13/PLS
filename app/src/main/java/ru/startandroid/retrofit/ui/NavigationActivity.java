@@ -172,52 +172,54 @@ public class NavigationActivity extends AppCompatActivity
 
                 navProgressBar.setVisibility(View.GONE);
 
-                Log.d("MainNav", "got to response RoutesInfo" + response.body().getFlights().size());
+                if (response.body() != null) {
 
-                routesList.add(response.body());
+                    Log.d("MainNav", "got to response RoutesInfo" + response.body().getFlights().size());
 
-
-                // Create the Realm instance
-                realm = Realm.getDefaultInstance();
-
-                tvRouteHeader.setText(response.body().getFlights().get(0).getName());
-
-                //if one route then go to history fragment
-                if (response.body().getFlights().size() == 1) {
-
-                    //Save Flight Id to shared preferences
-                    SharedPreferences pref = getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
-                    SharedPreferences.Editor editor = pref.edit();
-                    editor.putLong(FLIGHT_ID, response.body().getFlights().get(0).getId());
-                    editor.apply();
-
-                    //Save Flight Id to shared preferences
-                    SharedPreferences pref1 = getApplicationContext().getSharedPreferences(NAV_SHARED_PREF, 0); // 0 - for private mode
-                    SharedPreferences.Editor editor1 = pref1.edit();
-                    editor1.putString(FLIGHT_NAME, response.body().getFlights().get(0).getName());
-                    editor1.apply();
-
-                    entries = response.body().getFlights().get(0).getItineraryDTO().getEntries();
+                    routesList.add(response.body());
 
 
-                    startFragment(new LastActionsFragment());
+                    // Create the Realm instance
+                    realm = Realm.getDefaultInstance();
 
-                } else {
-                    Toast.makeText(NavigationActivity.this, response.body().getFlights().get(0).getName(), Toast.LENGTH_SHORT).show();
+                    tvRouteHeader.setText(response.body().getFlights().get(0).getName());
 
-                    flights = new ArrayList<String>();
-                    for (int i = 0; i < response.body().getFlights().size(); i++) {
-                        flights.add(i, response.body().getFlights().get(i).getName());
-                    }
+                    //if one route then go to history fragment
+                    if (response.body().getFlights().size() == 1) {
 
-                    Bundle bundle = new Bundle();
-                    bundle.putStringArrayList("flightsList", flights);
+                        //Save Flight Id to shared preferences
+                        SharedPreferences pref = getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
+                        SharedPreferences.Editor editor = pref.edit();
+                        editor.putLong(FLIGHT_ID, response.body().getFlights().get(0).getId());
+                        editor.apply();
+
+                        //Save Flight Id to shared preferences
+                        SharedPreferences pref1 = getApplicationContext().getSharedPreferences(NAV_SHARED_PREF, 0); // 0 - for private mode
+                        SharedPreferences.Editor editor1 = pref1.edit();
+                        editor1.putString(FLIGHT_NAME, response.body().getFlights().get(0).getName());
+                        editor1.apply();
+
+                        entries = response.body().getFlights().get(0).getItineraryDTO().getEntries();
 
 
-                    flightArrayList = response.body().getFlights();
+                        startFragment(new LastActionsFragment());
+
+                    } else {
+                        Toast.makeText(NavigationActivity.this, response.body().getFlights().get(0).getName(), Toast.LENGTH_SHORT).show();
+
+                        flights = new ArrayList<String>();
+                        for (int i = 0; i < response.body().getFlights().size(); i++) {
+                            flights.add(i, response.body().getFlights().get(i).getName());
+                        }
+
+                        Bundle bundle = new Bundle();
+                        bundle.putStringArrayList("flightsList", flights);
 
 
-                    createDialog();
+                        flightArrayList = response.body().getFlights();
+
+
+                        createDialog();
 
 
 //                    FlightFragment dialogFragment = new FlightFragment();
@@ -228,13 +230,13 @@ public class NavigationActivity extends AppCompatActivity
 //                            dialogFragment).commit();
 
 
-                }
+                    }
 
 //                navProgressBar.setVisibility(View.GONE);
 
 //                LastActionsFragment fragment = new LastActionsFragment();
 //                startFragment(fragment);
-
+                }
                 Log.d("Main", Const.Token);
             }
 
@@ -266,26 +268,29 @@ public class NavigationActivity extends AppCompatActivity
             @Override
             public void onResponse(Call<Member> call, Response<Member> response) {
 
-                String username = response.body().getData().get(0).getUserName();
-                String firstname = response.body().getData().get(0).getFirstName();
-                String lastname = response.body().getData().get(0).getLastName();
+                if (response.body() != null) {
+
+                    String username = response.body().getData().get(0).getUserName();
+                    String firstname = response.body().getData().get(0).getFirstName();
+                    String lastname = response.body().getData().get(0).getLastName();
 
 
-                realm.beginTransaction();
-                realm.insert(response.body().getData());
-                realm.commitTransaction();
+                    realm.beginTransaction();
+                    realm.insert(response.body().getData());
+                    realm.commitTransaction();
 
 
-                tvFirstName.setText(firstname);
-                tvLastName.setText(lastname);
+                    tvFirstName.setText(firstname);
+                    tvLastName.setText(lastname);
 
-                navProgressBar.setVisibility(View.GONE);
+                    navProgressBar.setVisibility(View.GONE);
 
-                LastActionsFragment fragment = new LastActionsFragment();
+                    LastActionsFragment fragment = new LastActionsFragment();
 //                startFragment(fragment);
 
-                Log.d("Main", Const.Token);
-                Log.d("Main", "got here");
+                    Log.d("Main", Const.Token);
+                    Log.d("Main", "got here");
+                }
             }
 
             @Override
@@ -337,7 +342,6 @@ public class NavigationActivity extends AppCompatActivity
                 editor1.apply();
 
 
-
                 tvRouteHeader.setText(pref1.getString(FLIGHT_NAME, "Путь"));
 
                 posReturn = position;
@@ -368,10 +372,9 @@ public class NavigationActivity extends AppCompatActivity
                     startFragment(new LastActionsFragment());
 
 
-                }else{
+                } else {
                     Toast.makeText(NavigationActivity.this, "Необходимо выбрать путь следования", Toast.LENGTH_SHORT).show();
                 }
-
 
 
             }
