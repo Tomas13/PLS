@@ -299,6 +299,9 @@ public class VolumesFragment extends Fragment {
 
                             } else {
 
+                                collateRVAdapter.notifyItemMoved(0, childPosition);
+
+
                                 if (objects.get(childPosition) instanceof Packet) {
                                     packetsList.remove(((Packet) objects.get(childPosition)).getId());
                                 } else {
