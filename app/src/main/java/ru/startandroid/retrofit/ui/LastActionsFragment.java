@@ -88,24 +88,26 @@ public class LastActionsFragment extends Fragment {
 
                 progressHistory.setVisibility(View.GONE);
 
-                if (response.isSuccessful() && response.body().getStatus().equals("success")) {
+                if (response.isSuccessful() && response.body() != null) {
+                    if (response.isSuccessful() && response.body().getStatus().equals("success")) {
 
-                    final List<History> lastActionsList = new ArrayList<>();
+                        final List<History> lastActionsList = new ArrayList<>();
 
-                    for (int i = 0; i < response.body().getHistory().size(); i++) {
+                        for (int i = 0; i < response.body().getHistory().size(); i++) {
 
-                        lastActionsList.add(response.body().getHistory().get(i));
-                    }
+                            lastActionsList.add(response.body().getHistory().get(i));
+                        }
 
-                    HistoryRVAdapter historyAdapter = new HistoryRVAdapter(lastActionsList);
-                    RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-                    rvHistory.setLayoutManager(mLayoutManager);
-                    rvHistory.setAdapter(historyAdapter);
+                        HistoryRVAdapter historyAdapter = new HistoryRVAdapter(lastActionsList);
+                        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+                        rvHistory.setLayoutManager(mLayoutManager);
+                        rvHistory.setAdapter(historyAdapter);
 
 
 //                } else if (response.body().getStatus().equals("list-empty")) {
-                } else {
-                    tvNoDataHistory.setVisibility(View.VISIBLE);
+                    } else {
+                        tvNoDataHistory.setVisibility(View.VISIBLE);
+                    }
                 }
             }
 

@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,7 +55,7 @@ public class AcceptGenInvoiceFragment extends Fragment {
 
     List<Long> ids;
     private Realm realm;
-
+    private ProgressBar progressAccept;
 
     private ArrayAdapter<String> listAdapter;
     private List<String> generalInvoiceIdsList = new ArrayList<>();
@@ -74,6 +75,7 @@ public class AcceptGenInvoiceFragment extends Fragment {
         tvAcceptGen = (TextView) view.findViewById(R.id.tv_no_data_accept_gen);
         btnCollate = (Button) view.findViewById(R.id.btn_collate);
 
+        progressAccept = (ProgressBar) view.findViewById(R.id.progress_accept_gen);
         Long id;
 
 
@@ -84,8 +86,11 @@ public class AcceptGenInvoiceFragment extends Fragment {
             id = getArguments().getLong("generalInvoiceId");
 
             Toast.makeText(getContext(), "id " + id, Toast.LENGTH_SHORT).show();
+
+            progressAccept.setVisibility(View.VISIBLE);
             retrofitAcceptGeneralInvoice(id);
         } else {
+            progressAccept.setVisibility(View.VISIBLE);
 
             Toast.makeText(getContext(), "came from menu", Toast.LENGTH_SHORT).show();
             retrofitDestinationList();
@@ -96,6 +101,8 @@ public class AcceptGenInvoiceFragment extends Fragment {
         btnCollate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                progressAccept.setVisibility(View.VISIBLE);
+
                 retrofitPostCollate();
             }
         });
@@ -117,6 +124,8 @@ public class AcceptGenInvoiceFragment extends Fragment {
             public void onResponse(Call<ResponseDestinationList> call, Response<ResponseDestinationList> response) {
                 if (response.isSuccessful() && response.body().getStatus().equals("success")) {
 
+                    progressAccept.setVisibility(View.GONE);
+
                     for (int i = 0; i < response.body().getDestinationLists().size(); i++) {
 
                         generalInvoiceIdsList.add(response.body().getDestinationLists().get(i).getDestinationListId());
@@ -131,9 +140,10 @@ public class AcceptGenInvoiceFragment extends Fragment {
 
 
                     Log.d("acceptGen", generalInvoiceIdsList.get(0).toString());
-                    listViewAcceptGen.notify();
+//                    listViewAcceptGen.notify();
 
                 } else {
+                    progressAccept.setVisibility(View.GONE);
 
                     tvAcceptGen.setVisibility(View.VISIBLE);
                 }
@@ -162,6 +172,8 @@ public class AcceptGenInvoiceFragment extends Fragment {
             @Override
             public void onResponse(Call<Oinvoice> call, Response<Oinvoice> response) {
 
+                progressAccept.setVisibility(View.GONE);
+
 //                Log.d("InvoiceORespo", response.body().getDestinationLists().get(0).getDestinationListId());
                 Log.d("MainAcceptGen", response.message());
 
@@ -179,6 +191,7 @@ public class AcceptGenInvoiceFragment extends Fragment {
                     listViewAcceptGen.setAdapter(listAdapter);
 
                 } else {
+                    progressAccept.setVisibility(View.GONE);
 
                     tvAcceptGen.setVisibility(View.VISIBLE);
                 }
@@ -208,6 +221,7 @@ public class AcceptGenInvoiceFragment extends Fragment {
             @Override
             public void onResponse(Call<CollateResponse> call, Response<CollateResponse> response) {
 
+                progressAccept.setVisibility(View.GONE);
 
                 if (response.isSuccessful() && response.body().getStatus().equals("success")) {
                     Log.d("MainAccept", "got response");
@@ -221,6 +235,11 @@ public class AcceptGenInvoiceFragment extends Fragment {
 
                     collateDtoObject = response.body().getDto();
 
+                    ArrayList<Label> labels = new ArrayList<Label>();
+                    labels.addAll(collateDtoObject.getLabels());
+
+                    ArrayList<Packet> packets = new ArrayList<>();
+                    packets.addAll(collateDtoObject.getPackets());
 
                     ArrayList<CollateResponse> collateResponsesArrayList = new ArrayList<CollateResponse>();
 //                collateResponsesArrayList.addAll(response)
@@ -229,13 +248,18 @@ public class AcceptGenInvoiceFragment extends Fragment {
                     realm = Realm.getDefaultInstance();
 
                     realm.beginTransaction();
-                    realm.insert(collateDtoObject);
+                    realm.insert(packets);
+                    realm.insert(labels);
+//                    realm.insert(collateDtoObject);
                     realm.commitTransaction();
                     Log.d("MainAccept", "got response");
+
+                    ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
 
 
                 } else {
 
+                    progressAccept.setVisibility(View.VISIBLE);
 
                     retrofitGetListForVpn();
                     tvAcceptGen.setVisibility(View.VISIBLE);
@@ -247,6 +271,7 @@ public class AcceptGenInvoiceFragment extends Fragment {
             @Override
             public void onFailure(Call<CollateResponse> call, Throwable t) {
                 Log.d("MainAccept", t.getMessage());
+                progressAccept.setVisibility(View.GONE);
 
             }
         });
@@ -266,6 +291,7 @@ public class AcceptGenInvoiceFragment extends Fragment {
             @Override
             public void onResponse(Call<CollateResponse> call, Response<CollateResponse> response) {
 
+                progressAccept.setVisibility(View.GONE);
 
                 if (response.isSuccessful() && response.body().getStatus().equals("success")) {
                     Log.d("MainAccept", "got response");
@@ -273,7 +299,6 @@ public class AcceptGenInvoiceFragment extends Fragment {
                     Log.d("MainAccept", response.body().getStatus());
                     Log.d("MainAccept labels", response.body().getDto().getLabels().size() + " ");
                     Log.d("MainAccept packets", response.body().getDto().getPackets().size() + " ");
-
 
 
                     ArrayList<Packet> packetsArrayList = new ArrayList<>();
@@ -287,7 +312,7 @@ public class AcceptGenInvoiceFragment extends Fragment {
                     objects.addAll(packetsArrayList);
                     objects.addAll(labelsArrayList);
 
-                    CollateRVAdapter collateRVAdapter = new CollateRVAdapter(objects);
+//                    CollateRVAdapter collateRVAdapter = new CollateRVAdapter(objects);
 
 
                     // Create the Realm instance
@@ -299,10 +324,11 @@ public class AcceptGenInvoiceFragment extends Fragment {
                     realm.commitTransaction();
                     Log.d("MainAccept", "got response");
 
-                    ((NavigationActivity) getActivity()).startFragment(new CollateFragment());
+                    ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
 
 
                 } else {
+                    progressAccept.setVisibility(View.GONE);
 
                     tvAcceptGen.setVisibility(View.VISIBLE);
                 }

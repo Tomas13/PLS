@@ -81,6 +81,7 @@ public class InvoiceFragment extends Fragment {
         return viewRoot;
     }
 
+
     private void getGeneralInvoice() {
         Retrofit retrofitInvoice = new Retrofit.Builder()
                 .baseUrl("http://pls-test.kazpost.kz/")

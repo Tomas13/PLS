@@ -77,6 +77,7 @@ public class NavigationActivity extends AppCompatActivity
         Toolbar toolbar = activityNavigationBinding.appBarNavigation.toolbar;
         setSupportActionBar(toolbar);
 
+        setTitle("PLS");
 
         navProgressBar = (ProgressBar) findViewById(R.id.activity_navigation_progressbar);
 

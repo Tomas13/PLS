@@ -138,6 +138,12 @@ public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             viewHolder1.tvToDeptName1.setText(packet.getToDep().getName());
             viewHolder1.tvToDeptNameRu1.setText(packet.getToDep().getNameRu());
 
+            viewHolder1.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    listener1.onCheckedChanged(buttonView, isChecked, position);
+                }
+            });
         }
 
     }
@@ -152,7 +158,7 @@ public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public int getItemViewType(int position) {
         if (items.get(position) instanceof Label) {
             return LABEL;
-        } else if (items.get(position) instanceof String) {
+        } else if (items.get(position) instanceof Packet) {
             return PACKET;
         }
         return -1;
