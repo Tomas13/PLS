@@ -12,11 +12,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmList;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -43,7 +47,11 @@ import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 public class RoutesFragment extends Fragment {
 
 
-    RecyclerView rvRoutes;
+    private RecyclerView rvRoutes;
+
+    private TextView tvNoData;
+    private ProgressBar progressBar;
+
 
     public RoutesFragment() {
         // Required empty public constructor
@@ -59,16 +67,24 @@ public class RoutesFragment extends Fragment {
 
         rvRoutes = (RecyclerView) viewRoot.findViewById(R.id.rv_routes);
 
+        tvNoData = (TextView) viewRoot.findViewById(R.id.tv_no_data_routes);
+        progressBar = (ProgressBar) viewRoot.findViewById(R.id.progress_routes);
+
         ((AppCompatActivity) getActivity())
                 .getSupportActionBar()
                 .setTitle("Маршруты");
 
 
+
+
+        progressBar.setVisibility(View.VISIBLE);
         getRoutesInfo();
 
 
         return viewRoot;
     }
+
+
 
 
     private void getRoutesInfo() {
@@ -87,51 +103,54 @@ public class RoutesFragment extends Fragment {
             @Override
             public void onResponse(Call<Routes> call, Response<Routes> response) {
 
+                progressBar.setVisibility(View.GONE);
 
-                int pos = 0;
+                if (response.isSuccessful() && response.body().getStatus().equals("success")){
 
-                if (isAdded()) {
 
-                    SharedPreferences pref = getActivity().getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
-                    pos = pref.getInt(FLIGHT_POS, 0);
+                    int pos = 0;
+                    if (isAdded()) {
+                        SharedPreferences pref = getActivity().getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
+                        pos = pref.getInt(FLIGHT_POS, 0);
+                    }
+
+
+                    Log.d("MainNav", "got to response" + response.body().getFlights().get(pos).getItineraryDTO().getEntries().size() + " pos " + pos);
+
+                    List<Entry> flights = new ArrayList<>();
+
+                    flights.addAll(response.body().getFlights().get(pos).getItineraryDTO().getEntries());
+
+
+
+
+
+
+                    Log.d("MainNav", flights.size() + " size");
+                    RoutesRVAdapter routesRVAdapter = new RoutesRVAdapter(flights);
+
+                    RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+                    rvRoutes.setLayoutManager(mLayoutManager);
+                    rvRoutes.setAdapter(routesRVAdapter);
+
+                }else{
+                    tvNoData.setVisibility(View.VISIBLE);
                 }
 
-
-                Log.d("MainNav", "got to response" + response.body().getFlights().get(pos).getItineraryDTO().getEntries().size() + " pos " + pos);
-
-                List<Entry> flights = new ArrayList<>();
-
-//                for (int i = 0; i < response.body().getFlights().size(); i++) {
-                flights.addAll(response.body().getFlights().get(pos).getItineraryDTO().getEntries());
-//                }
-
-
-                Log.d("MainNav", flights.size() + " size");
-                RoutesRVAdapter routesRVAdapter = new RoutesRVAdapter(flights);
-
-                RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-                rvRoutes.setLayoutManager(mLayoutManager);
-                rvRoutes.setAdapter(routesRVAdapter);
-
-               /* rvRoutes.addOnItemTouchListener(new RoutesRVAdapter(getActivity(), flights,
-                        new RoutesRVAdapter.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(View childView, int childAdapterPosition) {
-
-                                Log.d("MainRoute", " pos is " + childAdapterPosition);
-                                Toast.makeText(getActivity(), " pos is " + childAdapterPosition, Toast.LENGTH_SHORT).show();
-
-                            }
-                        }));*/
             }
 
             @Override
             public void onFailure(Call<Routes> call, Throwable t) {
                 Log.d("Main", t.getMessage());
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
 
             }
         });
     }
 
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
 }

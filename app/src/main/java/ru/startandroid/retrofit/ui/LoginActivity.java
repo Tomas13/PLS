@@ -1,6 +1,7 @@
 package ru.startandroid.retrofit.ui;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,9 +17,14 @@ import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.databinding.ActivityLoginBinding;
 import ru.startandroid.retrofit.utils.KeycloakHelper;
 
+import static ru.startandroid.retrofit.Const.TOKEN;
+import static ru.startandroid.retrofit.Const.TOKEN_SHARED_PREF;
+import static ru.startandroid.retrofit.Const.Token;
+
 public class LoginActivity extends AppCompatActivity {
 
     ActivityLoginBinding activityLoginBinding;
+    SharedPreferences pref1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +32,9 @@ public class LoginActivity extends AppCompatActivity {
 
         activityLoginBinding = DataBindingUtil.setContentView(this,
                 R.layout.activity_login);
+
+
+         pref1 = getApplicationContext().getSharedPreferences(TOKEN_SHARED_PREF, 0); // 0 - for private mode
 
         startAuth();
 
@@ -41,6 +50,10 @@ public class LoginActivity extends AppCompatActivity {
                     Const.Token += data;
 
 
+                    //Save Token to shared preferences
+                    SharedPreferences.Editor editor1 = pref1.edit();
+                    editor1.putString(TOKEN, data);
+                    editor1.apply();
 
                     Log.d("Login", Const.Token);
                     startActivity(intent);
@@ -53,6 +66,19 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                 }
             });
+        }else{
+
+            Intent intent = new Intent(LoginActivity.this, NavigationActivity.class);
+
+            if (pref1.contains(TOKEN)){
+                Token += pref1.getString(TOKEN, "0");
+            }
+
+            Log.d("MainLogin", Const.Token);
+            startActivity(intent);
+
+            finish();
+
         }
     }
 

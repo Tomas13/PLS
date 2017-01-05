@@ -2,7 +2,9 @@ package ru.startandroid.retrofit.Model.routes;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Dept {
+import io.realm.RealmObject;
+
+public class Dept extends RealmObject {
 
     @SerializedName("name")
     @Expose

@@ -45,7 +45,6 @@ public class KeycloakHelper {
                     .setClientId(AUTHZ_CLIENT_ID)
                     .setClientSecret(CLIENT_SECRET)
                     .setScopes(scopes)
-
                     .setRedirectURL(AUTHZ_REDIRECT_URL)
                     .asModule();
         } catch (Exception e) {
@@ -78,8 +77,8 @@ public class KeycloakHelper {
         return AuthorizationManager.getModule(MODULE_NAME).isAuthorized();
     }
 
-    public static void refresh() {
+    public static void deleteAccount() {
         Log.i(TAG, "refresh is called!");
-        AuthorizationManager.getModule(MODULE_NAME).refreshAccess();
+        AuthorizationManager.getModule(MODULE_NAME).deleteAccount();
     }
 }

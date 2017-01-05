@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,6 +48,8 @@ public class InvoiceFragment extends Fragment {
 
     TableRow tableRowInvoice;
 
+    private ProgressBar progressInvoice;
+
     public InvoiceFragment() {
         // Required empty public constructor
     }
@@ -70,6 +73,9 @@ public class InvoiceFragment extends Fragment {
 
         rvInvoice = (RecyclerView) viewRoot.findViewById(R.id.rv_invoice_fragment);
 
+        progressInvoice = (ProgressBar) viewRoot.findViewById(R.id.progress_invoice);
+
+        progressInvoice.setVisibility(View.VISIBLE);
         getGeneralInvoice();
 
         return viewRoot;
@@ -92,6 +98,8 @@ public class InvoiceFragment extends Fragment {
             public void onResponse(Call<InvoiceMain> call, Response<InvoiceMain> response) {
 
                 Log.d("InvoiceFrag", "got in onresponse");
+                progressInvoice.setVisibility(View.GONE);
+
 
                 if (response.isSuccessful() && response.body().getStatus().equals("success")) {
 
@@ -130,6 +138,9 @@ public class InvoiceFragment extends Fragment {
             @Override
             public void onFailure(Call<InvoiceMain> call, Throwable t) {
                 Log.d("Main", t.getMessage());
+                progressInvoice.setVisibility(View.GONE);
+                Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+
             }
         });
     }

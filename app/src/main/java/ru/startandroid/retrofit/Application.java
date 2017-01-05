@@ -5,9 +5,6 @@ import com.uphyca.stetho_realm.RealmInspectorModulesProvider;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
-//import com.uphyca.stetho_realm.RealmInspectorModulesProvider;
-
-//import io.realm.Realm;
 
 /**
  * Created by root on 12/29/16.

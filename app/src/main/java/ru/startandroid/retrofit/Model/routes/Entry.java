@@ -3,9 +3,10 @@ package ru.startandroid.retrofit.Model.routes;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import io.realm.RealmObject;
 import ru.startandroid.retrofit.Model.routes.Dept;
 
-public class Entry {
+public class Entry extends RealmObject {
 
     @SerializedName("dept")
     @Expose

@@ -10,7 +10,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +40,7 @@ public class LastActionsFragment extends Fragment {
 
     private RecyclerView rvHistory;
     private TextView tvNoDataHistory;
+    private ProgressBar progressHistory;
 
     public LastActionsFragment() {
         // Required empty public constructor
@@ -54,11 +57,12 @@ public class LastActionsFragment extends Fragment {
 
         rvHistory = (RecyclerView) viewRoot.findViewById(R.id.rv_fragment_history);
         tvNoDataHistory = (TextView) viewRoot.findViewById(R.id.tv_no_data_history);
-
+        progressHistory = (ProgressBar) viewRoot.findViewById(R.id.progress_history);
 
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Последние действия");
 
 
+        progressHistory.setVisibility(View.VISIBLE);
         getHistory();
 
 
@@ -81,6 +85,8 @@ public class LastActionsFragment extends Fragment {
         callEdges.enqueue(new Callback<LastActions>() {
             @Override
             public void onResponse(Call<LastActions> call, Response<LastActions> response) {
+
+                progressHistory.setVisibility(View.GONE);
 
                 if (response.isSuccessful() && response.body().getStatus().equals("success")) {
 
@@ -105,7 +111,7 @@ public class LastActionsFragment extends Fragment {
 
             @Override
             public void onFailure(Call<LastActions> call, Throwable t) {
-
+                Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 

@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -37,9 +38,12 @@ import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.Datum;
 import ru.startandroid.retrofit.Model.Member;
+import ru.startandroid.retrofit.Model.routes.Entry;
+import ru.startandroid.retrofit.Model.routes.Flight;
 import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.databinding.ActivityNavigationBinding;
+import ru.startandroid.retrofit.utils.KeycloakHelper;
 
 import static ru.startandroid.retrofit.Const.FLIGHT_ID;
 import static ru.startandroid.retrofit.Const.FLIGHT_NAME;
@@ -82,7 +86,6 @@ public class NavigationActivity extends AppCompatActivity
         tvRouteHeader = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_route_header);
 
 
-
         // Create the Realm instance
         realm = Realm.getDefaultInstance();
         // Build the query looking at all users:
@@ -93,8 +96,12 @@ public class NavigationActivity extends AppCompatActivity
         //if we don't have data of user
         if (queryData.findAll().size() == 0) {
             Log.d("Main", "fetching membership info");
+            navProgressBar.setVisibility(View.VISIBLE);
+
             getMembershipInfo();
         } else {
+
+            navProgressBar.setVisibility(View.GONE);
 
             Log.d("Main", "no fetching " + "size = " + queryData.findAll().size());
 
@@ -107,23 +114,19 @@ public class NavigationActivity extends AppCompatActivity
             }*/
         }
 
-
-        int position;
-
         //If VPN didn't choose flight then getRoutesInfo
         //TODO gotta remove shared pref value when needed (onLogout)
         SharedPreferences pref = getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
 
 
-
         SharedPreferences pref1 = getApplicationContext().getSharedPreferences(NAV_SHARED_PREF, 0); // 0 - for private mode
-        if (pref1.contains(FLIGHT_NAME)){
+        if (pref1.contains(FLIGHT_NAME)) {
             tvRouteHeader.setText(pref1.getString(FLIGHT_NAME, "Путь"));
-
         }
 
-
         if (!pref.contains(FLIGHT_POS)) {
+
+            navProgressBar.setVisibility(View.VISIBLE);
             getRoutesInfo();
 
         } else {
@@ -146,6 +149,10 @@ public class NavigationActivity extends AppCompatActivity
     }
 
 
+    List<Entry> entries;
+
+    List<Flight> flightArrayList;
+
     private void getRoutesInfo() {
         Retrofit retrofitLastActions = new Retrofit.Builder()
                 .baseUrl("http://pls-test.kazpost.kz/")
@@ -162,15 +169,16 @@ public class NavigationActivity extends AppCompatActivity
             @Override
             public void onResponse(Call<Routes> call, Response<Routes> response) {
 
-                Log.d("MainNav", "got to response RoutesInfo" + response.body().getFlights().size());
+                navProgressBar.setVisibility(View.GONE);
 
+                Log.d("MainNav", "got to response RoutesInfo" + response.body().getFlights().size());
 
                 routesList.add(response.body());
 
 
-                Log.d("MainNav", "Routes get name" + response.body().getFlights().get(0).getName());
+                // Create the Realm instance
+                realm = Realm.getDefaultInstance();
 
-                
                 tvRouteHeader.setText(response.body().getFlights().get(0).getName());
 
                 //if one route then go to history fragment
@@ -188,6 +196,9 @@ public class NavigationActivity extends AppCompatActivity
                     editor1.putString(FLIGHT_NAME, response.body().getFlights().get(0).getName());
                     editor1.apply();
 
+                    entries = response.body().getFlights().get(0).getItineraryDTO().getEntries();
+
+
                     startFragment(new LastActionsFragment());
 
                 } else {
@@ -203,6 +214,11 @@ public class NavigationActivity extends AppCompatActivity
 
 
                     createDialog();
+
+
+                    flightArrayList = response.body().getFlights();
+
+
 
 
 //                    FlightFragment dialogFragment = new FlightFragment();
@@ -226,7 +242,9 @@ public class NavigationActivity extends AppCompatActivity
             @Override
             public void onFailure(Call<Routes> call, Throwable t) {
                 Log.d("Main", t.getMessage());
+                navProgressBar.setVisibility(View.GONE);
 
+                Toast.makeText(NavigationActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -274,6 +292,9 @@ public class NavigationActivity extends AppCompatActivity
             @Override
             public void onFailure(Call<Member> call, Throwable t) {
                 Log.d("Main", t.getMessage());
+                navProgressBar.setVisibility(View.GONE);
+
+                Toast.makeText(NavigationActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -283,7 +304,12 @@ public class NavigationActivity extends AppCompatActivity
     ArrayAdapter<String> adapter;
     ArrayList<String> flights;
 
-    private void createDialog(){
+
+    int posReturn;
+
+    private void createDialog() {
+
+
         final Dialog flightDialog = new Dialog(this);
         flightDialog.setContentView(R.layout.fragment_flight);
 
@@ -312,6 +338,8 @@ public class NavigationActivity extends AppCompatActivity
 
                 tvRouteHeader.setText(pref1.getString(FLIGHT_NAME, "Путь"));
 
+                posReturn = position;
+
                 Toast.makeText(NavigationActivity.this, "Готово, можете нажать кнопку ОК для закрытия диалога", Toast.LENGTH_SHORT).show();
 
             }
@@ -322,10 +350,34 @@ public class NavigationActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 flightDialog.dismiss();
+
+                if (posReturn != 0) {
+
+                    Toast.makeText(NavigationActivity.this, "POS IS " + posReturn, Toast.LENGTH_SHORT).show();
+
+
+                    entries = flightArrayList.get(posReturn).getItineraryDTO().getEntries();
+
+                    realm.beginTransaction();
+                    realm.insert(entries);
+
+                    realm.commitTransaction();
+
+                    startFragment(new LastActionsFragment());
+
+
+                }else{
+                    Toast.makeText(NavigationActivity.this, "Необходимо выбрать путь следования", Toast.LENGTH_SHORT).show();
+                }
+
+
+
             }
         });
 
+
     }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -386,7 +438,9 @@ public class NavigationActivity extends AppCompatActivity
             startActivity(new Intent(this, ScannerActivity.class));
 
         } else if (id == R.id.nav_logout) {
-            startActivity(new Intent(this, LoginActivity.class));
+//            startActivity(new ntent(this, LoginActivity.class));
+
+//            KeycloakHelper.deleteAccount();
             this.finish();
         }
 
@@ -405,7 +459,8 @@ public class NavigationActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (!realm.isClosed()) realm.close();
+        if (realm != null && !realm.isClosed()) realm.close();
+
     }
 
     public void replaceFragments(Class fragmentClass) {

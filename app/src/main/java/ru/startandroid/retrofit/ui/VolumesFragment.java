@@ -1,6 +1,7 @@
 package ru.startandroid.retrofit.ui;
 
 
+import android.app.Dialog;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -12,8 +13,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
+import io.realm.RealmQuery;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -28,9 +33,11 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.Interface.GitHubService;
+import ru.startandroid.retrofit.Model.Datum;
 import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.Model.collatedestination.Label;
 import ru.startandroid.retrofit.Model.collatedestination.Packet;
+import ru.startandroid.retrofit.Model.routes.Entry;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.CollateRVAdapter;
 
@@ -48,18 +55,29 @@ public class VolumesFragment extends Fragment {
 
     List<Object> finalObjects;
 
+    private Realm realm;
+
+
     Button btnSendInvoice;
     TextView tvHeaderHint, tvNoDataVolumes, ftv_ll_first, stv_ll_first, ttv_ll_first,
             ftv_ll_second, stv_ll_second, ttv_ll_second,
             ftv_ll_third, stv_ll_third, ttv_ll_third;
 
     LinearLayout firstLL, secondLL, thirdLL;
+    RealmQuery<Entry> queryData;
 
     RecyclerView recyclerViewVolumes;
 
     public VolumesFragment() {
         // Required empty public constructor
     }
+
+
+    ArrayAdapter<String> adapter;
+
+    List<Entry> entries;
+
+    ArrayList<String> flightName;
 
 
     @Override
@@ -73,14 +91,81 @@ public class VolumesFragment extends Fragment {
                 .setTitle("Ёмкости");
 
 
+        flightName = new ArrayList<>();
+        entries = new ArrayList<>();
+
+        // Create the Realm instance
+        realm = Realm.getDefaultInstance();
+        // Build the query looking at all users:
+        queryData = realm.where(Entry.class);
+
+
+        if (!queryData.findAll().isEmpty()){
+            for (int i = 0; i < queryData.findAll().size(); i++) {
+                entries.add(queryData.findAll().get(i));
+            }
+        }
+
+
+        for (int i = 0; i < entries.size(); i++) {
+            flightName.add(entries.get(i).getDept().getNameRu());
+        }
+
+
+
+
         tvNoDataVolumes = (TextView) rootView.findViewById(R.id.tv_no_data_volumes);
         recyclerViewVolumes = (RecyclerView) rootView.findViewById(R.id.rv_fragment_volumes);
         btnSendInvoice = (Button) rootView.findViewById(R.id.btn_send_invoice);
         tvHeaderHint = (TextView) rootView.findViewById(R.id.tv_header_hint);
 
+        btnSendInvoice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialog();
+            }
+        });
+
         retrofitGetListForVpn();
 
         return rootView;
+    }
+
+
+
+    private void showDialog() {
+        final Dialog pointDialog = new Dialog(getContext());
+        pointDialog.setContentView(R.layout.fragment_flight);
+
+
+
+
+
+        ListView listView = (ListView) pointDialog.findViewById(R.id.list_view_flight);
+        adapter = new ArrayAdapter<String>(getContext(), R.layout.list_view_item, flightName);
+        listView.setAdapter(adapter);
+
+        pointDialog.show();
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+
+                Toast.makeText(getContext(), "Готово, можете нажать кнопку ОК для закрытия диалога", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        Button btnOk = (Button) pointDialog.findViewById(R.id.btn_ok_flight);
+        btnOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pointDialog.dismiss();
+
+            }
+        });
+
     }
 
 
@@ -127,7 +212,7 @@ public class VolumesFragment extends Fragment {
                                 if (objects.get(childPosition) instanceof Packet) {
                                     packetsList.add(((Packet) objects.get(childPosition)).getId());
 
-                                } else if (objects.get(childPosition) instanceof Label){
+                                } else if (objects.get(childPosition) instanceof Label) {
                                     labelsList.add(((Label) objects.get(childPosition)).getId());
                                 }
 
@@ -154,8 +239,6 @@ public class VolumesFragment extends Fragment {
                                     btnSendInvoice.setVisibility(View.VISIBLE);
                                     tvHeaderHint.setVisibility(View.GONE);
                                 }
-
-
 
 
                             }
@@ -196,4 +279,12 @@ public class VolumesFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (!packetsList.isEmpty()) packetsList.clear();
+        if (!labelsList.isEmpty()) labelsList.clear();
+
+        if (realm != null && !realm.isClosed()) realm.close();
+    }
 }
