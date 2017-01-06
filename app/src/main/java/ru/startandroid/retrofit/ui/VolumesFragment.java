@@ -37,6 +37,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoice;
+import ru.startandroid.retrofit.Model.CreateResponse;
 import ru.startandroid.retrofit.Model.Datum;
 import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.Model.collatedestination.Dto;
@@ -275,29 +276,37 @@ public class VolumesFragment extends Fragment {
                 .build();
 
         GitHubService gitHubServ = retrofitDestList.create(GitHubService.class);
-        gitHubServ.postCreateGeneralInvoice(body).enqueue(new Callback<ResponseBody>() {
+        gitHubServ.postCreateGeneralInvoice(body).enqueue(new Callback<CreateResponse>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(Call<CreateResponse> call, Response<CreateResponse> response) {
 
-                try {
-                    if (response.body() != null) {
+                if (response.body() != null) {
 
-                        if (response.isSuccessful() && response.body().string()
-                            .equals("{\"status\":\"success\"}")){
-
-                            Log.d("MainVolumes", response.body().toString());
+                    if (response.isSuccessful()) {
+                        if (response.body().getStatus().equals("success")) {
                             Toast.makeText(getContext(), "Общая накладная успешно создана", Toast.LENGTH_SHORT).show();
-                            ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
+
+                        }else{
+
+                            Toast.makeText(getContext(), response.body().getStatus(), Toast.LENGTH_SHORT).show();
                         }
+
+                        ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
+
+//                        if (response.isSuccessful() && response.body().string()
+//                            .equals("{\"status\":\"success\"}")){
+
+//                            Log.d("MainVolumes", response.body().toString());
+//                            Toast.makeText(getContext(), "Общая накладная успешно создана", Toast.LENGTH_SHORT).show();
+//                        }
                 }
+
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+            public void onFailure(Call<CreateResponse> call, Throwable t) {
+                Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

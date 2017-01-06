@@ -15,6 +15,7 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoice;
 import ru.startandroid.retrofit.Model.Contributor;
+import ru.startandroid.retrofit.Model.CreateResponse;
 import ru.startandroid.retrofit.Model.Edges;
 import ru.startandroid.retrofit.Model.IdsCollate;
 import ru.startandroid.retrofit.Model.LastActions;
@@ -96,7 +97,7 @@ public interface GitHubService {
 
     @POST("/api/mobile/create-general-invoice")
     @Headers("Content-Type: text/plain")
-    Call<ResponseBody> postCreateGeneralInvoice(
+    Call<CreateResponse> postCreateGeneralInvoice(
             @Body BodyForCreateInvoice bodyForCreateInvoice
     );
 
