@@ -15,6 +15,9 @@ public class Const {
     public static String Token = "Bearer ";
     public static String FLIGHT_ROUTES = "";
 
+    public static final String BASE_URL = "http://172.30.75.218/";
+//    public static final String BASE_URL = "http://pls-test.kazpost.kz/";
+
     public static List<Flight> ROUTES;
 
     public static final String ACCEPT_HISTORY_STATUS = "ACCEPT_GENERAL_INVOICE";

@@ -46,6 +46,7 @@ import ru.startandroid.retrofit.Model.routes.Entry;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.CollateRVAdapter;
 
+import static ru.startandroid.retrofit.Const.BASE_URL;
 import static ru.startandroid.retrofit.Const.FLIGHT_ID;
 import static ru.startandroid.retrofit.Const.FLIGHT_SHARED_PREF;
 import static ru.startandroid.retrofit.Const.NAV_SHARED_PREF;
@@ -268,7 +269,7 @@ public class VolumesFragment extends Fragment {
 
     private void retrofitPostCreateInvoice() {
         Retrofit retrofitDestList = new Retrofit.Builder()
-                .baseUrl("http://pls-test.kazpost.kz/")
+                .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(getUserClient(Const.Token))
                 .build();
@@ -281,11 +282,12 @@ public class VolumesFragment extends Fragment {
                 try {
                     if (response.body() != null) {
 
-                        if (response.isSuccessful()) {//&& response.body().string()
-//                            .equals("\"{status: success\"}")){
+                        if (response.isSuccessful() && response.body().string()
+                            .equals("{\"status\":\"success\"}")){
 
                             Log.d("MainVolumes", response.body().toString());
-                            Toast.makeText(getContext(), response.body().string(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Общая накладная успешно создана", Toast.LENGTH_SHORT).show();
+                            ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
                         }
                     }
                 } catch (IOException e) {
@@ -305,7 +307,7 @@ public class VolumesFragment extends Fragment {
 
     private void retrofitGetListForVpn() {
         Retrofit retrofitDestList = new Retrofit.Builder()
-                .baseUrl("http://pls-test.kazpost.kz/")
+                .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(getUserClient(Const.Token))
                 .build();

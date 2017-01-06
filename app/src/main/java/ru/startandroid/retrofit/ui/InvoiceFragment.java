@@ -36,6 +36,7 @@ import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.InvoiceRVAdapter;
 
+import static ru.startandroid.retrofit.Const.BASE_URL;
 import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
 
@@ -84,7 +85,7 @@ public class InvoiceFragment extends Fragment {
 
     private void getGeneralInvoice() {
         Retrofit retrofitInvoice = new Retrofit.Builder()
-                .baseUrl("http://pls-test.kazpost.kz/")
+                .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(getUserClient(Const.Token))
                 .build();

@@ -35,6 +35,7 @@ import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.RoutesRVAdapter;
 
+import static ru.startandroid.retrofit.Const.BASE_URL;
 import static ru.startandroid.retrofit.Const.FLIGHT_POS;
 import static ru.startandroid.retrofit.Const.FLIGHT_SHARED_PREF;
 import static ru.startandroid.retrofit.Const.ROUTES;
@@ -85,7 +86,7 @@ public class RoutesFragment extends Fragment {
 
     private void getRoutesInfo() {
         Retrofit retrofitLastActions = new Retrofit.Builder()
-                .baseUrl("http://pls-test.kazpost.kz/")
+                .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(getUserClient(Const.Token))
                 .build();

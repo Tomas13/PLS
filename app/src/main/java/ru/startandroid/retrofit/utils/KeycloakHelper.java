@@ -19,7 +19,8 @@ import java.util.List;
 public class KeycloakHelper {
 
 
-    private static final String SERVER_URL = "http://pls-test.kazpost.kz";
+//    private static final String SERVER_URL = "http://pls-test.kazpost.kz";
+    private static final String SERVER_URL = "http://172.30.75.218";
     private static final String AUTHZ_URL = SERVER_URL + "/auth";
     private static final String AUTHZ_ENDPOINT = "/realms/toolpar/protocol/openid-connect/auth";
     private static final String AUTHZ_CLIENT_ID = "toolpar-mobile";

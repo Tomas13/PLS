@@ -36,6 +36,7 @@ import ru.startandroid.retrofit.Model.collatedestination.Label;
 import ru.startandroid.retrofit.Model.collatedestination.Packet;
 import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
 
+import static ru.startandroid.retrofit.Const.BASE_URL;
 import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
 import ru.startandroid.retrofit.R;
@@ -92,7 +93,7 @@ public class AcceptGenInvoiceFragment extends Fragment {
         } else {
             progressAccept.setVisibility(View.VISIBLE);
 
-            Toast.makeText(getContext(), "came from menu", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getContext(), "came from menu", Toast.LENGTH_SHORT).show();
             retrofitDestinationList();
 
         }
@@ -101,9 +102,15 @@ public class AcceptGenInvoiceFragment extends Fragment {
         btnCollate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                progressAccept.setVisibility(View.VISIBLE);
 
-                retrofitPostCollate();
+                if (!generalInvoiceIdsList.isEmpty()){
+                    progressAccept.setVisibility(View.VISIBLE);
+
+                    retrofitPostCollate();
+                }else{
+                    Toast.makeText(getContext(), "Нечего сличать", Toast.LENGTH_SHORT).show();
+
+                }
             }
         });
 
@@ -113,7 +120,7 @@ public class AcceptGenInvoiceFragment extends Fragment {
 
     private void retrofitDestinationList() {
         Retrofit retrofitDestList = new Retrofit.Builder()
-                .baseUrl("http://pls-test.kazpost.kz/")
+                .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(getUserClient(Const.Token))
                 .build();
@@ -140,7 +147,6 @@ public class AcceptGenInvoiceFragment extends Fragment {
 
                         listViewAcceptGen.setAdapter(listAdapter);
 
-
                         Log.d("acceptGen", generalInvoiceIdsList.get(0).toString());
 //                    listViewAcceptGen.notify();
 
@@ -164,7 +170,7 @@ public class AcceptGenInvoiceFragment extends Fragment {
     private void retrofitAcceptGeneralInvoice(final Long generalInvoiceId) {
 
         Retrofit retrofitAcceptGenInvoice = new Retrofit.Builder()
-                .baseUrl("http://pls-test.kazpost.kz/")
+                .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(getUserClient(Const.Token))
                 .build();
@@ -194,6 +200,7 @@ public class AcceptGenInvoiceFragment extends Fragment {
 
                         listAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, generalInvoiceIdsList);
 
+
                         listViewAcceptGen.setAdapter(listAdapter);
 
                     } else {
@@ -216,7 +223,7 @@ public class AcceptGenInvoiceFragment extends Fragment {
 
     private void retrofitPostCollate() {
         Retrofit retrofitDestList = new Retrofit.Builder()
-                .baseUrl("http://pls-test.kazpost.kz/")
+                .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(getUserClient(Const.Token))
                 .build();
@@ -263,6 +270,7 @@ public class AcceptGenInvoiceFragment extends Fragment {
                         realm.commitTransaction();
                         Log.d("MainAccept", "got response");
 
+
                         ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
 
 
@@ -289,7 +297,7 @@ public class AcceptGenInvoiceFragment extends Fragment {
 
     private void retrofitGetListForVpn() {
         Retrofit retrofitDestList = new Retrofit.Builder()
-                .baseUrl("http://pls-test.kazpost.kz/")
+                .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(getUserClient(Const.Token))
                 .build();

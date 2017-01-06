@@ -52,6 +52,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
+import static ru.startandroid.retrofit.Const.BASE_URL;
 import static ru.startandroid.retrofit.Const.FLIGHT_ID;
 import static ru.startandroid.retrofit.Const.FLIGHT_NAME;
 import static ru.startandroid.retrofit.Const.FLIGHT_POS;
@@ -90,7 +91,7 @@ public class NavigationActivity extends AppCompatActivity
 
         Observable observable;
 
-        observable = Observable.interval(3, TimeUnit.MINUTES)
+        observable = Observable.interval(45, TimeUnit.SECONDS)
                 .map(new Func1<Long, String>() {
                     @Override
                     public String call(Long o) {
@@ -215,7 +216,7 @@ public class NavigationActivity extends AppCompatActivity
 
     private void getRoutesInfo() {
         Retrofit retrofitLastActions = new Retrofit.Builder()
-                .baseUrl("http://pls-test.kazpost.kz/")
+                .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(getUserClient(Const.Token))
                 .build();
@@ -312,7 +313,7 @@ public class NavigationActivity extends AppCompatActivity
 
     private void getMembershipInfo() {
         Retrofit retrofitLastActions = new Retrofit.Builder()
-                .baseUrl("http://pls-test.kazpost.kz/")
+                .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(getUserClient(Const.Token))
                 .build();
