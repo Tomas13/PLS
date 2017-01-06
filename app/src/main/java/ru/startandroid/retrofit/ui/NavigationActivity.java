@@ -24,8 +24,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.jboss.aerogear.android.authorization.oauth2.OAuth2AuthzSession;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -44,12 +47,19 @@ import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.databinding.ActivityNavigationBinding;
 import ru.startandroid.retrofit.utils.KeycloakHelper;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 import static ru.startandroid.retrofit.Const.FLIGHT_ID;
 import static ru.startandroid.retrofit.Const.FLIGHT_NAME;
 import static ru.startandroid.retrofit.Const.FLIGHT_POS;
 import static ru.startandroid.retrofit.Const.FLIGHT_SHARED_PREF;
 import static ru.startandroid.retrofit.Const.NAV_SHARED_PREF;
+import static ru.startandroid.retrofit.Const.TOKEN;
+import static ru.startandroid.retrofit.Const.TOKEN_SHARED_PREF;
+import static ru.startandroid.retrofit.Const.Token;
 import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
 public class NavigationActivity extends AppCompatActivity
@@ -76,6 +86,55 @@ public class NavigationActivity extends AppCompatActivity
 
         Toolbar toolbar = activityNavigationBinding.appBarNavigation.toolbar;
         setSupportActionBar(toolbar);
+
+
+        Observable observable;
+
+        observable = Observable.interval(3, TimeUnit.MINUTES)
+                .map(new Func1<Long, String>() {
+                    @Override
+                    public String call(Long o) {
+                        return "Hey " + o;
+                    }
+                }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+
+
+        observable.subscribe(new Observable.OnSubscribe() {
+            @Override
+            public void call(Object o) {
+
+
+                if (!KeycloakHelper.isConnected()) {
+                    KeycloakHelper.connect(NavigationActivity.this, new org.jboss.aerogear.android.core.Callback<String>() {
+                        @Override
+                        public void onSuccess(String data) {
+                            Const.Token = "Bearer " + data;
+
+                            SharedPreferences pref1 = getApplicationContext().getSharedPreferences(TOKEN_SHARED_PREF, 0); // 0 - for private mode
+
+                            //Save Token to shared preferences
+                            SharedPreferences.Editor editor1 = pref1.edit();
+                            editor1.putString(TOKEN, data);
+                            editor1.apply();
+
+                            Log.d("MainNavTimer", Const.Token);
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+
+                Log.d("MainApplication", o.toString() + Token ); //.getExpires_on());
+
+//                Const.Token = "Bearer "  + session.getRefreshToken();
+            }
+        });
+
+
+
 
         setTitle("PLS");
 
@@ -359,7 +418,7 @@ public class NavigationActivity extends AppCompatActivity
 
                 if (posReturn != 0) {
 
-                    Toast.makeText(NavigationActivity.this, "POS IS " + posReturn, Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(NavigationActivity.this, "POS IS " + posReturn, Toast.LENGTH_SHORT).show();
 
 
                     entries = flightArrayList.get(posReturn).getItineraryDTO().getEntries();
@@ -444,6 +503,9 @@ public class NavigationActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_logout) {
 //            startActivity(new ntent(this, LoginActivity.class));
+
+
+
 
 //            KeycloakHelper.deleteAccount();
             this.finish();

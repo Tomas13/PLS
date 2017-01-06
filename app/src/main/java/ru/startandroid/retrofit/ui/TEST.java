@@ -12,8 +12,14 @@ import android.widget.TextView;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import ru.startandroid.retrofit.R;
+import rx.Observable;
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 public class TEST extends AppCompatActivity {
 
@@ -21,6 +27,7 @@ public class TEST extends AppCompatActivity {
 
     RecyclerView rvTest;
     Adapter adapter;
+    Observable observable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,13 +53,51 @@ public class TEST extends AppCompatActivity {
             tv.append("" + a + " ");
         }
 
+
+
+        observable = Observable.interval(3, TimeUnit.SECONDS)
+                .map(new Func1<Long, String>() {
+                    @Override
+                    public String call(Long o) {
+                        return "Hey " + o;
+                    }
+                }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+
     }
 
     ArrayList<Integer> arrayList;
 
     public void Change(View view) {
 
-        adapter.notifyItemMoved(3, 0);
+        observable.subscribe(new Observable.OnSubscribe() {
+            @Override
+            public void call(Object o) {
+                tv.setText(o.toString() + "\n");
+
+            }
+        });
+
+/*
+        Observer observer = new Observer() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(Object o) {
+                someMethod();
+            }
+        };
+
+        observable.subscribe(observer);
+*/
+
       /*  tv.setText(arrayList.size() + "\n");
 
         int temp = arrayList.get(3);
@@ -67,7 +112,13 @@ public class TEST extends AppCompatActivity {
     }
 
 
-    class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder>{
+    private void someMethod(){
+        adapter.notifyItemMoved(3, 0);
+
+    }
+
+
+    class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
         public class ViewHolder extends RecyclerView.ViewHolder {
 

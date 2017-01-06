@@ -32,6 +32,7 @@ public class KeycloakHelper {
 
     private static final String ACCESS_TOKEN_ENDPOINT = "/realms/toolpar/protocol/openid-connect/token";
     private static final String REFRESH_TOKEN_ENDPOINT = "/realms/toolpar/protocol/openid-connect/token";
+
     static {
         try {
             List<String> scopes = new ArrayList<>();
@@ -55,7 +56,7 @@ public class KeycloakHelper {
 
     public static void connect(final Activity activity, final Callback<String> callback) {
         Log.i(TAG, "Run Connect ");
-        final AuthzModule authzModule = AuthorizationManager.getModule(MODULE_NAME);
+        AuthzModule authzModule = AuthorizationManager.getModule(MODULE_NAME);
         authzModule.requestAccess(activity, new Callback<String>() {
             @Override
             public void onSuccess(String data) {
@@ -79,6 +80,8 @@ public class KeycloakHelper {
 
     public static void refresh() {
         Log.i(TAG, "refresh is called!");
-        AuthorizationManager.getModule(MODULE_NAME).refreshAccess();
+
+
+        Log.d("MainAp", "State" + AuthorizationManager.getModule(MODULE_NAME).refreshAccess());
     }
 }
