@@ -31,5 +31,7 @@ public class Const {
     public static final String FLIGHT_NAME = "FLIGHT_NAME";
     public static final String FLIGHT_ID = "FLIGHT_ID";
     public static final String FLIGHT_POS = "FLIGHT_POS";
+    public static final String LOGIN_PREF = "LOGIN_PREF";
+    public static final String LOGIN_BOOL = "LOGIN_BOOL";
 
 }

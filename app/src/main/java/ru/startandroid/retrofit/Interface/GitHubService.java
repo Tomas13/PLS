@@ -26,6 +26,8 @@ import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
 import ru.startandroid.retrofit.Model.geninvoice.InvoiceMain;
 import ru.startandroid.retrofit.Model.routes.Routes;
 
+import static ru.startandroid.retrofit.utils.KeycloakHelper.LOGOUT;
+
 /**
  * Created by zhangali on 18.12.16.
  */
@@ -106,5 +108,10 @@ public interface GitHubService {
     Call<CollateResponse> getListForVpn(
 
     );
+
+
+
+    @GET(LOGOUT)
+    Call<ResponseBody> getLogout();
 
 }

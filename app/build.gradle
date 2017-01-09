@@ -70,7 +70,7 @@ dependencies {
     // Because RxAndroid releases are few and far between, it is recommended you also
 // explicitly depend on RxJava's latest version for bug fixes and new features.
 
-
+    compile 'org.jboss.aerogear:aerogear-android-auth:3.0.0'
     compile 'org.jboss.aerogear:aerogear-android-authz:3.0.0'
     compile 'org.jboss.aerogear:aerogear-android-pipe:3.1.0'
     compile 'com.android.support:appcompat-v7:25.1.0'
@@ -90,4 +90,6 @@ dependencies {
     compile 'com.uphyca:stetho_realm:2.0.0'
 
     testCompile 'junit:junit:4.12'
+
+    compile 'com.github.maning0303:ZXingCodeDemo:V1.0.3'
 }

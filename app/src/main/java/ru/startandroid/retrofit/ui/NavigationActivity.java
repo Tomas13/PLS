@@ -24,14 +24,22 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.jboss.aerogear.android.authentication.AuthenticationModule;
 import org.jboss.aerogear.android.authorization.oauth2.OAuth2AuthzSession;
+import org.jboss.aerogear.android.pipe.http.HeaderAndBody;
+import org.jboss.aerogear.android.pipe.http.HttpException;
+import org.jboss.aerogear.android.pipe.module.ModuleFields;
 
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -41,6 +49,7 @@ import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.Datum;
 import ru.startandroid.retrofit.Model.Member;
+import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.Model.routes.Entry;
 import ru.startandroid.retrofit.Model.routes.Flight;
 import ru.startandroid.retrofit.Model.routes.Routes;
@@ -61,6 +70,7 @@ import static ru.startandroid.retrofit.Const.NAV_SHARED_PREF;
 import static ru.startandroid.retrofit.Const.TOKEN;
 import static ru.startandroid.retrofit.Const.TOKEN_SHARED_PREF;
 import static ru.startandroid.retrofit.Const.Token;
+import static ru.startandroid.retrofit.utils.KeycloakHelper.AUTHZ_URL;
 import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
 public class NavigationActivity extends AppCompatActivity
@@ -73,23 +83,13 @@ public class NavigationActivity extends AppCompatActivity
     TextView tvLastName, tvRoleName, tvRouteHeader;
     private ArrayList<Routes> routesList = new ArrayList<>();
 
+    private boolean isLogged;
 
     private Realm realm;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-//        setContentView(R.layout.activity_navigation);
-
-        activityNavigationBinding = DataBindingUtil.setContentView(this,
-                R.layout.activity_navigation);
-
-        Toolbar toolbar = activityNavigationBinding.appBarNavigation.toolbar;
-        setSupportActionBar(toolbar);
+    private Observable observable;
 
 
-        Observable observable;
+    private void runRefreshToken() {
 
         observable = Observable.interval(45, TimeUnit.SECONDS)
                 .map(new Func1<Long, String>() {
@@ -128,13 +128,29 @@ public class NavigationActivity extends AppCompatActivity
                     });
                 }
 
-                Log.d("MainApplication", o.toString() + Token ); //.getExpires_on());
+                Log.d("MainApplication", o.toString() + Token); //.getExpires_on());
 
 //                Const.Token = "Bearer "  + session.getRefreshToken();
             }
         });
 
 
+    }
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+//        setContentView(R.layout.activity_navigation);
+
+        activityNavigationBinding = DataBindingUtil.setContentView(this,
+                R.layout.activity_navigation);
+
+        Toolbar toolbar = activityNavigationBinding.appBarNavigation.toolbar;
+        setSupportActionBar(toolbar);
+
+        runRefreshToken();
 
 
         setTitle("PLS");
@@ -503,18 +519,100 @@ public class NavigationActivity extends AppCompatActivity
             startActivity(new Intent(this, ScannerActivity.class));
 
         } else if (id == R.id.nav_logout) {
-//            startActivity(new ntent(this, LoginActivity.class));
 
 
+            AuthenticationModule module = KeycloakHelper.createAuthenticatior();
 
+            module.logout(new LogoutAuthCallBack(NavigationActivity.this));
+
+
+            /*module.logout(new org.jboss.aerogear.android.core.Callback<Void>() {
+                @Override
+                public void onSuccess(Void data) {
+                    Log.d("MainNav", "data is " + data);
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Log.d("MainNav", "e is " + e.getMessage());
+
+
+                }
+            });*/
+//            logout();
+//
+//            Token = "";
+//
+//            isLoggedIn(false);
+//            getSharedPreferences(LOGIN_PREF, MODE_PRIVATE).edit().putBoolean(LOGIN_BOOL, false).apply();
+//            getSharedPreferences(TOKEN_SHARED_PREF, MODE_PRIVATE).edit().remove(TOKEN).apply();
 
 //            KeycloakHelper.deleteAccount();
-            this.finish();
+//            this.finish();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+
+    private static class LogoutAuthCallBack implements org.jboss.aerogear.android.core.Callback<Void> {
+        private final NavigationActivity activity;
+
+        private LogoutAuthCallBack(NavigationActivity activity) {
+            this.activity = activity;
+        }
+
+        @Override
+        public void onSuccess(final Void data) {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+//                    activity.logged(false);
+                       Log.d("MainNav", " data is " + data);
+                }
+            });
+        }
+
+        @Override
+        public void onFailure(final Exception e) {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+//                    activity.logged(false);
+                    Log.d("MainNav", " e is " + e.getMessage());
+
+                }
+            });
+        }
+    }
+
+    private void logout() {
+        Retrofit retrofitDestList = new Retrofit.Builder()
+                .baseUrl(AUTHZ_URL + "/")
+                .addConverterFactory(GsonConverterFactory.create())
+//                .client(getUserClient(Const.Token))
+                .build();
+
+
+        GitHubService gitHubServ = retrofitDestList.create(GitHubService.class);
+        gitHubServ.getLogout().enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Log.d("MainNav", response.message().toString());
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+    }
+
+
+    private void isLoggedIn(boolean b) {
+        isLogged = b;
     }
 
     public void startFragment(Fragment fragment) {

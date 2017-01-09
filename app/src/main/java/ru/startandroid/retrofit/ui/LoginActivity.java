@@ -1,5 +1,6 @@
 package ru.startandroid.retrofit.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
@@ -9,6 +10,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import org.jboss.aerogear.android.authentication.AuthenticationManager;
+import org.jboss.aerogear.android.authentication.digest.HttpDigestAuthenticationConfiguration;
 import org.jboss.aerogear.android.core.Callback;
 
 import ru.startandroid.retrofit.Const;
@@ -17,6 +20,8 @@ import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.databinding.ActivityLoginBinding;
 import ru.startandroid.retrofit.utils.KeycloakHelper;
 
+import static ru.startandroid.retrofit.Const.LOGIN_BOOL;
+import static ru.startandroid.retrofit.Const.LOGIN_PREF;
 import static ru.startandroid.retrofit.Const.TOKEN;
 import static ru.startandroid.retrofit.Const.TOKEN_SHARED_PREF;
 import static ru.startandroid.retrofit.Const.Token;
@@ -36,6 +41,7 @@ public class LoginActivity extends AppCompatActivity {
 
          pref1 = getApplicationContext().getSharedPreferences(TOKEN_SHARED_PREF, 0); // 0 - for private mode
 
+
         startAuth();
 
     }
@@ -54,6 +60,10 @@ public class LoginActivity extends AppCompatActivity {
                     SharedPreferences.Editor editor1 = pref1.edit();
                     editor1.putString(TOKEN, data);
                     editor1.apply();
+
+
+                    SharedPreferences prefs = getSharedPreferences(LOGIN_PREF, Context.MODE_PRIVATE);
+                    prefs.edit().putBoolean(LOGIN_BOOL, true).apply();
 
                     Log.d("Login", Const.Token);
                     startActivity(intent);
