@@ -62,6 +62,13 @@ public class VolumesFragment extends Fragment {
     List<Long> packetsList = new ArrayList<>();
     List<Long> labelsList = new ArrayList<>();
 
+
+
+    final ArrayList<Label> labelsArrayList = new ArrayList<>();
+    final ArrayList<Packet> packetsArrayList = new ArrayList<>();
+
+
+
     private Realm realm;
 
     Button btnSendInvoice;
@@ -291,6 +298,11 @@ public class VolumesFragment extends Fragment {
                             Toast.makeText(getContext(), response.body().getStatus(), Toast.LENGTH_SHORT).show();
                         }
 
+//TODO THIS SHOULD UPDATE rv items
+//                        objects.removeAll(packetsArrayList);
+//                        objects.removeAll(labelsArrayList);
+//                        collateRVAdapter.notifyDataSetChanged();
+
                         ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
                     }
 
@@ -332,10 +344,8 @@ public class VolumesFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     if (response.isSuccessful() && response.body().getStatus().equals("success")) {
 
-                        ArrayList<Packet> packetsArrayList = new ArrayList<>();
                         packetsArrayList.addAll(response.body().getDto().getPackets());
 
-                        ArrayList<Label> labelsArrayList = new ArrayList<>();
                         labelsArrayList.addAll(response.body().getDto().getLabels());
 
 
@@ -372,6 +382,7 @@ public class VolumesFragment extends Fragment {
                                         btnSendInvoice.setVisibility(View.VISIBLE);
                                         tvHeaderHint.setVisibility(View.GONE);
                                     }
+
 
                                 } else {
 
@@ -427,6 +438,7 @@ public class VolumesFragment extends Fragment {
             }
         });
     }
+
 
     @Override
     public void onDestroy() {

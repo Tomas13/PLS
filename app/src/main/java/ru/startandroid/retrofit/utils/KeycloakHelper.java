@@ -74,19 +74,24 @@ public class KeycloakHelper extends HttpDigestAuthenticationConfiguration{
     public static void connect(final Activity activity, final Callback<String> callback) {
         Log.i(TAG, "Run Connect ");
         AuthzModule authzModule = AuthorizationManager.getModule(MODULE_NAME);
-        authzModule.requestAccess(activity, new Callback<String>() {
-            @Override
-            public void onSuccess(String data) {
-                Log.i(TAG, "loging data " + data);
-                callback.onSuccess(data);
-            }
+        if (!authzModule.isAuthorized()){
+            Log.i(TAG, "is Authorized " + authzModule.isAuthorized());
 
-            @Override
-            public void onFailure(Exception e) {
-                Log.e(TAG, e.getMessage(), e);
-                callback.onFailure(e);
-            }
-        });
+            authzModule.requestAccess(activity, new Callback<String>() {
+                @Override
+                public void onSuccess(String data) {
+                    Log.i(TAG, "loging data " + data);
+                    callback.onSuccess(data);
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Log.e(TAG, e.getMessage(), e);
+                    callback.onFailure(e);
+                }
+            });
+
+        }
 
     }
 
