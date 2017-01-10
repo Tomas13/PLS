@@ -1,9 +1,11 @@
 package ru.startandroid.retrofit.ui;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.design.widget.NavigationView;
@@ -16,6 +18,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -25,11 +29,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.jboss.aerogear.android.authentication.AuthenticationModule;
+import org.jboss.aerogear.android.authentication.basic.HttpBasicAuthenticationModule;
+import org.jboss.aerogear.android.authentication.digest.HttpDigestAuthenticationModule;
 import org.jboss.aerogear.android.authorization.oauth2.OAuth2AuthzSession;
 import org.jboss.aerogear.android.pipe.http.HeaderAndBody;
 import org.jboss.aerogear.android.pipe.http.HttpException;
 import org.jboss.aerogear.android.pipe.module.ModuleFields;
 
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -61,6 +68,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
+import static org.spongycastle.asn1.x500.style.BCStyle.C;
 import static ru.startandroid.retrofit.Const.BASE_URL;
 import static ru.startandroid.retrofit.Const.FLIGHT_ID;
 import static ru.startandroid.retrofit.Const.FLIGHT_NAME;
@@ -71,6 +79,7 @@ import static ru.startandroid.retrofit.Const.TOKEN;
 import static ru.startandroid.retrofit.Const.TOKEN_SHARED_PREF;
 import static ru.startandroid.retrofit.Const.Token;
 import static ru.startandroid.retrofit.utils.KeycloakHelper.AUTHZ_URL;
+import static ru.startandroid.retrofit.utils.KeycloakHelper.LOGOUT;
 import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
 public class NavigationActivity extends AppCompatActivity
@@ -520,10 +529,51 @@ public class NavigationActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_logout) {
 
+              /*try {
+                HttpBasicAuthenticationModule module;
+                module = new HttpBasicAuthenticationModule(new URL(BASE_URL));
 
-            AuthenticationModule module = KeycloakHelper.createAuthenticatior();
+                module.logout(new LogoutAuthCallBack(NavigationActivity.this));
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }*/
 
-            module.logout(new LogoutAuthCallBack(NavigationActivity.this));
+            KeycloakHelper.remove();
+            clearCookies(getApplicationContext());
+
+
+//            Intent intent = new Intent(this, LoginActivity.class);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//            startActivity(intent);
+
+
+            finish();
+            System.exit(0);
+
+//            Intent launchIntent = getPackageManager().getLaunchIntentForPackage("ru.startandroid.retrofit");
+//            if (launchIntent != null) {
+//                startActivity(launchIntent);//null pointer check in case package name was not found
+//            }
+
+
+
+
+/*
+            HttpDigestAuthenticationModule authenticationModule;
+
+            try {
+                authenticationModule = new HttpDigestAuthenticationModule(new URL(BASE_URL),
+                        "", LOGOUT, 2000);
+                authenticationModule.logout(new LogoutAuthCallBack(NavigationActivity.this));
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }*/
+
+
+//            AuthenticationModule module = KeycloakHelper.createAuthenticatior();
+
+//            module.logout(new LogoutAuthCallBack(NavigationActivity.this));
 
 
             /*module.logout(new org.jboss.aerogear.android.core.Callback<Void>() {
@@ -556,6 +606,24 @@ public class NavigationActivity extends AppCompatActivity
         return true;
     }
 
+    @SuppressWarnings("deprecation")
+    public static void clearCookies(Context context) {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            Log.d("MainNav", "Using clearCookies code for API >=" + String.valueOf(Build.VERSION_CODES.LOLLIPOP_MR1));
+            CookieManager.getInstance().removeAllCookies(null);
+            CookieManager.getInstance().flush();
+        } else {
+            Log.d("MainNav", "Using clearCookies code for API <" + String.valueOf(Build.VERSION_CODES.LOLLIPOP_MR1));
+            CookieSyncManager cookieSyncMngr = CookieSyncManager.createInstance(context);
+            cookieSyncMngr.startSync();
+            CookieManager cookieManager = CookieManager.getInstance();
+            cookieManager.removeAllCookie();
+            cookieManager.removeSessionCookie();
+            cookieSyncMngr.stopSync();
+            cookieSyncMngr.sync();
+        }
+    }
 
     private static class LogoutAuthCallBack implements org.jboss.aerogear.android.core.Callback<Void> {
         private final NavigationActivity activity;
@@ -570,7 +638,8 @@ public class NavigationActivity extends AppCompatActivity
                 @Override
                 public void run() {
 //                    activity.logged(false);
-                       Log.d("MainNav", " data is " + data);
+                    Log.d("MainNav", " data is " + data);
+
                 }
             });
         }
@@ -627,6 +696,7 @@ public class NavigationActivity extends AppCompatActivity
         super.onDestroy();
         if (realm != null && !realm.isClosed()) realm.close();
 
+        observable = null;
     }
 
 }

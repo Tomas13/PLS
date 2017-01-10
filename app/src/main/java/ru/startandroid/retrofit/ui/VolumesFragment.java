@@ -62,12 +62,8 @@ public class VolumesFragment extends Fragment {
     List<Long> packetsList = new ArrayList<>();
     List<Long> labelsList = new ArrayList<>();
 
-
-
     final ArrayList<Label> labelsArrayList = new ArrayList<>();
     final ArrayList<Packet> packetsArrayList = new ArrayList<>();
-
-
 
     private Realm realm;
 
@@ -208,6 +204,7 @@ public class VolumesFragment extends Fragment {
                     }
 
                     if (labelsList.isEmpty() && packetsList.isEmpty()) {
+
                         btnSendInvoice.setVisibility(View.GONE);
                         tvHeaderHint.setVisibility(View.VISIBLE);
                     } else {
@@ -293,25 +290,34 @@ public class VolumesFragment extends Fragment {
                         if (response.body().getStatus().equals("success")) {
                             Toast.makeText(getContext(), "Общая накладная успешно создана", Toast.LENGTH_SHORT).show();
 
-                        }else{
+                        } else {
 
                             Toast.makeText(getContext(), response.body().getStatus(), Toast.LENGTH_SHORT).show();
                         }
 
-//TODO THIS SHOULD UPDATE rv items
-//                        objects.removeAll(packetsArrayList);
-//                        objects.removeAll(labelsArrayList);
-//                        collateRVAdapter.notifyDataSetChanged();
+        //TODO THIS SHOULD UPDATE rv items
+/*
+                        for (int i = 0; i < packetsList.size(); i++) {
 
-                        ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
+                            if (packetsArrayList.get(i).getPacketListId().equals(String.valueOf(packetsList.get(i)))){
+                                packetsArrayList.remove(i);
+                            }
+                        }
+
+                        for (int i = 0; i < labelsList.size(); i++) {
+                            if (labelsArrayList.get(i).getLabelListid().equals(String.valueOf(labelsList.get(i)))){
+                                labelsArrayList.remove(i);
+
+                            }
+                        }
+
+                        objects.clear();
+                        objects.addAll(packetsArrayList);
+                        objects.addAll(labelsArrayList);
+                        collateRVAdapter.notifyDataSetChanged();*/
+
+//                        ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
                     }
-
-//                        if (response.isSuccessful() && response.body().string()
-//                            .equals("{\"status\":\"success\"}")){
-
-//                            Log.d("MainVolumes", response.body().toString());
-//                            Toast.makeText(getContext(), "Общая накладная успешно создана", Toast.LENGTH_SHORT).show();
-//                        }
                 }
 
             }
@@ -332,9 +338,6 @@ public class VolumesFragment extends Fragment {
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(getUserClient(Const.Token))
                 .build();
-
-//        realm.delete(Label.class);
-//        realm.delete(Packet.class);
 
         GitHubService gitHubServ = retrofitDestList.create(GitHubService.class);
         gitHubServ.getListForVpn().enqueue(new Callback<CollateResponse>() {
@@ -367,9 +370,12 @@ public class VolumesFragment extends Fragment {
                                     if (objects.get(childPosition) instanceof Packet) {
                                         packetsList.add(((Packet) objects.get(childPosition)).getId());
 
+
 //                                    collateRVAdapter.notifyItemMoved(childPosition, 0);
                                     } else if (objects.get(childPosition) instanceof Label) {
                                         labelsList.add(((Label) objects.get(childPosition)).getId());
+
+
                                /*     Label tempLabel = (Label) objects.get(childPosition);
                                     objects.remove(childPosition);
                                     objects.add(0, tempLabel);*/
@@ -389,8 +395,11 @@ public class VolumesFragment extends Fragment {
 
                                     if (objects.get(childPosition) instanceof Packet) {
                                         packetsList.remove(((Packet) objects.get(childPosition)).getId());
+
                                     } else {
                                         labelsList.remove(((Label) objects.get(childPosition)).getId());
+
+
                                     }
 
                                     if (labelsList.isEmpty() && packetsList.isEmpty()) {
@@ -419,9 +428,6 @@ public class VolumesFragment extends Fragment {
 //                    realm.insert(packetsArrayList);
 //                    realm.commitTransaction();
                         Log.d("MainAccept", "got response");
-
-//                    ((NavigationActivity) getActivity()).startFragment(new CollateFragment());
-
 
                     } else {
 

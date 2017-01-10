@@ -30,8 +30,8 @@ import java.util.Map;
 public class KeycloakHelper extends HttpDigestAuthenticationConfiguration{
 
 
-//    private static final String SERVER_URL = "http://pls-test.kazpost.kz";
-    private static final String SERVER_URL = "http://172.30.75.218";
+    private static final String SERVER_URL = "http://pls-test.post.kz";
+//    private static final String SERVER_URL = "http://172.30.75.218";
     public static final String AUTHZ_URL = SERVER_URL + "/auth";
     private static final String AUTHZ_ENDPOINT = "/realms/toolpar/protocol/openid-connect/auth";
     private static final String AUTHZ_CLIENT_ID = "toolpar-mobile";
@@ -45,6 +45,8 @@ public class KeycloakHelper extends HttpDigestAuthenticationConfiguration{
     private static final String ACCESS_TOKEN_ENDPOINT = "/realms/toolpar/protocol/openid-connect/token";
     private static final String REFRESH_TOKEN_ENDPOINT = "/realms/toolpar/protocol/openid-connect/token";
 
+//    public static final String LOGOUT = "/realms/toolpar/protocol/openid-connect/logout";
+//    public static final String LOGOUT = "http://pls-test.post.kz/auth/realms/toolpar/protocol/openid-connect/logout";
     public static final String LOGOUT = "/realms/toolpar/protocol/openid-connect/logout";
 
     static {
@@ -71,9 +73,11 @@ public class KeycloakHelper extends HttpDigestAuthenticationConfiguration{
 
 
 
+    static AuthzModule authzModule;
+
     public static void connect(final Activity activity, final Callback<String> callback) {
         Log.i(TAG, "Run Connect ");
-        AuthzModule authzModule = AuthorizationManager.getModule(MODULE_NAME);
+        authzModule = AuthorizationManager.getModule(MODULE_NAME);
         if (!authzModule.isAuthorized()){
             Log.i(TAG, "is Authorized " + authzModule.isAuthorized());
 
@@ -98,6 +102,10 @@ public class KeycloakHelper extends HttpDigestAuthenticationConfiguration{
     public static boolean isConnected() {
         Log.i("MainKeycloak", "check is connected!" + AuthorizationManager.getModule(MODULE_NAME).isAuthorized());
         return AuthorizationManager.getModule(MODULE_NAME).isAuthorized();
+    }
+
+    public static void remove(){
+        authzModule.deleteAccount();
     }
 
     public static void refresh() {
