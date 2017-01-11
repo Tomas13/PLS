@@ -66,6 +66,7 @@ import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.databinding.ActivityNavigationBinding;
 import ru.startandroid.retrofit.utils.KeycloakHelper;
 import rx.Observable;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -76,6 +77,7 @@ import static ru.startandroid.retrofit.Const.FLIGHT_ID;
 import static ru.startandroid.retrofit.Const.FLIGHT_NAME;
 import static ru.startandroid.retrofit.Const.FLIGHT_POS;
 import static ru.startandroid.retrofit.Const.FLIGHT_SHARED_PREF;
+import static ru.startandroid.retrofit.Const.LOGIN_PREF;
 import static ru.startandroid.retrofit.Const.NAV_SHARED_PREF;
 import static ru.startandroid.retrofit.Const.TOKEN;
 import static ru.startandroid.retrofit.Const.TOKEN_SHARED_PREF;
@@ -98,7 +100,7 @@ public class NavigationActivity extends AppCompatActivity
 
     private Realm realm;
     private Observable observable;
-
+    private Subscription subscription;
 
     private void runRefreshToken() {
 
@@ -111,7 +113,7 @@ public class NavigationActivity extends AppCompatActivity
                 }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 
 
-        observable.subscribe(new Observable.OnSubscribe() {
+       subscription = observable.subscribe(new Observable.OnSubscribe() {
             @Override
             public void call(Object o) {
 
@@ -145,7 +147,6 @@ public class NavigationActivity extends AppCompatActivity
             }
         });
 
-
     }
 
 
@@ -160,11 +161,9 @@ public class NavigationActivity extends AppCompatActivity
 
         Toolbar toolbar = activityNavigationBinding.appBarNavigation.toolbar;
         setSupportActionBar(toolbar);
+        setTitle("PLS");
 
         runRefreshToken();
-
-
-        setTitle("PLS");
 
         navProgressBar = (ProgressBar) findViewById(R.id.activity_navigation_progressbar);
 
@@ -172,7 +171,6 @@ public class NavigationActivity extends AppCompatActivity
         tvLastName = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_lname);
         tvRoleName = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_role_name);
         tvRouteHeader = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_route_header);
-
 
         // Create the Realm instance
         realm = Realm.getDefaultInstance();
@@ -549,9 +547,27 @@ public class NavigationActivity extends AppCompatActivity
     }
 
     private void remove() {
+        stopSubscription();
+
+       clearSharedPrefs();
         KeycloakHelper.remove();
         finish();
         System.exit(0);
+
+    }
+
+    void stopSubscription() {
+        if (subscription != null && !subscription.isUnsubscribed()) {
+            Log.d("MainNav", " Observable stopped");
+            subscription.unsubscribe();
+        }
+    }
+
+    private void clearSharedPrefs(){
+//        getSharedPreferences(LOGIN_PREF, MODE_PRIVATE).edit().clear().apply();
+        getSharedPreferences(NAV_SHARED_PREF, MODE_PRIVATE).edit().clear().apply();
+        getSharedPreferences(FLIGHT_SHARED_PREF, MODE_PRIVATE).edit().clear().apply();
+        getSharedPreferences(TOKEN_SHARED_PREF, MODE_PRIVATE).edit().clear().apply();
     }
 
     private void isLoggedIn(boolean b) {
