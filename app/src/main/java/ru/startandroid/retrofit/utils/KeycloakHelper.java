@@ -3,25 +3,18 @@ package ru.startandroid.retrofit.utils;
 import android.app.Activity;
 import android.util.Log;
 
-import org.jboss.aerogear.android.authentication.AbstractAuthenticationModule;
 import org.jboss.aerogear.android.authentication.AuthenticationManager;
 import org.jboss.aerogear.android.authentication.AuthenticationModule;
 import org.jboss.aerogear.android.authentication.digest.HttpDigestAuthenticationConfiguration;
-import org.jboss.aerogear.android.authentication.digest.HttpDigestAuthenticationModule;
 import org.jboss.aerogear.android.authorization.AuthorizationManager;
 import org.jboss.aerogear.android.authorization.AuthzModule;
 import org.jboss.aerogear.android.authorization.oauth2.OAuth2AuthorizationConfiguration;
 import org.jboss.aerogear.android.core.Callback;
-import org.jboss.aerogear.android.pipe.http.HeaderAndBody;
-import org.jboss.aerogear.android.pipe.http.HttpException;
-import org.jboss.aerogear.android.pipe.module.ModuleFields;
 
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by zhangali on 20.12.16.
@@ -45,8 +38,6 @@ public class KeycloakHelper extends HttpDigestAuthenticationConfiguration{
     private static final String ACCESS_TOKEN_ENDPOINT = "/realms/toolpar/protocol/openid-connect/token";
     private static final String REFRESH_TOKEN_ENDPOINT = "/realms/toolpar/protocol/openid-connect/token";
 
-//    public static final String LOGOUT = "/realms/toolpar/protocol/openid-connect/logout";
-//    public static final String LOGOUT = "http://pls-test.post.kz/auth/realms/toolpar/protocol/openid-connect/logout";
     public static final String LOGOUT = "/realms/toolpar/protocol/openid-connect/logout";
 
     static {
@@ -69,9 +60,6 @@ public class KeycloakHelper extends HttpDigestAuthenticationConfiguration{
         }
 
     }
-
-
-
 
     static AuthzModule authzModule;
 
@@ -115,23 +103,4 @@ public class KeycloakHelper extends HttpDigestAuthenticationConfiguration{
         Log.d("MainAp", "State" + AuthorizationManager.getModule(MODULE_NAME).refreshAccess());
     }
 
-    public static AuthenticationModule createAuthenticatior() {
-        AuthenticationModule module;
-
-        HttpDigestAuthenticationConfiguration authenticationConfiguration =
-                null;
-        try {
-            authenticationConfiguration = AuthenticationManager.config(MODULE_NAME, HttpDigestAuthenticationConfiguration.class)
-            .baseURL(new URL(AUTHZ_URL))
-            .loginEndpoint("")
-            .logoutEndpoint(LOGOUT);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-
-        module = authenticationConfiguration.asModule();
-
-
-        return module;
-    }
 }

@@ -2,6 +2,7 @@ package ru.startandroid.retrofit.ui;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
@@ -12,6 +13,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -222,7 +224,6 @@ public class NavigationActivity extends AppCompatActivity
 
         }
 
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -233,7 +234,6 @@ public class NavigationActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
     }
-
 
     List<Entry> entries;
 
@@ -389,7 +389,6 @@ public class NavigationActivity extends AppCompatActivity
         });
     }
 
-
     ArrayAdapter<String> adapter;
     ArrayList<String> flights;
 
@@ -397,7 +396,6 @@ public class NavigationActivity extends AppCompatActivity
     int posReturn;
 
     private void createDialog() {
-
 
         final Dialog flightDialog = new Dialog(this);
         flightDialog.setContentView(R.layout.fragment_flight);
@@ -426,7 +424,6 @@ public class NavigationActivity extends AppCompatActivity
                 editor1.putString(FLIGHT_NAME, flights.get(position));
                 editor1.apply();
 
-
                 tvRouteHeader.setText(pref1.getString(FLIGHT_NAME, "Путь"));
 
                 posReturn = position;
@@ -446,12 +443,10 @@ public class NavigationActivity extends AppCompatActivity
 
 //                    Toast.makeText(NavigationActivity.this, "POS IS " + posReturn, Toast.LENGTH_SHORT).show();
 
-
                     entries = flightArrayList.get(posReturn).getItineraryDTO().getEntries();
 
                     realm.beginTransaction();
                     realm.insert(entries);
-
                     realm.commitTransaction();
 
                     startFragment(new LastActionsFragment());
@@ -460,11 +455,8 @@ public class NavigationActivity extends AppCompatActivity
                 } else {
                     Toast.makeText(NavigationActivity.this, "Необходимо выбрать путь следования", Toast.LENGTH_SHORT).show();
                 }
-
-
             }
         });
-
 
     }
 
@@ -529,68 +521,18 @@ public class NavigationActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_logout) {
 
-              /*try {
-                HttpBasicAuthenticationModule module;
-                module = new HttpBasicAuthenticationModule(new URL(BASE_URL));
 
-                module.logout(new LogoutAuthCallBack(NavigationActivity.this));
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }*/
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(NavigationActivity.this);
 
-            KeycloakHelper.remove();
-            clearCookies(getApplicationContext());
-
-
-//            Intent intent = new Intent(this, LoginActivity.class);
-//            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//            startActivity(intent);
-
-
-            finish();
-            System.exit(0);
-
-//            Intent launchIntent = getPackageManager().getLaunchIntentForPackage("ru.startandroid.retrofit");
-//            if (launchIntent != null) {
-//                startActivity(launchIntent);//null pointer check in case package name was not found
-//            }
+            alertDialog
+                    .setTitle(R.string.exit_dialog_text)
+                    .setPositiveButton(R.string.ok, ((dialog, which) -> remove()))
+                    .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.cancel())
+                    .create()
+                    .show();
 
 
 
-
-/*
-            HttpDigestAuthenticationModule authenticationModule;
-
-            try {
-                authenticationModule = new HttpDigestAuthenticationModule(new URL(BASE_URL),
-                        "", LOGOUT, 2000);
-                authenticationModule.logout(new LogoutAuthCallBack(NavigationActivity.this));
-
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }*/
-
-
-//            AuthenticationModule module = KeycloakHelper.createAuthenticatior();
-
-//            module.logout(new LogoutAuthCallBack(NavigationActivity.this));
-
-
-            /*module.logout(new org.jboss.aerogear.android.core.Callback<Void>() {
-                @Override
-                public void onSuccess(Void data) {
-                    Log.d("MainNav", "data is " + data);
-                }
-
-                @Override
-                public void onFailure(Exception e) {
-                    Log.d("MainNav", "e is " + e.getMessage());
-
-
-                }
-            });*/
-//            logout();
-//
 //            Token = "";
 //
 //            isLoggedIn(false);
@@ -606,79 +548,11 @@ public class NavigationActivity extends AppCompatActivity
         return true;
     }
 
-    @SuppressWarnings("deprecation")
-    public static void clearCookies(Context context) {
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            Log.d("MainNav", "Using clearCookies code for API >=" + String.valueOf(Build.VERSION_CODES.LOLLIPOP_MR1));
-            CookieManager.getInstance().removeAllCookies(null);
-            CookieManager.getInstance().flush();
-        } else {
-            Log.d("MainNav", "Using clearCookies code for API <" + String.valueOf(Build.VERSION_CODES.LOLLIPOP_MR1));
-            CookieSyncManager cookieSyncMngr = CookieSyncManager.createInstance(context);
-            cookieSyncMngr.startSync();
-            CookieManager cookieManager = CookieManager.getInstance();
-            cookieManager.removeAllCookie();
-            cookieManager.removeSessionCookie();
-            cookieSyncMngr.stopSync();
-            cookieSyncMngr.sync();
-        }
+    private void remove() {
+        KeycloakHelper.remove();
+        finish();
+        System.exit(0);
     }
-
-    private static class LogoutAuthCallBack implements org.jboss.aerogear.android.core.Callback<Void> {
-        private final NavigationActivity activity;
-
-        private LogoutAuthCallBack(NavigationActivity activity) {
-            this.activity = activity;
-        }
-
-        @Override
-        public void onSuccess(final Void data) {
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-//                    activity.logged(false);
-                    Log.d("MainNav", " data is " + data);
-
-                }
-            });
-        }
-
-        @Override
-        public void onFailure(final Exception e) {
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-//                    activity.logged(false);
-                    Log.d("MainNav", " e is " + e.getMessage());
-
-                }
-            });
-        }
-    }
-
-    private void logout() {
-        Retrofit retrofitDestList = new Retrofit.Builder()
-                .baseUrl(AUTHZ_URL + "/")
-                .addConverterFactory(GsonConverterFactory.create())
-//                .client(getUserClient(Const.Token))
-                .build();
-
-
-        GitHubService gitHubServ = retrofitDestList.create(GitHubService.class);
-        gitHubServ.getLogout().enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                Log.d("MainNav", response.message().toString());
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-            }
-        });
-    }
-
 
     private void isLoggedIn(boolean b) {
         isLogged = b;
