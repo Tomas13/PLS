@@ -104,51 +104,60 @@ public class NavigationActivity extends AppCompatActivity
 
     private void runRefreshToken() {
 
-        observable = Observable.interval(45, TimeUnit.SECONDS)
-                .map(new Func1<Long, String>() {
-                    @Override
-                    public String call(Long o) {
-                        return "Hey " + o;
-                    }
-                }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        subscription = Observable.interval(45, TimeUnit.SECONDS)
+                .map(aLong -> "HeyRx " + aLong)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::connect);
 
-
+        /*.map(new Func1<Long, String>() {
+            @Override
+            public String call(Long o) {
+                return "Hey " + o;
+            }
+        })*/
+//        subscription = observable.subscribe(o -> connect(o));
+/*
        subscription = observable.subscribe(new Observable.OnSubscribe() {
             @Override
             public void call(Object o) {
 
 
-                if (!KeycloakHelper.isConnected()) {
-                    KeycloakHelper.connect(NavigationActivity.this, new org.jboss.aerogear.android.core.Callback<String>() {
-                        @Override
-                        public void onSuccess(String data) {
-                            Const.Token = "Bearer " + data;
-
-                            SharedPreferences pref1 = getApplicationContext().getSharedPreferences(TOKEN_SHARED_PREF, 0); // 0 - for private mode
-
-                            //Save Token to shared preferences
-                            SharedPreferences.Editor editor1 = pref1.edit();
-                            editor1.putString(TOKEN, data);
-                            editor1.apply();
-
-                            Log.d("MainNavTimer", Const.Token);
-                        }
-
-                        @Override
-                        public void onFailure(Exception e) {
-                            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }
-
-                Log.d("MainApplication", o.toString() + Token); //.getExpires_on());
-
 //                Const.Token = "Bearer "  + session.getRefreshToken();
             }
         });
+*/
 
     }
 
+    private void connect(Object object) {
+
+        if (!KeycloakHelper.isConnected()) {
+            KeycloakHelper.connect(NavigationActivity.this, new org.jboss.aerogear.android.core.Callback<String>() {
+                @Override
+                public void onSuccess(String data) {
+                    Const.Token = "Bearer " + data;
+
+                    SharedPreferences pref1 = getApplicationContext().getSharedPreferences(TOKEN_SHARED_PREF, 0); // 0 - for private mode
+
+                    //Save Token to shared preferences
+                    SharedPreferences.Editor editor1 = pref1.edit();
+                    editor1.putString(TOKEN, data);
+                    editor1.apply();
+
+                    Log.d("MainNavTimerRX", Const.Token);
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
+        Log.d("MainApplication", object.toString() + Token); //.getExpires_on());
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -398,6 +407,7 @@ public class NavigationActivity extends AppCompatActivity
         final Dialog flightDialog = new Dialog(this);
         flightDialog.setContentView(R.layout.fragment_flight);
 
+
         ListView listView = (ListView) flightDialog.findViewById(R.id.list_view_flight);
         adapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.list_view_item, flights);
         listView.setAdapter(adapter);
@@ -530,7 +540,6 @@ public class NavigationActivity extends AppCompatActivity
                     .show();
 
 
-
 //            Token = "";
 //
 //            isLoggedIn(false);
@@ -548,12 +557,31 @@ public class NavigationActivity extends AppCompatActivity
 
     private void remove() {
         stopSubscription();
-
-       clearSharedPrefs();
+        clearCookies(getApplicationContext());
+        clearSharedPrefs();
         KeycloakHelper.remove();
         finish();
         System.exit(0);
 
+    }
+
+    @SuppressWarnings("deprecation")
+    public static void clearCookies(Context context) {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            Log.d("MainNav", "Using clearCookies code for API >=" + String.valueOf(Build.VERSION_CODES.LOLLIPOP_MR1));
+            CookieManager.getInstance().removeAllCookies(null);
+            CookieManager.getInstance().flush();
+        } else {
+            Log.d("MainNav", "Using clearCookies code for API <" + String.valueOf(Build.VERSION_CODES.LOLLIPOP_MR1));
+            CookieSyncManager cookieSyncMngr = CookieSyncManager.createInstance(context);
+            cookieSyncMngr.startSync();
+            CookieManager cookieManager = CookieManager.getInstance();
+            cookieManager.removeAllCookie();
+            cookieManager.removeSessionCookie();
+            cookieSyncMngr.stopSync();
+            cookieSyncMngr.sync();
+        }
     }
 
     void stopSubscription() {
@@ -563,8 +591,8 @@ public class NavigationActivity extends AppCompatActivity
         }
     }
 
-    private void clearSharedPrefs(){
-//        getSharedPreferences(LOGIN_PREF, MODE_PRIVATE).edit().clear().apply();
+    private void clearSharedPrefs() {
+        getSharedPreferences(LOGIN_PREF, MODE_PRIVATE).edit().clear().apply();
         getSharedPreferences(NAV_SHARED_PREF, MODE_PRIVATE).edit().clear().apply();
         getSharedPreferences(FLIGHT_SHARED_PREF, MODE_PRIVATE).edit().clear().apply();
         getSharedPreferences(TOKEN_SHARED_PREF, MODE_PRIVATE).edit().clear().apply();
