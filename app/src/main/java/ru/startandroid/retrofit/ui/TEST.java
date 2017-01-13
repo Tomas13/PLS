@@ -1,5 +1,7 @@
 package ru.startandroid.retrofit.ui;
 
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -7,7 +9,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.jakewharton.rxbinding.view.RxView;
 
 import org.w3c.dom.Text;
 
@@ -29,10 +35,18 @@ public class TEST extends AppCompatActivity {
     Adapter adapter;
     Observable observable;
 
+    Button btnRx;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
+
+
+        btnRx = (Button) findViewById(R.id.btn_rx);
+//        btnRx.setOnClickListener(v -> ShowToast());
+
+//        RxView.clicks(btnRx).subscribe(v -> {ShowToast();});
 
         rvTest = (RecyclerView) findViewById(R.id.rv_test);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -55,6 +69,7 @@ public class TEST extends AppCompatActivity {
 
 
 
+
         observable = Observable.interval(3, TimeUnit.SECONDS)
                 .map(new Func1<Long, String>() {
                     @Override
@@ -65,6 +80,10 @@ public class TEST extends AppCompatActivity {
 
     }
 
+
+    private void ShowToast(){
+        Toast.makeText(this, "Button", Toast.LENGTH_SHORT).show();
+    }
     ArrayList<Integer> arrayList;
 
     public void Change(View view) {

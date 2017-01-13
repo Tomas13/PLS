@@ -33,4 +33,12 @@
         android:layout_height="wrap_content"
         android:text="put to first"
         android:onClick="Change"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:id="@+id/btn_rx"
+        android:layout_toRightOf="@id/btn"
+        android:layout_alignParentBottom="true"
+        android:text="rxBinding"
+        android:layout_height="wrap_content" />
 </RelativeLayout>

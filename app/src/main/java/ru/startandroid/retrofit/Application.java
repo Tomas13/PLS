@@ -2,10 +2,12 @@ package ru.startandroid.retrofit;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.NetworkInfo;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.facebook.stetho.Stetho;
+import com.github.pwittchen.reactivenetwork.library.ReactiveNetwork;
 import com.uphyca.stetho_realm.RealmInspectorModulesProvider;
 
 import org.jboss.aerogear.android.authorization.oauth2.OAuth2AuthorizationConfiguration;
@@ -22,6 +24,7 @@ import ru.startandroid.retrofit.ui.LoginActivity;
 import ru.startandroid.retrofit.ui.NavigationActivity;
 import ru.startandroid.retrofit.utils.KeycloakHelper;
 import rx.Observable;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -60,5 +63,21 @@ public class Application extends android.app.Application {
 
 
 
+        Subscription subscription = ReactiveNetwork.observeNetworkConnectivity(getApplicationContext())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(connectivity -> {
+                    if (connectivity.getState() == NetworkInfo.State.DISCONNECTED) {
+                        LogMessage("dis");
+                    } else {
+                        LogMessage("connected");
+                    }
+                });
+
+
+    }
+
+    private void LogMessage(String s) {
+        Log.d("Main", s);
     }
 }

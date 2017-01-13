@@ -1,5 +1,6 @@
 package ru.startandroid.retrofit.ui;
 
+import android.app.ActivityManager;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -108,7 +109,11 @@ public class NavigationActivity extends AppCompatActivity
                 .map(aLong -> "HeyRx " + aLong)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::connect);
+                .subscribe(
+                        this::connect,
+                        error -> Log.d("MainNavObser", error.getMessage()),
+                        () -> Log.d("MainNavObser", "OnCompleted"));
+
 
         /*.map(new Func1<Long, String>() {
             @Override
@@ -556,12 +561,23 @@ public class NavigationActivity extends AppCompatActivity
     }
 
     private void remove() {
-        stopSubscription();
+       /* stopSubscription();
         clearCookies(getApplicationContext());
         clearSharedPrefs();
-        KeycloakHelper.remove();
-        finish();
-        System.exit(0);
+        KeycloakHelper.remove();*/
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            ((ActivityManager) getApplicationContext().getSystemService(ACTIVITY_SERVICE))
+                    .clearApplicationUserData(); // note: it has a return value!
+        } else {
+            // use old hacky way, which can be removed
+            // once minSdkVersion goes above 19 in a few years.
+        }
+
+        startActivity(new Intent(this, LoginActivity.class));
+//        finish();
+//        System.exit(0);
 
     }
 
