@@ -41,10 +41,6 @@ public class LastActionsFragment extends Fragment implements HistoryView {
         // Required empty public constructor
     }
 
-
-    NetworkService service;
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -57,8 +53,6 @@ public class LastActionsFragment extends Fragment implements HistoryView {
         progressHistory = (ProgressBar) viewRoot.findViewById(R.id.progress_history);
 
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Последние действия");
-
-//        service = ((Application) getActivity().getApplication()).getNetworkService();
 
         presenter = new HistoryPresenterImpl(this, new NetworkService());
         presenter.loadHistory();

@@ -30,7 +30,6 @@ import ru.startandroid.retrofit.view.RoutesView;
 import static ru.startandroid.retrofit.Const.FLIGHT_POS;
 import static ru.startandroid.retrofit.Const.FLIGHT_SHARED_PREF;
 
-
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -40,7 +39,6 @@ public class RoutesFragment extends Fragment implements RoutesView {
     private TextView tvNoData;
     private ProgressBar progressBar;
     private RoutesPresenter presenter;
-NetworkService service;
 
     public RoutesFragment() {
         // Required empty public constructor
