@@ -20,18 +20,15 @@ public class Singleton {
         httpClient.addNetworkInterceptor(new StethoInterceptor()); //подключаю Stetho
         httpClient.readTimeout(60, TimeUnit.SECONDS);
         httpClient.connectTimeout(60, TimeUnit.SECONDS);
-        httpClient.addInterceptor(new Interceptor() {
-            @Override
-            public okhttp3.Response intercept(Interceptor.Chain chain) throws IOException {
-                Request original = chain.request();
+        httpClient.addInterceptor(chain -> {
+            Request original = chain.request();
 
-                Request request = original.newBuilder()
-                        .header("Authorization", credentials) //добавляю хедер
-                        .method(original.method(), original.body())
-                        .build();
+            Request request = original.newBuilder()
+                    .header("Authorization", credentials) //добавляю хедер
+                    .method(original.method(), original.body())
+                    .build();
 
-                return chain.proceed(request);
-            }
+            return chain.proceed(request);
         });
 
         return httpClient.build();

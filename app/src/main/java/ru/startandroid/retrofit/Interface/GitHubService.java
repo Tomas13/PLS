@@ -25,6 +25,7 @@ import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
 import ru.startandroid.retrofit.Model.geninvoice.InvoiceMain;
 import ru.startandroid.retrofit.Model.routes.Routes;
+import rx.Observable;
 
 import static ru.startandroid.retrofit.utils.KeycloakHelper.LOGOUT;
 
@@ -49,7 +50,7 @@ public interface GitHubService {
 
     @GET("api/mobile/history")
 //    @GET("api/security/membership-info")
-    Call<LastActions> getLastActions(
+    Observable<LastActions> getLastActions(
 
     );
 

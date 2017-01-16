@@ -367,7 +367,6 @@ public class NavigationActivity extends AppCompatActivity
 
                 if (response.body() != null) {
 
-                    String username = response.body().getData().get(0).getUserName();
                     String firstname = response.body().getData().get(0).getFirstName();
                     String lastname = response.body().getData().get(0).getLastName();
 

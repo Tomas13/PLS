@@ -1,7 +1,5 @@
 package ru.startandroid.retrofit.ui;
 
-
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -17,27 +15,23 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import ru.startandroid.retrofit.Const;
-import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.History;
 import ru.startandroid.retrofit.Model.LastActions;
-import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.HistoryRVAdapter;
+import ru.startandroid.retrofit.models.HistoryService;
+import ru.startandroid.retrofit.presenter.HistoryPresenter;
+import ru.startandroid.retrofit.presenter.HistoryPresenterImpl;
+import ru.startandroid.retrofit.view.HistoryView;
 
-import static ru.startandroid.retrofit.Const.BASE_URL;
-import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class LastActionsFragment extends Fragment {
+public class LastActionsFragment extends Fragment implements HistoryView {
 
+
+    private HistoryPresenter presenter;
 
     private RecyclerView rvHistory;
     private TextView tvNoDataHistory;
@@ -53,7 +47,6 @@ public class LastActionsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-
         View viewRoot = inflater.inflate(R.layout.fragment_last_actions, container, false);
 
         rvHistory = (RecyclerView) viewRoot.findViewById(R.id.rv_fragment_history);
@@ -63,62 +56,46 @@ public class LastActionsFragment extends Fragment {
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Последние действия");
 
 
-        progressHistory.setVisibility(View.VISIBLE);
-        getHistory();
-
+        presenter = new HistoryPresenterImpl(this, new HistoryService());
+        presenter.loadHistory();
 
         return viewRoot;
     }
 
-    private void getHistory() {
-        Retrofit retrofitLastActions = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(getUserClient(Const.Token))
-                .build();
+    @Override
+    public void showProgress() {
+        progressHistory.setVisibility(View.VISIBLE);
+    }
 
-        GitHubService gitHubServ = retrofitLastActions.create(GitHubService.class);
+    @Override
+    public void hideProgress() {
+        progressHistory.setVisibility(View.GONE);
+    }
 
-        final Call<LastActions> callEdges =
-                gitHubServ.getLastActions();
+    @Override
+    public void showHistoryData(LastActions lastActions) {
 
+        final List<History> lastActionsList = new ArrayList<>();
 
-        callEdges.enqueue(new Callback<LastActions>() {
-            @Override
-            public void onResponse(Call<LastActions> call, Response<LastActions> response) {
+        for (int i = 0; i < lastActions.getHistory().size(); i++) {
+            lastActionsList.add(lastActions.getHistory().get(i));
+        }
 
-                progressHistory.setVisibility(View.GONE);
-
-                if (response.isSuccessful() && response.body() != null) {
-                    if (response.isSuccessful() && response.body().getStatus().equals("success")) {
-
-                        final List<History> lastActionsList = new ArrayList<>();
-
-                        for (int i = 0; i < response.body().getHistory().size(); i++) {
-
-                            lastActionsList.add(response.body().getHistory().get(i));
-                        }
-
-                        HistoryRVAdapter historyAdapter = new HistoryRVAdapter(lastActionsList);
-                        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-                        rvHistory.setLayoutManager(mLayoutManager);
-                        rvHistory.setAdapter(historyAdapter);
-
-
-//                } else if (response.body().getStatus().equals("list-empty")) {
-                    } else {
-                        tvNoDataHistory.setVisibility(View.VISIBLE);
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<LastActions> call, Throwable t) {
-                Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        HistoryRVAdapter historyAdapter = new HistoryRVAdapter(lastActionsList);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+        rvHistory.setLayoutManager(mLayoutManager);
+        rvHistory.setAdapter(historyAdapter);
 
     }
 
+    @Override
+    public void showHistoryEmptyData() {
+        tvNoDataHistory.setVisibility(View.VISIBLE);
+        progressHistory.setVisibility(View.GONE);
+    }
 
+    @Override
+    public void showHistoryError(Throwable throwable) {
+        Toast.makeText(getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+    }
 }
