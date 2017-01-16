@@ -19,7 +19,7 @@ import ru.startandroid.retrofit.Model.History;
 import ru.startandroid.retrofit.Model.LastActions;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.HistoryRVAdapter;
-import ru.startandroid.retrofit.models.HistoryService;
+import ru.startandroid.retrofit.models.NetworkService;
 import ru.startandroid.retrofit.presenter.HistoryPresenter;
 import ru.startandroid.retrofit.presenter.HistoryPresenterImpl;
 import ru.startandroid.retrofit.view.HistoryView;
@@ -42,6 +42,9 @@ public class LastActionsFragment extends Fragment implements HistoryView {
     }
 
 
+    NetworkService service;
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -55,8 +58,9 @@ public class LastActionsFragment extends Fragment implements HistoryView {
 
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Последние действия");
 
+//        service = ((Application) getActivity().getApplication()).getNetworkService();
 
-        presenter = new HistoryPresenterImpl(this, new HistoryService());
+        presenter = new HistoryPresenterImpl(this, new NetworkService());
         presenter.loadHistory();
 
         return viewRoot;
@@ -91,11 +95,16 @@ public class LastActionsFragment extends Fragment implements HistoryView {
     @Override
     public void showHistoryEmptyData() {
         tvNoDataHistory.setVisibility(View.VISIBLE);
-        progressHistory.setVisibility(View.GONE);
     }
 
     @Override
     public void showHistoryError(Throwable throwable) {
         Toast.makeText(getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        presenter.unSubscribe();
     }
 }

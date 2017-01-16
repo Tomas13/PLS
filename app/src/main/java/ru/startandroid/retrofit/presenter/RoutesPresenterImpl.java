@@ -1,8 +1,8 @@
 package ru.startandroid.retrofit.presenter;
 
-import ru.startandroid.retrofit.Model.LastActions;
+import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.models.NetworkService;
-import ru.startandroid.retrofit.view.HistoryView;
+import ru.startandroid.retrofit.view.RoutesView;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -12,13 +12,13 @@ import rx.schedulers.Schedulers;
  * Created by root on 1/16/17.
  */
 
-public class HistoryPresenterImpl implements HistoryPresenter {
+public class RoutesPresenterImpl implements RoutesPresenter {
 
-    Subscription subscription;
-    private HistoryView view;
+    private Subscription subscription;
+    private RoutesView view;
     private NetworkService service;
 
-    public HistoryPresenterImpl(HistoryView view, NetworkService service) {
+    public RoutesPresenterImpl(RoutesView view, NetworkService service) {
         this.view = view;
         this.service = service;
     }
@@ -28,15 +28,13 @@ public class HistoryPresenterImpl implements HistoryPresenter {
         view = null;
     }
 
-
     @Override
-    public void loadHistory() {
+    public void loadRoutes() {
 
         view.showProgress();
 
-        Observable<LastActions> callEdges =
-                service.getApiService().getLastActions();
-
+        Observable<Routes> callEdges =
+                service.getApiService().getRoutesInfo();
 
         subscription = callEdges
                 .subscribeOn(Schedulers.io())
@@ -44,27 +42,24 @@ public class HistoryPresenterImpl implements HistoryPresenter {
                 .subscribe(
                         response -> {
                             if (response.getStatus().equals("success")) {
-                                view.showHistoryData(response);
+                                view.showRoutesData(response);
                                 view.hideProgress();
-
                             } else {
-                                view.showHistoryEmptyData();
+                                view.showRoutesEmptyData();
                                 view.hideProgress();
-
                             }
                         },
                         throwable -> {
-                            view.showHistoryError(throwable);
+                            view.showRoutesError(throwable);
                             view.hideProgress();
                         });
+
     }
 
     @Override
     public void unSubscribe() {
-        if (subscription != null && !subscription.isUnsubscribed()){
+        if (subscription != null && !subscription.isUnsubscribed()) {
             subscription.unsubscribe();
         }
-
     }
-
 }

@@ -261,7 +261,7 @@ public class NavigationActivity extends AppCompatActivity
         GitHubService gitHubServ = retrofitLastActions.create(GitHubService.class);
 
         final Call<Routes> callEdges =
-                gitHubServ.getRoutesInfo();
+                gitHubServ.getRoutesInfoCall();
 
         callEdges.enqueue(new Callback<Routes>() {
             @Override

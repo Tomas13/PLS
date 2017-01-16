@@ -63,10 +63,14 @@ public interface GitHubService {
 
 
     @GET("api/mobile/flights")
-    Call<Routes> getRoutesInfo(
+    Observable<Routes> getRoutesInfo(
 
     );
 
+    @GET("api/mobile/flights")
+    Call<Routes> getRoutesInfoCall(
+
+    );
 
     //Принятие общей накладной
     @GET("api/mobile/general-invoices")
