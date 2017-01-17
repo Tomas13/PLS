@@ -24,20 +24,17 @@ import ru.startandroid.retrofit.presenter.HistoryPresenter;
 import ru.startandroid.retrofit.presenter.HistoryPresenterImpl;
 import ru.startandroid.retrofit.view.HistoryView;
 
-
 /**
  * A simple {@link Fragment} subclass.
  */
-public class LastActionsFragment extends Fragment implements HistoryView {
-
+public class HistoryFragment extends Fragment implements HistoryView {
 
     private HistoryPresenter presenter;
-
     private RecyclerView rvHistory;
     private TextView tvNoDataHistory;
     private ProgressBar progressHistory;
 
-    public LastActionsFragment() {
+    public HistoryFragment() {
         // Required empty public constructor
     }
 

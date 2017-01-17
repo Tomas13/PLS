@@ -74,7 +74,7 @@ public interface GitHubService {
 
     //Принятие общей накладной
     @GET("api/mobile/general-invoices")
-    Call<InvoiceMain> getGeneralInvoice(
+    Observable<InvoiceMain> getGeneralInvoice(
 
     );
 

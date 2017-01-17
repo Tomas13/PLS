@@ -213,7 +213,7 @@ public class NavigationActivity extends AppCompatActivity
         } else {
 
             Log.d("MainNav", "no request getroutesinfo");
-            startFragment(new LastActionsFragment());
+            startFragment(new HistoryFragment());
 
         }
 
@@ -280,7 +280,7 @@ public class NavigationActivity extends AppCompatActivity
                         entries = response.body().getFlights().get(0).getItineraryDTO().getEntries();
 
 
-                        startFragment(new LastActionsFragment());
+                        startFragment(new HistoryFragment());
 
                     } else {
                         Toast.makeText(NavigationActivity.this, response.body().getFlights().get(0).getName(), Toast.LENGTH_SHORT).show();
@@ -312,7 +312,7 @@ public class NavigationActivity extends AppCompatActivity
 
 //                navProgressBar.setVisibility(View.GONE);
 
-//                LastActionsFragment fragment = new LastActionsFragment();
+//                HistoryFragment fragment = new HistoryFragment();
 //                startFragment(fragment);
                 }
                 Log.d("Main", Const.Token);
@@ -362,7 +362,7 @@ public class NavigationActivity extends AppCompatActivity
 
                     navProgressBar.setVisibility(View.GONE);
 
-                    LastActionsFragment fragment = new LastActionsFragment();
+                    HistoryFragment fragment = new HistoryFragment();
 //                startFragment(fragment);
 
                     Log.d("Main", Const.Token);
@@ -442,7 +442,7 @@ public class NavigationActivity extends AppCompatActivity
                     realm.insert(entries);
                     realm.commitTransaction();
 
-                    startFragment(new LastActionsFragment());
+                    startFragment(new HistoryFragment());
 
 
                 } else {
@@ -492,7 +492,7 @@ public class NavigationActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_last_actions) {
-            startFragment(new LastActionsFragment());
+            startFragment(new HistoryFragment());
         } else if (id == R.id.nav_volumes) {
 
             startFragment(new VolumesFragment());

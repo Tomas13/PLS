@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ru.startandroid.retrofit.ui.LastActionsFragment">
+    tools:context="ru.startandroid.retrofit.ui.HistoryFragment">
 
     <LinearLayout
         android:id="@+id/ll_collate"
