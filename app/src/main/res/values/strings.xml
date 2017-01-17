@@ -34,7 +34,7 @@
     <string name="no_data">Нет данных по запросу</string>
     <string name="collate">Сличить</string>
     <string name="ok">OK</string>
-    <string name="cancel">Отмена</string>
+    <string name="cancel">ОТМЕНА</string>
     <string name="exit_dialog_text">Вы уверены что хотите выйти?</string>
 
 </resources>

@@ -24,7 +24,8 @@ public class KeycloakHelper extends HttpDigestAuthenticationConfiguration{
 
 
     private static final String SERVER_URL = "http://pls-test.post.kz";
-//    private static final String SERVER_URL = "http://172.30.75.218";
+//    private static final String SERVER_URL = "http://89.218.48.171";
+//    private static final String SERVER_URL = "http://172.30.75.218:80";
     public static final String AUTHZ_URL = SERVER_URL + "/auth";
     private static final String AUTHZ_ENDPOINT = "/realms/toolpar/protocol/openid-connect/auth";
     private static final String AUTHZ_CLIENT_ID = "toolpar-mobile";

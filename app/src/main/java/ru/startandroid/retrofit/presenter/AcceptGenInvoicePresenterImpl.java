@@ -1,6 +1,8 @@
 package ru.startandroid.retrofit.presenter;
 
+import ru.startandroid.retrofit.Model.IdsCollate;
 import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
+import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
 import ru.startandroid.retrofit.models.NetworkService;
 import ru.startandroid.retrofit.view.AcceptGenInvoiceView;
 import rx.Observable;
@@ -49,6 +51,64 @@ public class AcceptGenInvoicePresenterImpl implements AcceptGenInvoicePresenter{
                         });
 
     }
+
+    @Override
+    public void loadDestinationList() {
+        view.showProgress();
+
+        Observable<ResponseDestinationList> callDestinationList =
+                service.getApiService().getDestionationLists();
+
+        subscription = callDestinationList
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        response -> {
+                            if (response.getStatus().equals("success")) {
+                                view.hideProgress();
+                                view.showDestinationList(response);
+                            } else {
+                                view.hideProgress();
+                                view.showRoutesEmptyData();
+                            }
+                        },
+                        throwable -> {
+                            view.showRoutesError(throwable);
+                            view.hideProgress();
+                        });
+
+    }
+
+    @Override
+    public void postCollate(IdsCollate idsCollate) {
+        view.showProgress();
+
+        Observable<CollateResponse> postCollateDestinationLists =
+                service.getApiService().postCollateDestinationLists(idsCollate);
+
+        subscription = postCollateDestinationLists
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        response -> {
+                            if (response.getStatus().equals("success")) {
+                                view.hideProgress();
+                                view.showCollateResponse(response);
+                            } else {
+
+                                loadGetListForVpn();
+
+//                                view.hideProgress();
+//                                view.showRoutesEmptyData();
+                            }
+                        },
+                        throwable -> {
+                            view.showRoutesError(throwable);
+                            view.hideProgress();
+                        });
+
+    }
+
 
     @Override
     public void unSubscribe() {

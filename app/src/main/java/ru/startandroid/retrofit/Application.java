@@ -1,8 +1,11 @@
 package ru.startandroid.retrofit;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.NetworkInfo;
+import android.support.multidex.MultiDex;
+import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -37,10 +40,16 @@ import static ru.startandroid.retrofit.Const.Token;
  * Created by root on 12/29/16.
  */
 
-public class Application extends android.app.Application {
-
+public class Application extends MultiDexApplication {
     private Subscription subscription;
     public RealmConfiguration realmConfiguration;
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        MultiDex.install(this);
+        super.attachBaseContext(base);
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -63,7 +72,7 @@ public class Application extends android.app.Application {
                         .build());
 
 
-
+/*
         subscription = ReactiveNetwork.observeNetworkConnectivity(getApplicationContext())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -73,7 +82,7 @@ public class Application extends android.app.Application {
                     } else {
                         LogMessage("connected");
                     }
-                });
+                });*/
 
 
     }
@@ -82,11 +91,12 @@ public class Application extends android.app.Application {
         Log.d("Main", s);
     }
 
-    @Override
+   /* @Override
     public void onTerminate() {
         super.onTerminate();
         if (subscription != null && !subscription.isUnsubscribed()) {
             subscription.unsubscribe();
         }
-    }
+    }*/
+
 }

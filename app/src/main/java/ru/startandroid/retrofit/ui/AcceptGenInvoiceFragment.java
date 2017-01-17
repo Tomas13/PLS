@@ -67,7 +67,6 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
         // Required empty public constructor
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -97,20 +96,19 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
             progressAccept.setVisibility(View.VISIBLE);
 
 //            Toast.makeText(getContext(), "came from menu", Toast.LENGTH_SHORT).show();
-            retrofitDestinationList();
+            presenter.loadDestinationList();
 
         }
 
-
         btnCollate.setOnClickListener(v -> {
-
             if (!generalInvoiceIdsList.isEmpty()) {
                 progressAccept.setVisibility(View.VISIBLE);
 
-                retrofitPostCollate();
+                IdsCollate idsCol = new IdsCollate(ids);
+                presenter.postCollate(idsCol);
+
             } else {
                 Toast.makeText(getContext(), "Нечего сличать", Toast.LENGTH_SHORT).show();
-
             }
         });
 
@@ -118,50 +116,21 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
     }
 
 
-    private void retrofitDestinationList() {
-        Retrofit retrofitDestList = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(getUserClient(Const.Token))
-                .build();
 
-        GitHubService gitHubServ = retrofitDestList.create(GitHubService.class);
-        gitHubServ.getDestionationLists().enqueue(new Callback<ResponseDestinationList>() {
-            @Override
-            public void onResponse(Call<ResponseDestinationList> call, Response<ResponseDestinationList> response) {
-                if (response.body() != null) {
+    @Override
+    public void showDestinationList(ResponseDestinationList destinationList) {
 
-                    if (response.isSuccessful() && response.body().getStatus().equals("success")) {
+        for (int i = 0; i < destinationList.getDestinationLists().size(); i++) {
 
-                        progressAccept.setVisibility(View.GONE);
+            generalInvoiceIdsList.add(destinationList.getDestinationLists().get(i).getDestinationListId());
+            ids.add(destinationList.getDestinationLists().get(i).getId());
+        }
 
-                        for (int i = 0; i < response.body().getDestinationLists().size(); i++) {
+        listAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, generalInvoiceIdsList);
 
-                            generalInvoiceIdsList.add(response.body().getDestinationLists().get(i).getDestinationListId());
+        listViewAcceptGen.setAdapter(listAdapter);
 
-                            ids.add(response.body().getDestinationLists().get(i).getId());
-
-                        }
-
-                        listAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, generalInvoiceIdsList);
-
-                        listViewAcceptGen.setAdapter(listAdapter);
-
-                        Log.d("acceptGen", generalInvoiceIdsList.get(0).toString());
-//                    listViewAcceptGen.notify();
-
-                    } else {
-                        showRoutesEmptyData();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseDestinationList> call, Throwable t) {
-                Log.d("MainAcceptGen", t.getMessage());
-
-            }
-        });
+        Log.d("acceptGen", generalInvoiceIdsList.get(0));
     }
 
 
@@ -215,81 +184,41 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
     }
 
 
-    private void retrofitPostCollate() {
-        Retrofit retrofitDestList = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(getUserClient(Const.Token))
-                .build();
+    @Override
+    public void showCollateResponse(CollateResponse collateResponse) {
+        Log.d("MainAccept", "got response");
 
-        IdsCollate idsCol = new IdsCollate(ids);
-
-        GitHubService gitHubServ = retrofitDestList.create(GitHubService.class);
-        gitHubServ.postCollateDestinationLists(idsCol).enqueue(new Callback<CollateResponse>() {
-            @Override
-            public void onResponse(Call<CollateResponse> call, Response<CollateResponse> response) {
-
-                progressAccept.setVisibility(View.GONE);
-
-                if (response.body() != null) {
-
-                    if (response.isSuccessful() && response.body().getStatus().equals("success")) {
-                        Log.d("MainAccept", "got response");
-
-                        Log.d("MainAccept", response.body().getStatus());
-                        Log.d("MainAccept labels", response.body().getDto().getLabels().size() + " ");
-                        Log.d("MainAccept packets", response.body().getDto().getPackets().size() + " ");
+        Log.d("MainAccept", collateResponse.getStatus());
+        Log.d("MainAccept labels", collateResponse.getDto().getLabels().size() + " ");
+        Log.d("MainAccept packets", collateResponse.getDto().getPackets().size() + " ");
 
 
-                        collateDtoObject = new Dto();
+        collateDtoObject = new Dto();
 
-                        collateDtoObject = response.body().getDto();
+        collateDtoObject = collateResponse.getDto();
 
-                        ArrayList<Label> labels = new ArrayList<Label>();
-                        labels.addAll(collateDtoObject.getLabels());
+        ArrayList<Label> labels = new ArrayList<Label>();
+        labels.addAll(collateDtoObject.getLabels());
 
-                        ArrayList<Packet> packets = new ArrayList<>();
-                        packets.addAll(collateDtoObject.getPackets());
+        ArrayList<Packet> packets = new ArrayList<>();
+        packets.addAll(collateDtoObject.getPackets());
 
-                        ArrayList<CollateResponse> collateResponsesArrayList = new ArrayList<CollateResponse>();
+        ArrayList<CollateResponse> collateResponsesArrayList = new ArrayList<CollateResponse>();
 //                collateResponsesArrayList.addAll(response)
 
-                        // Create the Realm instance
-                        realm = Realm.getDefaultInstance();
+        // Create the Realm instance
+        realm = Realm.getDefaultInstance();
 
-                        realm.beginTransaction();
-                        realm.insert(packets);
-                        realm.insert(labels);
+        realm.beginTransaction();
+        realm.insert(packets);
+        realm.insert(labels);
 //                    realm.insert(collateDtoObject);
-                        realm.commitTransaction();
-                        Log.d("MainAccept", "got response");
+        realm.commitTransaction();
+        Log.d("MainAccept", "got response");
 
 
-                        ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
-
-
-                    } else {
-
-
-                        showProgress();
-
-                        presenter.loadGetListForVpn();
-
-                        tvNoDataAcceptGen.setVisibility(View.VISIBLE);
-                    }
-
-                }
-            }
-
-            @Override
-            public void onFailure(Call<CollateResponse> call, Throwable t) {
-                Log.d("MainAccept", t.getMessage());
-                progressAccept.setVisibility(View.GONE);
-
-            }
-        });
+        ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
     }
-
 
     @Override
     public void onDestroy() {
@@ -336,6 +265,8 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
 
         ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
     }
+
+
 
     @Override
     public void showRoutesEmptyData() {

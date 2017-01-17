@@ -14,9 +14,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Checkable;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -226,14 +228,23 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
         ListView listView = (ListView) pointDialog.findViewById(R.id.list_view_flight);
         adapter = new ArrayAdapter<String>(getContext(), R.layout.list_view_item, flightName);
+//        adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_activated_1, flightName);
+        listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         listView.setAdapter(adapter);
+
 
         pointDialog.show();
 
         listView.setOnItemClickListener((parent, view, position, id) -> {
 
-            SharedPreferences pref1 = getActivity().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
+            pointDialog.setTitle(flightName.get(position));
 
+            Checkable child = (Checkable) parent.getChildAt(position);
+            child.toggle();
+
+            listView.setItemChecked(position, true);
+
+            SharedPreferences pref1 = getActivity().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
             if (pref1.contains(FLIGHT_ID)) {
 
                 Long flightId = pref1.getLong(FLIGHT_ID, 1L);
@@ -291,7 +302,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
                             Toast.makeText(getContext(), response.body().getStatus(), Toast.LENGTH_SHORT).show();
                         }
 
-        //TODO THIS SHOULD UPDATE rv items
+                        //TODO THIS SHOULD UPDATE rv items
 /*
                         for (int i = 0; i < packetsList.size(); i++) {
 

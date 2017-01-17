@@ -5,4 +5,13 @@
     <color name="colorAccent">#2bb43b</color>
     <color name="green">#3fec5f</color>
     <color name="red">#ec3f3f</color>
+
+
+    <color name="background">#A0A0A0</color>
+    <color name="listitem_default_color">#FFFFFF</color>
+    <color name="listitem_pressed_color">#A0A0A0</color>
+    <color name="listitem_focused_color">#A0A0A0</color>
+
+    <drawable name="focused">#ff5500</drawable>
+    <drawable name="selected">#FF00FF</drawable>
 </resources>

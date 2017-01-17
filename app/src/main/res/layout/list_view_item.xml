@@ -3,9 +3,12 @@
 
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/label"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="fill_parent"
     android:padding="10dip"
+    android:text="sdf"
+    android:layout_gravity="center"
+    android:gravity="center_horizontal"
     android:textColor="@android:color/black"
     android:textSize="16dip"
     android:textStyle="bold" >

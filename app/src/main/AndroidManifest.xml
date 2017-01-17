@@ -16,11 +16,11 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="reverseLandscape" />
+            android:screenOrientation="portrait" />
         <activity android:name=".ui.ScannerActivity" />
         <activity
             android:name=".LaunchActivity"
-            android:screenOrientation="reverseLandscape" />
+            android:screenOrientation="portrait" />
         <activity android:name=".ui.ScannerSelectionBarcodeActivity" />
         <activity
             android:name=".ui.LoginActivity"
@@ -38,7 +38,7 @@
         <activity
             android:name=".ui.NavigationActivity"
             android:label="@string/title_activity_navigation"
-            android:screenOrientation="reverseLandscape"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".ui.TEST">
 

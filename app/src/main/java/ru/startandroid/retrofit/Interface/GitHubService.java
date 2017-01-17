@@ -89,13 +89,13 @@ public interface GitHubService {
 
     //    Получение списка s накладных, которые уже извлекли из О
     @GET("/api/mobile/destination-lists")
-    Call<ResponseDestinationList> getDestionationLists(
+    Observable<ResponseDestinationList> getDestionationLists(
     );
 
 
     @POST("/api/mobile/collate-destination-lists")
     @Headers("Content-Type: text/plain")
-    Call<CollateResponse> postCollateDestinationLists(
+    Observable<CollateResponse> postCollateDestinationLists(
             @Body IdsCollate idsCollate
             );
 
