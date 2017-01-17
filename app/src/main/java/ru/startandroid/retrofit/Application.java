@@ -39,6 +39,7 @@ import static ru.startandroid.retrofit.Const.Token;
 
 public class Application extends android.app.Application {
 
+    private Subscription subscription;
     public RealmConfiguration realmConfiguration;
     @Override
     public void onCreate() {
@@ -63,7 +64,7 @@ public class Application extends android.app.Application {
 
 
 
-        Subscription subscription = ReactiveNetwork.observeNetworkConnectivity(getApplicationContext())
+        subscription = ReactiveNetwork.observeNetworkConnectivity(getApplicationContext())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(connectivity -> {
@@ -79,5 +80,13 @@ public class Application extends android.app.Application {
 
     private void LogMessage(String s) {
         Log.d("Main", s);
+    }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        if (subscription != null && !subscription.isUnsubscribed()) {
+            subscription.unsubscribe();
+        }
     }
 }

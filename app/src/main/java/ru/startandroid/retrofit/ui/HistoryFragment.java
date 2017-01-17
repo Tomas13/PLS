@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,6 +34,7 @@ public class HistoryFragment extends Fragment implements HistoryView {
     private RecyclerView rvHistory;
     private TextView tvNoDataHistory;
     private ProgressBar progressHistory;
+    private LinearLayout llHistory;
 
     public HistoryFragment() {
         // Required empty public constructor
@@ -45,6 +47,7 @@ public class HistoryFragment extends Fragment implements HistoryView {
 
         View viewRoot = inflater.inflate(R.layout.fragment_last_actions, container, false);
 
+        llHistory = (LinearLayout) viewRoot.findViewById(R.id.ll_history);
         rvHistory = (RecyclerView) viewRoot.findViewById(R.id.rv_fragment_history);
         tvNoDataHistory = (TextView) viewRoot.findViewById(R.id.tv_no_data_history);
         progressHistory = (ProgressBar) viewRoot.findViewById(R.id.progress_history);
@@ -85,6 +88,7 @@ public class HistoryFragment extends Fragment implements HistoryView {
 
     @Override
     public void showHistoryEmptyData() {
+        llHistory.setVisibility(View.GONE);
         tvNoDataHistory.setVisibility(View.VISIBLE);
     }
 

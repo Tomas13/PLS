@@ -46,6 +46,11 @@ import ru.startandroid.retrofit.Model.collatedestination.Packet;
 import ru.startandroid.retrofit.Model.routes.Entry;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.CollateRVAdapter;
+import ru.startandroid.retrofit.models.NetworkService;
+import ru.startandroid.retrofit.presenter.InvoicePresenterImpl;
+import ru.startandroid.retrofit.presenter.VolumesPresenter;
+import ru.startandroid.retrofit.presenter.VolumesPresenterImpl;
+import ru.startandroid.retrofit.view.VolumesView;
 
 import static ru.startandroid.retrofit.Const.BASE_URL;
 import static ru.startandroid.retrofit.Const.FLIGHT_ID;
@@ -57,32 +62,29 @@ import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class VolumesFragment extends Fragment {
+public class VolumesFragment extends Fragment implements VolumesView {
 
-    List<Long> packetsList = new ArrayList<>();
-    List<Long> labelsList = new ArrayList<>();
-
-    final ArrayList<Label> labelsArrayList = new ArrayList<>();
-    final ArrayList<Packet> packetsArrayList = new ArrayList<>();
-
+    private List<Long> packetsList = new ArrayList<>();
+    private List<Long> labelsList = new ArrayList<>();
+    private ArrayList<Label> labelsArrayList = new ArrayList<>();
+    private ArrayList<Packet> packetsArrayList = new ArrayList<>();
     private Realm realm;
-
-    Button btnSendInvoice;
-    TextView tvHeaderHint, tvNoDataVolumes;
-    RealmQuery<Entry> queryData;
-    RealmQuery<Packet> queryPacket;
-    RealmQuery<Label> queryLabel;
-
-    RecyclerView recyclerViewVolumes;
+    private Button btnSendInvoice;
+    private TextView tvHeaderHint, tvNoDataVolumes;
+    private RealmQuery<Entry> queryData;
+    private RealmQuery<Packet> queryPacket;
+    private RealmQuery<Label> queryLabel;
+    private VolumesPresenter presenter;
+    private RecyclerView recyclerViewVolumes;
+    private ArrayAdapter<String> adapter;
+    private List<Entry> entries;
+    private ArrayList<String> flightName;
+    private BodyForCreateInvoice body;
+    private LinearLayout ll, llbtnHint;
 
     public VolumesFragment() {
         // Required empty public constructor
     }
-
-    ArrayAdapter<String> adapter;
-    List<Entry> entries;
-    ArrayList<String> flightName;
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -94,6 +96,8 @@ public class VolumesFragment extends Fragment {
                 .getSupportActionBar()
                 .setTitle("Ёмкости");
 
+        ll = (LinearLayout) rootView.findViewById(R.id.ll);
+        llbtnHint = (LinearLayout) rootView.findViewById(R.id.ll_btn_hint);
 
         tvNoDataVolumes = (TextView) rootView.findViewById(R.id.tv_no_data_volumes);
         recyclerViewVolumes = (RecyclerView) rootView.findViewById(R.id.rv_fragment_volumes);
@@ -127,15 +131,10 @@ public class VolumesFragment extends Fragment {
             flightName.add(entries.get(i).getDept().getNameRu());
         }
 
+        btnSendInvoice.setOnClickListener(v -> showDialog());
 
-        btnSendInvoice.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDialog();
-            }
-        });
-
-        retrofitGetListForVpn();
+        presenter = new VolumesPresenterImpl(this, new NetworkService());
+        presenter.loadGetListForVpn();
 
         return rootView;
     }
@@ -231,46 +230,43 @@ public class VolumesFragment extends Fragment {
 
         pointDialog.show();
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+
+            SharedPreferences pref1 = getActivity().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
+
+            if (pref1.contains(FLIGHT_ID)) {
+
+                Long flightId = pref1.getLong(FLIGHT_ID, 1L);
+                Boolean isDepIndex = true;
+                String toDeptIndex = entries.get(position).getDept().getName();
+                String fromDeptIndex = entries.get(0).getDept().getName();
+                body = new BodyForCreateInvoice(flightId, isDepIndex, toDeptIndex, fromDeptIndex, labelsList, packetsList);
 
 
-                SharedPreferences pref1 = getActivity().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
-
-                if (pref1.contains(FLIGHT_ID)) {
-
-                    Long flightId = pref1.getLong(FLIGHT_ID, 1L);
-                    Boolean isDepIndex = true;
-                    String toDeptIndex = entries.get(position).getDept().getName();
-                    String fromDeptIndex = entries.get(0).getDept().getName();
-                    body = new BodyForCreateInvoice(flightId, isDepIndex, toDeptIndex, fromDeptIndex, labelsList, packetsList);
-
-
-                } else {
-                    Toast.makeText(getContext(), "Ошибка. Нет flightID", Toast.LENGTH_SHORT).show();
-                }
-
-
-                Toast.makeText(getContext(), "Готово, можете нажать кнопку ОК для закрытия диалога", Toast.LENGTH_SHORT).show();
-
+            } else {
+                Toast.makeText(getContext(), "Ошибка. Нет flightID", Toast.LENGTH_SHORT).show();
             }
+
+
+            Toast.makeText(getContext(), "Готово, можете нажать кнопку ОК для закрытия диалога", Toast.LENGTH_SHORT).show();
+
         });
 
         Button btnOk = (Button) pointDialog.findViewById(R.id.btn_ok_flight);
-        btnOk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pointDialog.dismiss();
+        btnOk.setOnClickListener(v -> {
+            pointDialog.dismiss();
 
-                retrofitPostCreateInvoice();
+            retrofitPostCreateInvoice();
+        });
 
-            }
+
+        Button btnCancel = (Button) pointDialog.findViewById(R.id.btn_cancel_flight);
+        btnCancel.setOnClickListener(v -> {
+            pointDialog.dismiss();
         });
 
     }
 
-    BodyForCreateInvoice body;
 
     private void retrofitPostCreateInvoice() {
         Retrofit retrofitDestList = new Retrofit.Builder()
@@ -332,120 +328,6 @@ public class VolumesFragment extends Fragment {
     ArrayList<Object> objects;
     CollateRVAdapter collateRVAdapter;
 
-    private void retrofitGetListForVpn() {
-        Retrofit retrofitDestList = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(getUserClient(Const.Token))
-                .build();
-
-        GitHubService gitHubServ = retrofitDestList.create(GitHubService.class);
-        gitHubServ.getListForVpn().enqueue(new Callback<CollateResponse>() {
-            @Override
-            public void onResponse(Call<CollateResponse> call, Response<CollateResponse> response) {
-
-                if (response.isSuccessful() && response.body() != null) {
-                    if (response.isSuccessful() && response.body().getStatus().equals("success")) {
-
-                        packetsArrayList.addAll(response.body().getDto().getPackets());
-
-                        labelsArrayList.addAll(response.body().getDto().getLabels());
-
-
-                        objects = new ArrayList<Object>();
-                        objects.addAll(packetsArrayList);
-                        objects.addAll(labelsArrayList);
-
-                        collateRVAdapter = new CollateRVAdapter(getActivity(), objects, new CollateRVAdapter.OnItemCheckedListener() {
-                            @Override
-                            public void onCheckedChanged(View childView, boolean isChecked, int childPosition) {
-
-                                if (isChecked) {
-
-                               /* Object tempPacket = objects.get(childPosition);
-                                objects.remove(childPosition);
-                                objects.add(0, tempPacket);
-                                collateRVAdapter.notifyDataSetChanged();*/
-
-                                    if (objects.get(childPosition) instanceof Packet) {
-                                        packetsList.add(((Packet) objects.get(childPosition)).getId());
-
-
-//                                    collateRVAdapter.notifyItemMoved(childPosition, 0);
-                                    } else if (objects.get(childPosition) instanceof Label) {
-                                        labelsList.add(((Label) objects.get(childPosition)).getId());
-
-
-                               /*     Label tempLabel = (Label) objects.get(childPosition);
-                                    objects.remove(childPosition);
-                                    objects.add(0, tempLabel);*/
-                                    }
-//                                    collateRVAdapter.notifyItemMoved(childPosition, 0);
-                                    if (labelsList.isEmpty() && packetsList.isEmpty()) {
-                                        btnSendInvoice.setVisibility(View.GONE);
-                                        tvHeaderHint.setVisibility(View.VISIBLE);
-                                    } else {
-                                        btnSendInvoice.setVisibility(View.VISIBLE);
-                                        tvHeaderHint.setVisibility(View.GONE);
-                                    }
-
-
-                                } else {
-
-
-                                    if (objects.get(childPosition) instanceof Packet) {
-                                        packetsList.remove(((Packet) objects.get(childPosition)).getId());
-
-                                    } else {
-                                        labelsList.remove(((Label) objects.get(childPosition)).getId());
-
-
-                                    }
-
-                                    if (labelsList.isEmpty() && packetsList.isEmpty()) {
-                                        btnSendInvoice.setVisibility(View.GONE);
-                                        tvHeaderHint.setVisibility(View.VISIBLE);
-                                    } else {
-                                        btnSendInvoice.setVisibility(View.VISIBLE);
-                                        tvHeaderHint.setVisibility(View.GONE);
-                                    }
-                                    //      collateRVAdapter.notifyItemMoved(0, childPosition);
-                                }
-
-                            }
-
-                        });
-
-                        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-                        recyclerViewVolumes.setLayoutManager(mLayoutManager);
-                        recyclerViewVolumes.setAdapter(collateRVAdapter);
-
-
-                        // Create the Realm instance
-//                    realm = Realm.getDefaultInstance();
-//                    realm.beginTransaction();
-//                    realm.insert(labelsArrayList);
-//                    realm.insert(packetsArrayList);
-//                    realm.commitTransaction();
-                        Log.d("MainAccept", "got response");
-
-                    } else {
-
-                        tvNoDataVolumes.setVisibility(View.VISIBLE);
-                    }
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<CollateResponse> call, Throwable t) {
-                Log.d("MainAccept", t.getMessage());
-
-            }
-        });
-    }
-
-
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -453,5 +335,98 @@ public class VolumesFragment extends Fragment {
         if (!labelsList.isEmpty()) labelsList.clear();
 
         if (realm != null && !realm.isClosed()) realm.close();
+    }
+
+    @Override
+    public void showProgress() {
+
+    }
+
+    @Override
+    public void hideProgress() {
+
+    }
+
+    @Override
+    public void showVolumesData(CollateResponse volumes) {
+
+        packetsArrayList.addAll(volumes.getDto().getPackets());
+        labelsArrayList.addAll(volumes.getDto().getLabels());
+
+        objects = new ArrayList<Object>();
+        objects.addAll(packetsArrayList);
+        objects.addAll(labelsArrayList);
+
+        collateRVAdapter = new CollateRVAdapter(getActivity(), objects, (childView, isChecked, childPosition) -> {
+
+            if (isChecked) {
+
+                           /* Object tempPacket = objects.get(childPosition);
+                            objects.remove(childPosition);
+                            objects.add(0, tempPacket);
+                            collateRVAdapter.notifyDataSetChanged();*/
+
+                if (objects.get(childPosition) instanceof Packet) {
+                    packetsList.add(((Packet) objects.get(childPosition)).getId());
+
+
+//                                    collateRVAdapter.notifyItemMoved(childPosition, 0);
+                } else if (objects.get(childPosition) instanceof Label) {
+                    labelsList.add(((Label) objects.get(childPosition)).getId());
+
+
+                           /*     Label tempLabel = (Label) objects.get(childPosition);
+                                objects.remove(childPosition);
+                                objects.add(0, tempLabel);*/
+                }
+//                                    collateRVAdapter.notifyItemMoved(childPosition, 0);
+                if (labelsList.isEmpty() && packetsList.isEmpty()) {
+                    btnSendInvoice.setVisibility(View.GONE);
+                    tvHeaderHint.setVisibility(View.VISIBLE);
+                } else {
+                    btnSendInvoice.setVisibility(View.VISIBLE);
+                    tvHeaderHint.setVisibility(View.GONE);
+                }
+
+
+            } else {
+
+                if (objects.get(childPosition) instanceof Packet) {
+                    packetsList.remove(((Packet) objects.get(childPosition)).getId());
+
+                } else {
+                    labelsList.remove(((Label) objects.get(childPosition)).getId());
+                }
+
+                if (labelsList.isEmpty() && packetsList.isEmpty()) {
+                    btnSendInvoice.setVisibility(View.GONE);
+                    tvHeaderHint.setVisibility(View.VISIBLE);
+                } else {
+                    btnSendInvoice.setVisibility(View.VISIBLE);
+                    tvHeaderHint.setVisibility(View.GONE);
+                }
+                //      collateRVAdapter.notifyItemMoved(0, childPosition);
+            }
+
+        });
+
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+        recyclerViewVolumes.setLayoutManager(mLayoutManager);
+        recyclerViewVolumes.setAdapter(collateRVAdapter);
+
+    }
+
+    @Override
+    public void showRoutesEmptyData() {
+        ll.setVisibility(View.GONE);
+        llbtnHint.setVisibility(View.GONE);
+        tvNoDataVolumes.setVisibility(View.VISIBLE);
+
+    }
+
+    @Override
+    public void showRoutesError(Throwable throwable) {
+        Log.d("MainAccept", throwable.getMessage());
+        Toast.makeText(getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
     }
 }

@@ -41,25 +41,27 @@ import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.CollateRVAdapter;
+import ru.startandroid.retrofit.models.NetworkService;
+import ru.startandroid.retrofit.presenter.AcceptGenInvoicePresenter;
+import ru.startandroid.retrofit.presenter.AcceptGenInvoicePresenterImpl;
+import ru.startandroid.retrofit.view.AcceptGenInvoiceView;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class AcceptGenInvoiceFragment extends Fragment {
-
+public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoiceView {
 
     private ListView listViewAcceptGen;
-
-    private TextView tvAcceptGen;
-
+    private TextView tvNoDataAcceptGen;
     private Button btnCollate;
-
-    List<Long> ids;
+    private List<Long> ids;
     private Realm realm;
     private ProgressBar progressAccept;
-
     private ArrayAdapter<String> listAdapter;
     private List<String> generalInvoiceIdsList = new ArrayList<>();
+    private AcceptGenInvoicePresenter presenter;
+    private Dto collateDtoObject;
+
 
     public AcceptGenInvoiceFragment() {
         // Required empty public constructor
@@ -73,11 +75,12 @@ public class AcceptGenInvoiceFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_accept_gen_invoice, container, false);
 
         listViewAcceptGen = (ListView) view.findViewById(R.id.list_view_accept_gen);
-        tvAcceptGen = (TextView) view.findViewById(R.id.tv_no_data_accept_gen);
+        tvNoDataAcceptGen = (TextView) view.findViewById(R.id.tv_no_data_accept_gen);
         btnCollate = (Button) view.findViewById(R.id.btn_collate);
 
         progressAccept = (ProgressBar) view.findViewById(R.id.progress_accept_gen);
         Long id;
+        presenter = new AcceptGenInvoicePresenterImpl(this, new NetworkService());
 
 
         ids = new ArrayList<Long>();
@@ -99,18 +102,15 @@ public class AcceptGenInvoiceFragment extends Fragment {
         }
 
 
-        btnCollate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        btnCollate.setOnClickListener(v -> {
 
-                if (!generalInvoiceIdsList.isEmpty()){
-                    progressAccept.setVisibility(View.VISIBLE);
+            if (!generalInvoiceIdsList.isEmpty()) {
+                progressAccept.setVisibility(View.VISIBLE);
 
-                    retrofitPostCollate();
-                }else{
-                    Toast.makeText(getContext(), "Нечего сличать", Toast.LENGTH_SHORT).show();
+                retrofitPostCollate();
+            } else {
+                Toast.makeText(getContext(), "Нечего сличать", Toast.LENGTH_SHORT).show();
 
-                }
             }
         });
 
@@ -151,9 +151,7 @@ public class AcceptGenInvoiceFragment extends Fragment {
 //                    listViewAcceptGen.notify();
 
                     } else {
-                        progressAccept.setVisibility(View.GONE);
-
-                        tvAcceptGen.setVisibility(View.VISIBLE);
+                        showRoutesEmptyData();
                     }
                 }
             }
@@ -188,7 +186,6 @@ public class AcceptGenInvoiceFragment extends Fragment {
 
                 if (response.body() != null) {
 
-
                     if (response.isSuccessful() && response.body().getStatus().equals("success")) {
 
                         for (int i = 0; i < response.body().getDestinationLists().size(); i++) {
@@ -204,9 +201,8 @@ public class AcceptGenInvoiceFragment extends Fragment {
                         listViewAcceptGen.setAdapter(listAdapter);
 
                     } else {
-                        progressAccept.setVisibility(View.GONE);
 
-                        tvAcceptGen.setVisibility(View.VISIBLE);
+                        showRoutesEmptyData();
                     }
                 }
             }
@@ -218,8 +214,6 @@ public class AcceptGenInvoiceFragment extends Fragment {
         });
     }
 
-
-    Dto collateDtoObject;
 
     private void retrofitPostCollate() {
         Retrofit retrofitDestList = new Retrofit.Builder()
@@ -276,10 +270,12 @@ public class AcceptGenInvoiceFragment extends Fragment {
 
                     } else {
 
-                        progressAccept.setVisibility(View.VISIBLE);
 
-                        retrofitGetListForVpn();
-                        tvAcceptGen.setVisibility(View.VISIBLE);
+                        showProgress();
+
+                        presenter.loadGetListForVpn();
+
+                        tvNoDataAcceptGen.setVisibility(View.VISIBLE);
                     }
 
                 }
@@ -294,80 +290,65 @@ public class AcceptGenInvoiceFragment extends Fragment {
         });
     }
 
-
-    private void retrofitGetListForVpn() {
-        Retrofit retrofitDestList = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(getUserClient(Const.Token))
-                .build();
-
-
-        GitHubService gitHubServ = retrofitDestList.create(GitHubService.class);
-        gitHubServ.getListForVpn().enqueue(new Callback<CollateResponse>() {
-            @Override
-            public void onResponse(Call<CollateResponse> call, Response<CollateResponse> response) {
-
-                progressAccept.setVisibility(View.GONE);
-
-                if (response.body() != null) {
-
-                    if (response.isSuccessful() && response.body().getStatus().equals("success")) {
-                        Log.d("MainAccept", "got response");
-
-                        Log.d("MainAccept", response.body().getStatus());
-                        Log.d("MainAccept labels", response.body().getDto().getLabels().size() + " ");
-                        Log.d("MainAccept packets", response.body().getDto().getPackets().size() + " ");
-
-
-                        ArrayList<Packet> packetsArrayList = new ArrayList<>();
-                        packetsArrayList.addAll(response.body().getDto().getPackets());
-
-                        ArrayList<Label> labelsArrayList = new ArrayList<>();
-                        labelsArrayList.addAll(response.body().getDto().getLabels());
-
-
-                        ArrayList<Object> objects = new ArrayList<Object>();
-                        objects.addAll(packetsArrayList);
-                        objects.addAll(labelsArrayList);
-
-//                    CollateRVAdapter collateRVAdapter = new CollateRVAdapter(objects);
-
-
-                        // Create the Realm instance
-                        realm = Realm.getDefaultInstance();
-
-                        realm.beginTransaction();
-                        realm.insert(labelsArrayList);
-                        realm.insert(packetsArrayList);
-                        realm.commitTransaction();
-                        Log.d("MainAccept", "got response");
-
-                        ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
-
-
-                    } else {
-                        progressAccept.setVisibility(View.GONE);
-
-                        tvAcceptGen.setVisibility(View.VISIBLE);
-                    }
-                }
-
-
-            }
-
-            @Override
-            public void onFailure(Call<CollateResponse> call, Throwable t) {
-                Log.d("MainAccept", t.getMessage());
-
-            }
-        });
-    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
     }
 
+    @Override
+    public void showProgress() {
+        progressAccept.setVisibility(View.VISIBLE);
+    }
 
+    @Override
+    public void hideProgress() {
+        progressAccept.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showVolumesData(CollateResponse volumes) {
+
+        Log.d("MainAccept", volumes.getStatus());
+        Log.d("MainAccept labels", volumes.getDto().getLabels().size() + " ");
+        Log.d("MainAccept packets", volumes.getDto().getPackets().size() + " ");
+
+        ArrayList<Packet> packetsArrayList = new ArrayList<>();
+        packetsArrayList.addAll(volumes.getDto().getPackets());
+
+        ArrayList<Label> labelsArrayList = new ArrayList<>();
+        labelsArrayList.addAll(volumes.getDto().getLabels());
+
+        ArrayList<Object> objects = new ArrayList<Object>();
+        objects.addAll(packetsArrayList);
+        objects.addAll(labelsArrayList);
+
+//                    CollateRVAdapter collateRVAdapter = new CollateRVAdapter(objects);
+
+
+        // Create the Realm instance
+        realm = Realm.getDefaultInstance();
+
+        realm.beginTransaction();
+        realm.insert(labelsArrayList);
+        realm.insert(packetsArrayList);
+        realm.commitTransaction();
+
+        ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
+    }
+
+    @Override
+    public void showRoutesEmptyData() {
+        hideProgress();
+        btnCollate.setVisibility(View.GONE);
+        tvNoDataAcceptGen.setVisibility(View.VISIBLE);
+
+    }
+
+    @Override
+    public void showRoutesError(Throwable throwable) {
+        Log.d("MainAccept", throwable.getMessage());
+        Toast.makeText(getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+
+    }
 }

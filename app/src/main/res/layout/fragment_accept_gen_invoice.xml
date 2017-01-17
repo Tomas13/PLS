@@ -16,7 +16,7 @@
         android:id="@+id/tv_no_data_accept_gen"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_centerInParent="true"
         android:text="@string/no_data"
         android:textSize="22sp"
         android:visibility="gone" />

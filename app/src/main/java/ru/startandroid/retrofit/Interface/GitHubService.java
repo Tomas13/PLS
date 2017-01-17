@@ -110,7 +110,7 @@ public interface GitHubService {
 
     //    Получение списка s накладных, которые уже извлекли из О
     @GET("/api/mobile/list-for-vpn")
-    Call<CollateResponse> getListForVpn(
+    Observable<CollateResponse> getListForVpn(
 
     );
 
