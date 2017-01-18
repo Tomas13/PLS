@@ -64,6 +64,7 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
     private TextView tvNoDataAcceptGen;
     private Button btnCollate, btnScan;
     private List<Long> ids;
+    private List<Long> chosenIds;
     private Realm realm;
     private ProgressBar progressAccept;
     private ArrayAdapter<String> listAdapter;
@@ -71,6 +72,8 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
     private AcceptGenInvoicePresenter presenter;
     private Dto collateDtoObject;
     private EditText editTextScan;
+
+
 
     public AcceptGenInvoiceFragment() {
         // Required empty public constructor
@@ -141,12 +144,16 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
                     if (generalInvoiceIdsList.get(i).equals(s.toString())){
 
 
+                        chosenIds.add(ids.get(i));
+
                         count++;
                         String temp = generalInvoiceIdsList.get(i);
                         generalInvoiceIdsList.remove(i);
                         generalInvoiceIdsList.add(0, temp);
                         listAdapter.notifyDataSetChanged();
                         listViewAcceptGen.getChildAt(count-1).setBackgroundColor(Color.GREEN);
+
+
                     }
 
                 }
@@ -157,7 +164,8 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
             if (!generalInvoiceIdsList.isEmpty()) {
                 progressAccept.setVisibility(View.VISIBLE);
 
-                IdsCollate idsCol = new IdsCollate(ids);
+//                IdsCollate idsCol = new IdsCollate(ids);
+                IdsCollate idsCol = new IdsCollate(chosenIds);
                 presenter.postCollate(idsCol);
 
             } else {
