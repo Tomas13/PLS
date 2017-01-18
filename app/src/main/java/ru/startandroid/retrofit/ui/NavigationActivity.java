@@ -613,4 +613,6 @@ public class NavigationActivity extends AppCompatActivity
         observable = null;
     }
 
+
+
 }

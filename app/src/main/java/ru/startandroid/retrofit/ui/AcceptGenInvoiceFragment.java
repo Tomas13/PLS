@@ -1,19 +1,24 @@
 package ru.startandroid.retrofit.ui;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baozi.Zxing.CaptureActivity;
+import com.baozi.Zxing.ZXingConstants;
 import com.facebook.stetho.Stetho;
 
 import java.util.ArrayList;
@@ -53,7 +58,7 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
 
     private ListView listViewAcceptGen;
     private TextView tvNoDataAcceptGen;
-    private Button btnCollate;
+    private Button btnCollate, btnScan;
     private List<Long> ids;
     private Realm realm;
     private ProgressBar progressAccept;
@@ -61,7 +66,7 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
     private List<String> generalInvoiceIdsList = new ArrayList<>();
     private AcceptGenInvoicePresenter presenter;
     private Dto collateDtoObject;
-
+    private EditText editTextScan;
 
     public AcceptGenInvoiceFragment() {
         // Required empty public constructor
@@ -72,6 +77,9 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_accept_gen_invoice, container, false);
+
+        btnScan = (Button) view.findViewById(R.id.btn_scan);
+        editTextScan = (EditText) view.findViewById(R.id.et_scan);
 
         listViewAcceptGen = (ListView) view.findViewById(R.id.list_view_accept_gen);
         tvNoDataAcceptGen = (TextView) view.findViewById(R.id.tv_no_data_accept_gen);
@@ -112,10 +120,37 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
             }
         });
 
+
+        btnScan.setOnClickListener(v -> startScanActivity());
         return view;
     }
 
+    private void startScanActivity() {
+        Intent intent = new Intent(getContext(), CaptureActivity.class);
+        intent.putExtra(ZXingConstants.ScanIsShowHistory, true);
+        startActivityForResult(intent, ZXingConstants.ScanRequestCode);
+    }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data == null) {
+            return;
+        }
+        switch (requestCode) {
+            case ZXingConstants.ScanRequestCode:
+                if (resultCode == ZXingConstants.ScanRequestCode) {
+                    String result = data.getStringExtra(ZXingConstants.ScanResult);
+                    editTextScan.setText(result);
+                } else if (resultCode == ZXingConstants.ScanHistoryResultCode) {
+                    String resultHistory = data.getStringExtra(ZXingConstants.ScanHistoryResult);
+                    if (!TextUtils.isEmpty(resultHistory)) {
+//                        startActivity(new Intent(MainActivity.this,HistoryActivity.class));
+                    }
+                }
+                break;
+        }
+    }
 
     @Override
     public void showDestinationList(ResponseDestinationList destinationList) {
@@ -265,7 +300,6 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
 
         ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
     }
-
 
 
     @Override

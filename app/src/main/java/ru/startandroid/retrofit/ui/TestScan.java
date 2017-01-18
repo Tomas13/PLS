@@ -25,12 +25,9 @@ public class TestScan extends AppCompatActivity{
         textView = (TextView) findViewById(R.id.tvsca);
 
         Intent intent = new Intent(this, CaptureActivity.class);
-        //是不是显示历史记录按钮
         intent.putExtra(ZXingConstants.ScanIsShowHistory,true);
         startActivityForResult(intent, ZXingConstants.ScanRequestCode);
 
-//        mScannerView = new ZXingScannerView(this);   // Programmatically initialize the scanner view
-//        setContentView(mScannerView);                // Set the scanner view as the content view
     }
 
     @Override
@@ -42,18 +39,11 @@ public class TestScan extends AppCompatActivity{
         switch (requestCode) {
             case ZXingConstants.ScanRequestCode:
                 if(resultCode == ZXingConstants.ScanRequestCode){
-                    /**
-                     * 拿到解析完成的字符串
-                     */
                     String result = data.getStringExtra(ZXingConstants.ScanResult);
                     textView.setText(result);
                 }else if(resultCode == ZXingConstants.ScanHistoryResultCode){
-                    /**
-                     * 历史记录
-                     */
                     String resultHistory = data.getStringExtra(ZXingConstants.ScanHistoryResult);
                     if(!TextUtils.isEmpty(resultHistory)){
-                        //自己实现历史页面
 //                        startActivity(new Intent(MainActivity.this,HistoryActivity.class));
                     }
                 }
