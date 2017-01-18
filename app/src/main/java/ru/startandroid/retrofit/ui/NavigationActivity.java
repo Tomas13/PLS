@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -280,6 +281,10 @@ public class NavigationActivity extends AppCompatActivity
 
                         entries = response.body().getFlights().get(0).getItineraryDTO().getEntries();
 
+                        realm.beginTransaction();
+                        realm.insert(entries);
+                        realm.commitTransaction();
+
 
                         startFragment(new HistoryFragment());
 
@@ -393,11 +398,14 @@ public class NavigationActivity extends AppCompatActivity
         final Dialog flightDialog = new Dialog(this);
         flightDialog.setContentView(R.layout.fragment_flight);
 
+
 //        flightDialog.setCanceledOnTouchOutside(false);
         flightDialog.setCancelable(false);
 
         ListView listView = (ListView) flightDialog.findViewById(R.id.list_view_flight);
-        adapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.list_view_item, flights);
+//        adapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.list_view_item, flights);
+        adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_activated_1, flights);
+        listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         listView.setAdapter(adapter);
 
         flightDialog.show();
@@ -405,6 +413,9 @@ public class NavigationActivity extends AppCompatActivity
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                flightDialog.setTitle(flights.get(position));
+                listView.setItemChecked(position, true);
 
                 Toast.makeText(getApplicationContext(), "Сохраняем " + flights.get(position), Toast.LENGTH_SHORT).show();
                 //Save Flight Id to shared preferences

@@ -245,7 +245,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
             pointDialog.setTitle(flightName.get(position));
 
-
             listView.setItemChecked(position, true);
 
             SharedPreferences pref1 = getActivity().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
