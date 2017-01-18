@@ -2,9 +2,13 @@ package ru.startandroid.retrofit.ui;
 
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -71,6 +75,7 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
     public AcceptGenInvoiceFragment() {
         // Required empty public constructor
     }
+    int count = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -78,8 +83,15 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_accept_gen_invoice, container, false);
 
+        ((AppCompatActivity) getActivity())
+                .getSupportActionBar()
+                .setTitle("Список S-накладных");
+
+
         btnScan = (Button) view.findViewById(R.id.btn_scan);
         editTextScan = (EditText) view.findViewById(R.id.et_scan);
+
+
 
         listViewAcceptGen = (ListView) view.findViewById(R.id.list_view_accept_gen);
         tvNoDataAcceptGen = (TextView) view.findViewById(R.id.tv_no_data_accept_gen);
@@ -108,6 +120,39 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
 
         }
 
+        editTextScan.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                for (int i = 0; i < generalInvoiceIdsList.size(); i++) {
+
+
+
+                    if (generalInvoiceIdsList.get(i).equals(s.toString())){
+
+
+                        count++;
+                        String temp = generalInvoiceIdsList.get(i);
+                        generalInvoiceIdsList.remove(i);
+                        generalInvoiceIdsList.add(0, temp);
+                        listAdapter.notifyDataSetChanged();
+                        listViewAcceptGen.getChildAt(count-1).setBackgroundColor(Color.GREEN);
+                    }
+
+                }
+            }
+        });
+
         btnCollate.setOnClickListener(v -> {
             if (!generalInvoiceIdsList.isEmpty()) {
                 progressAccept.setVisibility(View.VISIBLE);
@@ -122,6 +167,20 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
 
 
         btnScan.setOnClickListener(v -> startScanActivity());
+
+
+/*
+
+        generalInvoiceIdsList.add("First");
+        generalInvoiceIdsList.add("Second");
+        generalInvoiceIdsList.add("Third");
+        generalInvoiceIdsList.add("Four");
+        generalInvoiceIdsList.add("Five");
+        listAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, generalInvoiceIdsList);
+
+        listViewAcceptGen.setAdapter(listAdapter);*/
+
+
         return view;
     }
 

@@ -505,7 +505,6 @@ public class NavigationActivity extends AppCompatActivity
             startFragment(new InvoiceFragment());
         } else if (id == R.id.nav_dest_list) {
 
-            setTitle("Список S");
             startFragment(new AcceptGenInvoiceFragment());
 
         } else if (id == R.id.nav_routes) {
