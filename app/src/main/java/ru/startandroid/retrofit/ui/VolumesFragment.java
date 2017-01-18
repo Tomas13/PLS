@@ -2,11 +2,13 @@ package ru.startandroid.retrofit.ui;
 
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -227,8 +229,8 @@ public class VolumesFragment extends Fragment implements VolumesView {
         pointDialog.setContentView(R.layout.fragment_flight);
 
         ListView listView = (ListView) pointDialog.findViewById(R.id.list_view_flight);
-        adapter = new ArrayAdapter<String>(getContext(), R.layout.list_view_item, flightName);
-//        adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_activated_1, flightName);
+//        adapter = new ArrayAdapter<String>(getContext(), R.layout.list_view_item, flightName);
+        adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_activated_1, flightName);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         listView.setAdapter(adapter);
 
@@ -239,8 +241,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
             pointDialog.setTitle(flightName.get(position));
 
-            Checkable child = (Checkable) parent.getChildAt(position);
-            child.toggle();
 
             listView.setItemChecked(position, true);
 
@@ -298,6 +298,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
                             Toast.makeText(getContext(), "Общая накладная успешно создана", Toast.LENGTH_SHORT).show();
 
                         } else {
+                            createErrorDialog(response.body().getStatus());
 
                             Toast.makeText(getContext(), response.body().getStatus(), Toast.LENGTH_SHORT).show();
                         }
@@ -331,6 +332,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
             @Override
             public void onFailure(Call<CreateResponse> call, Throwable t) {
+
                 Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -438,6 +440,27 @@ public class VolumesFragment extends Fragment implements VolumesView {
     @Override
     public void showRoutesError(Throwable throwable) {
         Log.d("MainAccept", throwable.getMessage());
-        Toast.makeText(getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+
+        createErrorDialog(throwable.getMessage());
+
     }
+
+
+    private void createErrorDialog(String error) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage(error)
+                .setPositiveButton(R.string.ok, (dialog, id) -> {
+                    dialog.dismiss();
+                });
+//                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int id) {
+//                         User cancelled the dialog
+//                    }
+
+        // Create the AlertDialog object and return it
+        builder.create();
+        builder.show();
+    }
+
 }
