@@ -166,6 +166,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
             public void onCheckedChanged(View childView, boolean isChecked, int childPosition) {
 
                 if (isChecked) {
+                    recyclerViewVolumes.getChildAt(childPosition).setBackgroundColor(Color.GREEN);
 
 /*
                                 Object tempPacket = objects.get(childPosition);
@@ -199,6 +200,8 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
                 } else {
 
+                    recyclerViewVolumes.getChildAt(childPosition).setBackgroundColor(Color.TRANSPARENT);
+
 
                     if (objects.get(childPosition) instanceof Packet) {
                         packetsList.remove(((Packet) objects.get(childPosition)).getId());
@@ -227,6 +230,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
     private void showDialog() {
         final Dialog pointDialog = new Dialog(getContext());
         pointDialog.setContentView(R.layout.fragment_flight);
+        pointDialog.setCancelable(false);
 
         ListView listView = (ListView) pointDialog.findViewById(R.id.list_view_flight);
 //        adapter = new ArrayAdapter<String>(getContext(), R.layout.list_view_item, flightName);
@@ -374,6 +378,8 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
             if (isChecked) {
 
+                recyclerViewVolumes.getChildAt(childPosition).setBackgroundColor(Color.GREEN);
+
                            /* Object tempPacket = objects.get(childPosition);
                             objects.remove(childPosition);
                             objects.add(0, tempPacket);
@@ -403,6 +409,9 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
 
             } else {
+
+                recyclerViewVolumes.getChildAt(childPosition).setBackgroundColor(Color.TRANSPARENT);
+
 
                 if (objects.get(childPosition) instanceof Packet) {
                     packetsList.remove(((Packet) objects.get(childPosition)).getId());

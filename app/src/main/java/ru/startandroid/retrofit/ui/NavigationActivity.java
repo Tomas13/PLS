@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.widget.AdapterView;
@@ -392,6 +393,8 @@ public class NavigationActivity extends AppCompatActivity
         final Dialog flightDialog = new Dialog(this);
         flightDialog.setContentView(R.layout.fragment_flight);
 
+//        flightDialog.setCanceledOnTouchOutside(false);
+        flightDialog.setCancelable(false);
 
         ListView listView = (ListView) flightDialog.findViewById(R.id.list_view_flight);
         adapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.list_view_item, flights);
@@ -502,6 +505,7 @@ public class NavigationActivity extends AppCompatActivity
             startFragment(new InvoiceFragment());
         } else if (id == R.id.nav_dest_list) {
 
+            setTitle("Список S");
             startFragment(new AcceptGenInvoiceFragment());
 
         } else if (id == R.id.nav_routes) {
@@ -516,11 +520,14 @@ public class NavigationActivity extends AppCompatActivity
 
 
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(NavigationActivity.this);
+            // Make us non-modal, so that others can receive touch events.
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 
             alertDialog
                     .setTitle(R.string.exit_dialog_text)
                     .setPositiveButton(R.string.ok, ((dialog, which) -> remove()))
                     .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.cancel())
+
                     .create()
                     .show();
 
