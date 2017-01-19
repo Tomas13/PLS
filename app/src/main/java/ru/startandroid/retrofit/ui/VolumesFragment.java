@@ -63,7 +63,6 @@ import static ru.startandroid.retrofit.Const.FLIGHT_SHARED_PREF;
 import static ru.startandroid.retrofit.Const.NAV_SHARED_PREF;
 import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
-
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -86,6 +85,8 @@ public class VolumesFragment extends Fragment implements VolumesView {
     private ArrayList<String> flightName;
     private BodyForCreateInvoice body;
     private LinearLayout ll, llbtnHint;
+    private ArrayList<Object> objects;
+    private CollateRVAdapter collateRVAdapter;
 
     public VolumesFragment() {
         // Required empty public constructor
@@ -103,7 +104,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
         ll = (LinearLayout) rootView.findViewById(R.id.ll);
         llbtnHint = (LinearLayout) rootView.findViewById(R.id.ll_btn_hint);
-
         tvNoDataVolumes = (TextView) rootView.findViewById(R.id.tv_no_data_volumes);
         recyclerViewVolumes = (RecyclerView) rootView.findViewById(R.id.rv_fragment_volumes);
         btnSendInvoice = (Button) rootView.findViewById(R.id.btn_send_invoice);
@@ -116,10 +116,8 @@ public class VolumesFragment extends Fragment implements VolumesView {
         realm = Realm.getDefaultInstance();
         // Build the query looking at all users:
         queryData = realm.where(Entry.class);
-
         queryLabel = realm.where(Label.class);
         queryPacket = realm.where(Packet.class);
-
 
         if (queryPacket.findAll().size() > 0 || queryLabel.findAll().size() > 0) {
             inflateWithRealm();
@@ -239,7 +237,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         listView.setAdapter(adapter);
 
-
         pointDialog.show();
 
         listView.setOnItemClickListener((parent, view, position, id) -> {
@@ -342,9 +339,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
         });
     }
 
-    ArrayList<Object> objects;
-    CollateRVAdapter collateRVAdapter;
-
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -446,16 +440,12 @@ public class VolumesFragment extends Fragment implements VolumesView {
         ll.setVisibility(View.GONE);
         llbtnHint.setVisibility(View.GONE);
         tvNoDataVolumes.setVisibility(View.VISIBLE);
-
     }
 
     @Override
     public void showRoutesError(Throwable throwable) {
         Log.d("MainAccept", throwable.getMessage());
-//        Toast.makeText(getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
-
         showErrorDialog(throwable.getMessage());
-
     }
 
 
@@ -463,13 +453,8 @@ public class VolumesFragment extends Fragment implements VolumesView {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setMessage(error)
                 .setPositiveButton(R.string.ok, (dialog, id) -> dialog.dismiss());
-//                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int id) {
-//                         User cancelled the dialog
-//                    }
-
-        // Create the AlertDialog object and return it
-        builder.create().show();
+        builder
+                .create().show();
     }
 
 }

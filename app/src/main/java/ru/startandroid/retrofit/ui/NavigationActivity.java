@@ -193,14 +193,12 @@ public class NavigationActivity extends AppCompatActivity
         //TODO gotta remove shared pref value when needed (onLogout)
         SharedPreferences pref = getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
 
-
         SharedPreferences pref1 = getApplicationContext().getSharedPreferences(NAV_SHARED_PREF, 0); // 0 - for private mode
         if (pref1.contains(FLIGHT_NAME)) {
             tvRouteHeader.setText(pref1.getString(FLIGHT_NAME, "Путь"));
         }
 
         if (!pref.contains(FLIGHT_POS)) {
-
 //            navProgressBar.setVisibility(View.VISIBLE);
             routesPresenter.loadRoutes();
 
@@ -237,13 +235,10 @@ public class NavigationActivity extends AppCompatActivity
             tvFirstName.setText(firstname);
             tvLastName.setText(lastname);
 
-            hideProgress();
-
 //                    HistoryFragment fragment = new HistoryFragment();
 //                startFragment(fragment);
 
             Log.d("Main", Const.Token);
-            Log.d("Main", "got here");
         }
     }
 
@@ -421,7 +416,12 @@ public class NavigationActivity extends AppCompatActivity
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             ((ActivityManager) getApplicationContext().getSystemService(ACTIVITY_SERVICE))
                     .clearApplicationUserData(); // note: it has a return value!
+
+            removeRealm();
+
         } else {
+            removeRealm();
+
             // use old hacky way, which can be removed
             // once minSdkVersion goes above 19 in a few years.
             stopSubscription();
@@ -467,6 +467,14 @@ public class NavigationActivity extends AppCompatActivity
         getSharedPreferences(TOKEN_SHARED_PREF, MODE_PRIVATE).edit().clear().apply();
     }
 
+    private void removeRealm() {
+        if (realm != null && !realm.isClosed()) {
+
+            realm.close();
+            Realm.deleteRealm(realm.getConfiguration());
+
+        }
+    }
 
     public void startFragment(Fragment fragment) {
         getSupportFragmentManager().beginTransaction().replace(R.id.content_navigation_container,

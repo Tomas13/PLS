@@ -70,27 +70,17 @@ public class HistoryRVAdapter extends RecyclerView.Adapter<HistoryRVAdapter.Hist
 
         switch (history.getStatus()) {
             case ACCEPT_HISTORY_STATUS:
-                holder.tvImage.setImageResource(R.drawable.ic_cloud_download_black_18dp);
-                holder.tvImage.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Toast.makeText(v.getContext(), "Статус - Принят", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                holder.tvImage.setImageResource(R.drawable.ic_done_black_24dp);
+                holder.tvImage.setOnClickListener(v -> Toast.makeText(v.getContext(), "Статус - Принят", Toast.LENGTH_SHORT).show());
                 break;
 
             case COLLATE_HISTORY_STATUS:
-                holder.tvImage.setImageResource(R.drawable.ic_cached_black_18dp);
-                holder.tvImage.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Toast.makeText(v.getContext(), "Статус - В процессе сличения", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                holder.tvImage.setImageResource(R.drawable.ic_cached_black_24dp);
+                holder.tvImage.setOnClickListener(v -> Toast.makeText(v.getContext(), "Статус - В процессе сличения", Toast.LENGTH_SHORT).show());
                 break;
 
             case CREATED_HISTORY_STATUS:
-                holder.tvImage.setImageResource(R.drawable.ic_done_black_18dp);
+                holder.tvImage.setImageResource(R.drawable.ic_done_all_black_24dp);
                 holder.tvImage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

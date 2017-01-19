@@ -76,13 +76,13 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
     private AcceptGenInvoicePresenter presenter;
     private Dto collateDtoObject;
     private EditText editTextScan;
+    int count = 0;
 
 
 
     public AcceptGenInvoiceFragment() {
         // Required empty public constructor
     }
-    int count = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -90,16 +90,11 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_accept_gen_invoice, container, false);
 
-        ((AppCompatActivity) getActivity())
-                .getSupportActionBar()
-                .setTitle("Список S-накладных");
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Список S-накладных");
 
 
         btnScan = (Button) view.findViewById(R.id.btn_scan);
         editTextScan = (EditText) view.findViewById(R.id.et_scan);
-
-
-
         listViewAcceptGen = (ListView) view.findViewById(R.id.list_view_accept_gen);
         tvNoDataAcceptGen = (TextView) view.findViewById(R.id.tv_no_data_accept_gen);
         btnCollate = (Button) view.findViewById(R.id.btn_collate);
@@ -110,6 +105,7 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
 
 
         ids = new ArrayList<Long>();
+        chosenIds = new ArrayList<Long>();
 
         if (getArguments() != null) {
 
@@ -148,7 +144,6 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
                     if (generalInvoiceIdsList.get(i).equals(s.toString())){
 
 
-                        chosenIds.add(ids.get(i));
 
                         count++;
                         String temp = generalInvoiceIdsList.get(i);
@@ -156,6 +151,10 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
                         generalInvoiceIdsList.add(0, temp);
                         listAdapter.notifyDataSetChanged();
                         listViewAcceptGen.getChildAt(count-1).setBackgroundColor(Color.GREEN);
+
+                        editTextScan.setText("");
+
+                        chosenIds.add(ids.get(i));
 
 
                     }
