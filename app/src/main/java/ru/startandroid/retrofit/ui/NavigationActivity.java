@@ -54,9 +54,12 @@ import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.databinding.ActivityNavigationBinding;
 import ru.startandroid.retrofit.models.NetworkService;
+import ru.startandroid.retrofit.presenter.NavigationPresenterImpl;
+import ru.startandroid.retrofit.presenter.NavitationPresenter;
 import ru.startandroid.retrofit.presenter.RoutesPresenter;
 import ru.startandroid.retrofit.presenter.RoutesPresenterImpl;
 import ru.startandroid.retrofit.utils.KeycloakHelper;
+import ru.startandroid.retrofit.view.NavigationActView;
 import ru.startandroid.retrofit.view.RoutesView;
 import rx.Observable;
 import rx.Subscription;
@@ -76,23 +79,21 @@ import static ru.startandroid.retrofit.Const.Token;
 import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
 public class NavigationActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, RoutesView {
+        implements NavigationView.OnNavigationItemSelectedListener, RoutesView, NavigationActView {
 
-    ActivityNavigationBinding activityNavigationBinding;
-
-    ProgressBar navProgressBar;
-    TextView tvFirstName;
-    TextView tvLastName, tvRoleName, tvRouteHeader;
+    private ActivityNavigationBinding activityNavigationBinding;
+    private ProgressBar navProgressBar;
+    private TextView tvFirstName;
+    private TextView tvLastName, tvRoleName, tvRouteHeader;
     private ArrayList<Routes> routesList = new ArrayList<>();
-
-    private boolean isLogged;
-
-    List<Entry> entries;
-
-    List<Flight> flightArrayList;
+    private ArrayAdapter<String> adapter;
+    private ArrayList<String> flights;
+    private int posReturn;
+    private List<Entry> entries;
+    private List<Flight> flightArrayList;
     private RoutesPresenter routesPresenter;
+    private NavitationPresenter navPresenter;
     private Realm realm;
-    private Observable observable;
     private Subscription subscription;
 
     private void runRefreshToken() {
@@ -151,7 +152,7 @@ public class NavigationActivity extends AppCompatActivity
         runRefreshToken();
 
         routesPresenter = new RoutesPresenterImpl(this, new NetworkService());
-
+        navPresenter = new NavigationPresenterImpl(this, new NetworkService());
         navProgressBar = (ProgressBar) findViewById(R.id.activity_navigation_progressbar);
 
         tvFirstName = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_fname);
@@ -171,7 +172,8 @@ public class NavigationActivity extends AppCompatActivity
             Log.d("Main", "fetching membership info");
             navProgressBar.setVisibility(View.VISIBLE);
 
-            getMembershipInfo();
+            navPresenter.loadMembershipInfo();
+
         } else {
 
             navProgressBar.setVisibility(View.GONE);
@@ -220,63 +222,44 @@ public class NavigationActivity extends AppCompatActivity
 
     }
 
-    private void getMembershipInfo() {
-        Retrofit retrofitLastActions = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(getUserClient(Const.Token))
-                .build();
 
+    @Override
+    public void getMembershipData(Member member) {
+        if (member != null) {
 
-        GitHubService gitHubServ = retrofitLastActions.create(GitHubService.class);
+            String firstname = member.getData().get(0).getFirstName();
+            String lastname = member.getData().get(0).getLastName();
 
-        final Call<Member> callEdges =
-                gitHubServ.getMembershipInfo();
+            realm.beginTransaction();
+            realm.insert(member.getData());
+            realm.commitTransaction();
 
-        callEdges.enqueue(new Callback<Member>() {
-            @Override
-            public void onResponse(Call<Member> call, Response<Member> response) {
+            tvFirstName.setText(firstname);
+            tvLastName.setText(lastname);
 
-                if (response.body() != null) {
+            hideProgress();
 
-                    String firstname = response.body().getData().get(0).getFirstName();
-                    String lastname = response.body().getData().get(0).getLastName();
-
-
-                    realm.beginTransaction();
-                    realm.insert(response.body().getData());
-                    realm.commitTransaction();
-
-
-                    tvFirstName.setText(firstname);
-                    tvLastName.setText(lastname);
-
-                    navProgressBar.setVisibility(View.GONE);
-
-                    HistoryFragment fragment = new HistoryFragment();
+//                    HistoryFragment fragment = new HistoryFragment();
 //                startFragment(fragment);
 
-                    Log.d("Main", Const.Token);
-                    Log.d("Main", "got here");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Member> call, Throwable t) {
-                Log.d("Main", t.getMessage());
-                navProgressBar.setVisibility(View.GONE);
-
-                Toast.makeText(NavigationActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
-
-            }
-        });
+            Log.d("Main", Const.Token);
+            Log.d("Main", "got here");
+        }
     }
 
-    ArrayAdapter<String> adapter;
-    ArrayList<String> flights;
+    @Override
+    public void showMemberEmptyData() {
 
+    }
 
-    int posReturn;
+    @Override
+    public void showMemberError(Throwable throwable) {
+        Log.d("Main", throwable.getMessage());
+        hideProgress();
+
+        Toast.makeText(NavigationActivity.this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+
+    }
 
     private void createDialog() {
 
@@ -323,27 +306,21 @@ public class NavigationActivity extends AppCompatActivity
         });
 
         Button btnOk = (Button) flightDialog.findViewById(R.id.btn_ok_flight);
-        btnOk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                flightDialog.dismiss();
+        btnOk.setOnClickListener(v -> {
+            flightDialog.dismiss();
 
-                if (posReturn != 0) {
+            if (posReturn != 0) {
 
-//                    Toast.makeText(NavigationActivity.this, "POS IS " + posReturn, Toast.LENGTH_SHORT).show();
+                entries = flightArrayList.get(posReturn).getItineraryDTO().getEntries();
 
-                    entries = flightArrayList.get(posReturn).getItineraryDTO().getEntries();
+                realm.beginTransaction();
+                realm.insert(entries);
+                realm.commitTransaction();
 
-                    realm.beginTransaction();
-                    realm.insert(entries);
-                    realm.commitTransaction();
+                startFragment(new HistoryFragment());
 
-                    startFragment(new HistoryFragment());
-
-
-                } else {
-                    Toast.makeText(NavigationActivity.this, "Необходимо выбрать путь следования", Toast.LENGTH_SHORT).show();
-                }
+            } else {
+                Toast.makeText(NavigationActivity.this, "Необходимо выбрать путь следования", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -440,11 +417,6 @@ public class NavigationActivity extends AppCompatActivity
     }
 
     private void remove() {
-       /* stopSubscription();
-        clearCookies(getApplicationContext());
-        clearSharedPrefs();
-        KeycloakHelper.remove();*/
-
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             ((ActivityManager) getApplicationContext().getSystemService(ACTIVITY_SERVICE))
@@ -452,11 +424,13 @@ public class NavigationActivity extends AppCompatActivity
         } else {
             // use old hacky way, which can be removed
             // once minSdkVersion goes above 19 in a few years.
+            stopSubscription();
+            clearCookies(getApplicationContext());
+            clearSharedPrefs();
+            KeycloakHelper.remove();
+            finish();
+            System.exit(0);
         }
-
-        startActivity(new Intent(this, LoginActivity.class));
-//        finish();
-//        System.exit(0);
 
     }
 
@@ -493,12 +467,8 @@ public class NavigationActivity extends AppCompatActivity
         getSharedPreferences(TOKEN_SHARED_PREF, MODE_PRIVATE).edit().clear().apply();
     }
 
-    private void isLoggedIn(boolean b) {
-        isLogged = b;
-    }
 
     public void startFragment(Fragment fragment) {
-
         getSupportFragmentManager().beginTransaction().replace(R.id.content_navigation_container,
                 fragment).commit();
     }
@@ -509,8 +479,6 @@ public class NavigationActivity extends AppCompatActivity
         super.onDestroy();
         if (realm != null && !realm.isClosed()) realm.close();
 
-        observable = null;
-
         routesPresenter.unSubscribe();
         routesPresenter.onDestroy();
     }
@@ -519,13 +487,11 @@ public class NavigationActivity extends AppCompatActivity
     @Override
     public void showProgress() {
         navProgressBar.setVisibility(View.VISIBLE);
-
     }
 
     @Override
     public void hideProgress() {
         navProgressBar.setVisibility(View.GONE);
-
     }
 
     @Override
@@ -536,7 +502,6 @@ public class NavigationActivity extends AppCompatActivity
             Log.d("MainNav", "got to response RoutesInfo" + routes.getFlights().size());
 
             routesList.add(routes);
-
 
             // Create the Realm instance
             realm = Realm.getDefaultInstance();
@@ -590,6 +555,7 @@ public class NavigationActivity extends AppCompatActivity
     @Override
     public void showRoutesEmptyData() {
         //No routes e.g. status = list-emtpy
+        tvRouteHeader.setText("");
         showErrorDialog(getString(R.string.empty_routes));
         startFragment(new HistoryFragment());
     }

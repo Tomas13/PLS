@@ -1,0 +1,13 @@
+package ru.startandroid.retrofit.presenter;
+
+/**
+ * Created by root on 1/19/17.
+ */
+
+public interface NavitationPresenter {
+    void onDestroy();
+
+    void loadMembershipInfo();
+
+    void unSubscribe();
+}

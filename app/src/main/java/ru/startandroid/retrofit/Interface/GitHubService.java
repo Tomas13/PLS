@@ -57,7 +57,7 @@ public interface GitHubService {
 //    http://pls-test.kazpost.kz/api/mobile/flights
 
     @GET("api/security/membership-info")
-    Call<Member> getMembershipInfo(
+    Observable<Member> getMembershipInfo(
 
     );
 
