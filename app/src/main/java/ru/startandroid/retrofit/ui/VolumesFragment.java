@@ -38,6 +38,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import ru.startandroid.retrofit.Application;
 import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoice;
@@ -233,8 +234,8 @@ public class VolumesFragment extends Fragment implements VolumesView {
         pointDialog.setCancelable(false);
 
         ListView listView = (ListView) pointDialog.findViewById(R.id.list_view_flight);
-//        adapter = new ArrayAdapter<String>(getContext(), R.layout.list_view_item, flightName);
-        adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_activated_1, flightName);
+        adapter = new ArrayAdapter<String>(getContext(), R.layout.list_view_item, flightName);
+//        adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_activated_1, flightName);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         listView.setAdapter(adapter);
 
@@ -301,7 +302,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
                             Toast.makeText(getContext(), "Общая накладная успешно создана", Toast.LENGTH_SHORT).show();
 
                         } else {
-                            createErrorDialog(response.body().getStatus());
+                            showErrorDialog(response.body().getStatus());
 
                             Toast.makeText(getContext(), response.body().getStatus(), Toast.LENGTH_SHORT).show();
                         }
@@ -351,6 +352,9 @@ public class VolumesFragment extends Fragment implements VolumesView {
         if (!labelsList.isEmpty()) labelsList.clear();
 
         if (realm != null && !realm.isClosed()) realm.close();
+
+        presenter.unSubscribe();
+        presenter.onDestroy();
     }
 
     @Override
@@ -450,25 +454,22 @@ public class VolumesFragment extends Fragment implements VolumesView {
         Log.d("MainAccept", throwable.getMessage());
 //        Toast.makeText(getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
 
-        createErrorDialog(throwable.getMessage());
+        showErrorDialog(throwable.getMessage());
 
     }
 
 
-    private void createErrorDialog(String error) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+    public void showErrorDialog(String error) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setMessage(error)
-                .setPositiveButton(R.string.ok, (dialog, id) -> {
-                    dialog.dismiss();
-                });
+                .setPositiveButton(R.string.ok, (dialog, id) -> dialog.dismiss());
 //                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
 //                    public void onClick(DialogInterface dialog, int id) {
 //                         User cancelled the dialog
 //                    }
 
         // Create the AlertDialog object and return it
-        builder.create();
-        builder.show();
+        builder.create().show();
     }
 
 }

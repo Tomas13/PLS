@@ -38,5 +38,6 @@
     <string name="exit_dialog_text">Вы уверены что хотите выйти?</string>
     <string name="btn_scan_text">Сканировать</string>
     <string name="enter_code">Введите код емкости или просканируйте</string>
+    <string name="empty_routes">У вас нет маршрутов</string>
 
 </resources>

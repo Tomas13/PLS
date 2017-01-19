@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.net.NetworkInfo;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -90,6 +91,7 @@ public class Application extends MultiDexApplication {
     private void LogMessage(String s) {
         Log.d("Main", s);
     }
+
 
    /* @Override
     public void onTerminate() {

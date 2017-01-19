@@ -43,6 +43,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import ru.startandroid.retrofit.Application;
 import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.Datum;
@@ -52,7 +53,11 @@ import ru.startandroid.retrofit.Model.routes.Flight;
 import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.databinding.ActivityNavigationBinding;
+import ru.startandroid.retrofit.models.NetworkService;
+import ru.startandroid.retrofit.presenter.RoutesPresenter;
+import ru.startandroid.retrofit.presenter.RoutesPresenterImpl;
 import ru.startandroid.retrofit.utils.KeycloakHelper;
+import ru.startandroid.retrofit.view.RoutesView;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -71,7 +76,7 @@ import static ru.startandroid.retrofit.Const.Token;
 import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
 public class NavigationActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, RoutesView {
 
     ActivityNavigationBinding activityNavigationBinding;
 
@@ -82,12 +87,15 @@ public class NavigationActivity extends AppCompatActivity
 
     private boolean isLogged;
 
+    List<Entry> entries;
+
+    List<Flight> flightArrayList;
+    private RoutesPresenter routesPresenter;
     private Realm realm;
     private Observable observable;
     private Subscription subscription;
 
     private void runRefreshToken() {
-
         subscription = Observable.interval(45, TimeUnit.SECONDS)
                 .map(aLong -> "HeyRx " + aLong)
                 .subscribeOn(Schedulers.io())
@@ -96,26 +104,6 @@ public class NavigationActivity extends AppCompatActivity
                         this::connect,
                         error -> Log.d("MainNavObser", error.getMessage()),
                         () -> Log.d("MainNavObser", "OnCompleted"));
-
-
-        /*.map(new Func1<Long, String>() {
-            @Override
-            public String call(Long o) {
-                return "Hey " + o;
-            }
-        })*/
-//        subscription = observable.subscribe(o -> connect(o));
-/*
-       subscription = observable.subscribe(new Observable.OnSubscribe() {
-            @Override
-            public void call(Object o) {
-
-
-//                Const.Token = "Bearer "  + session.getRefreshToken();
-            }
-        });
-*/
-
     }
 
     private void connect(Object object) {
@@ -161,6 +149,8 @@ public class NavigationActivity extends AppCompatActivity
         setTitle("PLS");
 
         runRefreshToken();
+
+        routesPresenter = new RoutesPresenterImpl(this, new NetworkService());
 
         navProgressBar = (ProgressBar) findViewById(R.id.activity_navigation_progressbar);
 
@@ -209,8 +199,8 @@ public class NavigationActivity extends AppCompatActivity
 
         if (!pref.contains(FLIGHT_POS)) {
 
-            navProgressBar.setVisibility(View.VISIBLE);
-            getRoutesInfo();
+//            navProgressBar.setVisibility(View.VISIBLE);
+            routesPresenter.loadRoutes();
 
         } else {
 
@@ -229,111 +219,6 @@ public class NavigationActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
     }
-
-    List<Entry> entries;
-
-    List<Flight> flightArrayList;
-
-    private void getRoutesInfo() {
-        Retrofit retrofitLastActions = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(getUserClient(Const.Token))
-                .build();
-
-        GitHubService gitHubServ = retrofitLastActions.create(GitHubService.class);
-
-        final Call<Routes> callEdges =
-                gitHubServ.getRoutesInfoCall();
-
-        callEdges.enqueue(new Callback<Routes>() {
-            @Override
-            public void onResponse(Call<Routes> call, Response<Routes> response) {
-
-                navProgressBar.setVisibility(View.GONE);
-
-                if (response.body() != null) {
-
-                    Log.d("MainNav", "got to response RoutesInfo" + response.body().getFlights().size());
-
-                    routesList.add(response.body());
-
-
-                    // Create the Realm instance
-                    realm = Realm.getDefaultInstance();
-
-                    tvRouteHeader.setText(response.body().getFlights().get(0).getName());
-
-                    //if one route then go to history fragment
-                    if (response.body().getFlights().size() == 1) {
-
-                        //Save Flight Id to shared preferences
-                        SharedPreferences pref = getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
-                        SharedPreferences.Editor editor = pref.edit();
-                        editor.putLong(FLIGHT_ID, response.body().getFlights().get(0).getId());
-                        editor.apply();
-
-                        //Save Flight Id to shared preferences
-                        SharedPreferences pref1 = getApplicationContext().getSharedPreferences(NAV_SHARED_PREF, 0); // 0 - for private mode
-                        SharedPreferences.Editor editor1 = pref1.edit();
-                        editor1.putString(FLIGHT_NAME, response.body().getFlights().get(0).getName());
-                        editor1.apply();
-
-                        entries = response.body().getFlights().get(0).getItineraryDTO().getEntries();
-
-                        realm.beginTransaction();
-                        realm.insert(entries);
-                        realm.commitTransaction();
-
-
-                        startFragment(new HistoryFragment());
-
-                    } else {
-                        Toast.makeText(NavigationActivity.this, response.body().getFlights().get(0).getName(), Toast.LENGTH_SHORT).show();
-
-                        flights = new ArrayList<String>();
-                        for (int i = 0; i < response.body().getFlights().size(); i++) {
-                            flights.add(i, response.body().getFlights().get(i).getName());
-                        }
-
-                        Bundle bundle = new Bundle();
-                        bundle.putStringArrayList("flightsList", flights);
-
-
-                        flightArrayList = response.body().getFlights();
-
-
-                        createDialog();
-
-
-//                    FlightFragment dialogFragment = new FlightFragment();
-//
-//                    dialogFragment.setArguments(bundle);
-//
-//                    getSupportFragmentManager().beginTransaction().replace(R.id.content_navigation_container,
-//                            dialogFragment).commit();
-
-
-                    }
-
-//                navProgressBar.setVisibility(View.GONE);
-
-//                HistoryFragment fragment = new HistoryFragment();
-//                startFragment(fragment);
-                }
-                Log.d("Main", Const.Token);
-            }
-
-            @Override
-            public void onFailure(Call<Routes> call, Throwable t) {
-                Log.d("Main", t.getMessage());
-                navProgressBar.setVisibility(View.GONE);
-
-                Toast.makeText(NavigationActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
 
     private void getMembershipInfo() {
         Retrofit retrofitLastActions = new Retrofit.Builder()
@@ -397,14 +282,11 @@ public class NavigationActivity extends AppCompatActivity
 
         final Dialog flightDialog = new Dialog(this);
         flightDialog.setContentView(R.layout.fragment_flight);
-
-
-//        flightDialog.setCanceledOnTouchOutside(false);
         flightDialog.setCancelable(false);
 
         ListView listView = (ListView) flightDialog.findViewById(R.id.list_view_flight);
-//        adapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.list_view_item, flights);
-        adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_activated_1, flights);
+        adapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.list_view_item, flights);
+//        adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_activated_1, flights);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         listView.setAdapter(adapter);
 
@@ -417,7 +299,7 @@ public class NavigationActivity extends AppCompatActivity
                 flightDialog.setTitle(flights.get(position));
                 listView.setItemChecked(position, true);
 
-                Toast.makeText(getApplicationContext(), "Сохраняем " + flights.get(position), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), "Сохраняем " + flights.get(position), Toast.LENGTH_SHORT).show();
                 //Save Flight Id to shared preferences
                 SharedPreferences pref = getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
                 SharedPreferences.Editor editor = pref.edit();
@@ -628,8 +510,105 @@ public class NavigationActivity extends AppCompatActivity
         if (realm != null && !realm.isClosed()) realm.close();
 
         observable = null;
+
+        routesPresenter.unSubscribe();
+        routesPresenter.onDestroy();
     }
 
 
+    @Override
+    public void showProgress() {
+        navProgressBar.setVisibility(View.VISIBLE);
 
+    }
+
+    @Override
+    public void hideProgress() {
+        navProgressBar.setVisibility(View.GONE);
+
+    }
+
+    @Override
+    public void showRoutesData(Routes routes) {
+
+        if (routes != null) {
+
+            Log.d("MainNav", "got to response RoutesInfo" + routes.getFlights().size());
+
+            routesList.add(routes);
+
+
+            // Create the Realm instance
+            realm = Realm.getDefaultInstance();
+
+            tvRouteHeader.setText(routes.getFlights().get(0).getName());
+
+            //if one route then go to history fragment
+            if (routes.getFlights().size() == 1) {
+
+                //Save Flight Id to shared preferences
+                SharedPreferences pref = getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
+                SharedPreferences.Editor editor = pref.edit();
+                editor.putLong(FLIGHT_ID, routes.getFlights().get(0).getId());
+                editor.apply();
+
+                //Save Flight Id to shared preferences
+                SharedPreferences pref1 = getApplicationContext().getSharedPreferences(NAV_SHARED_PREF, 0); // 0 - for private mode
+                SharedPreferences.Editor editor1 = pref1.edit();
+                editor1.putString(FLIGHT_NAME, routes.getFlights().get(0).getName());
+                editor1.apply();
+
+                entries = routes.getFlights().get(0).getItineraryDTO().getEntries();
+
+                realm.beginTransaction();
+                realm.insert(entries);
+                realm.commitTransaction();
+
+
+                startFragment(new HistoryFragment());
+
+            } else {
+                Toast.makeText(NavigationActivity.this, routes.getFlights().get(0).getName(), Toast.LENGTH_SHORT).show();
+
+                flights = new ArrayList<String>();
+                for (int i = 0; i < routes.getFlights().size(); i++) {
+                    flights.add(i, routes.getFlights().get(i).getName());
+                }
+
+//                Bundle bundle = new Bundle();
+//                bundle.putStringArrayList("flightsList", flights);
+
+                flightArrayList = routes.getFlights();
+
+                createDialog();
+            }
+
+        }
+        Log.d("Main", Const.Token);
+    }
+
+    @Override
+    public void showRoutesEmptyData() {
+        //No routes e.g. status = list-emtpy
+        showErrorDialog(getString(R.string.empty_routes));
+        startFragment(new HistoryFragment());
+    }
+
+    @Override
+    public void showRoutesError(Throwable throwable) {
+        showErrorDialog(throwable.getMessage());
+    }
+
+    public void showErrorDialog(String error) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(error)
+                .setPositiveButton(R.string.ok, (dialog, id) -> dialog.dismiss());
+//                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int id) {
+//                         User cancelled the dialog
+//                    }
+
+        // Create the AlertDialog object and return it
+        builder.create().show();
+    }
 }

@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,6 +39,7 @@ public class RoutesFragment extends Fragment implements RoutesView {
     private TextView tvNoData;
     private ProgressBar progressBar;
     private RoutesPresenter presenter;
+    private LinearLayout linearLayoutHeader;
 
     public RoutesFragment() {
         // Required empty public constructor
@@ -53,6 +55,7 @@ public class RoutesFragment extends Fragment implements RoutesView {
         rvRoutes = (RecyclerView) viewRoot.findViewById(R.id.rv_routes);
         tvNoData = (TextView) viewRoot.findViewById(R.id.tv_no_data_routes);
         progressBar = (ProgressBar) viewRoot.findViewById(R.id.progress_routes);
+        linearLayoutHeader = (LinearLayout) viewRoot.findViewById(R.id.ll_routes);
 
         ((AppCompatActivity) getActivity())
                 .getSupportActionBar()
@@ -107,6 +110,7 @@ public class RoutesFragment extends Fragment implements RoutesView {
     @Override
     public void showRoutesEmptyData() {
         tvNoData.setVisibility(View.VISIBLE);
+        linearLayoutHeader.setVisibility(View.GONE);
     }
 
     @Override
