@@ -470,8 +470,8 @@ public class NavigationActivity extends AppCompatActivity
     private void removeRealm() {
         if (realm != null && !realm.isClosed()) {
 
-            realm.close();
             Realm.deleteRealm(realm.getConfiguration());
+            realm.close();
 
         }
     }
