@@ -157,66 +157,33 @@ public class VolumesFragment extends Fragment implements VolumesView {
         }
 
 
-        objects = new ArrayList<Object>();
+        objects = new ArrayList<>();
         objects.addAll(packetsArrayList);
         objects.addAll(labelsArrayList);
-        collateRVAdapter = new CollateRVAdapter(getActivity(), objects, new CollateRVAdapter.OnItemCheckedListener() {
-            @Override
-            public void onCheckedChanged(View childView, boolean isChecked, int childPosition) {
+        collateRVAdapter = new CollateRVAdapter(getActivity(), objects, (childView, isChecked, childPosition) -> {
 
-                if (isChecked) {
-                    recyclerViewVolumes.getChildAt(childPosition).setBackgroundColor(Color.GREEN);
+            if (isChecked) {
+                recyclerViewVolumes.getChildAt(childPosition).setBackgroundColor(Color.GREEN);
 
-/*
-                                Object tempPacket = objects.get(childPosition);
-                                objects.remove(childPosition);
-                                objects.add(0, tempPacket);
-                                collateRVAdapter.notifyDataSetChanged();*/
-
-
-                    if (objects.get(childPosition) instanceof Packet) {
-                        packetsList.add(((Packet) objects.get(childPosition)).getId());
-
-
-//                                    collateRVAdapter.notifyItemMoved(childPosition, 0);
-                    } else if (objects.get(childPosition) instanceof Label) {
-                        labelsList.add(((Label) objects.get(childPosition)).getId());
-
-                               /*     Label tempLabel = (Label) objects.get(childPosition);
-                                    objects.remove(childPosition);
-                                    objects.add(0, tempLabel);*/
-
-                    }
-
-
-                    if (labelsList.isEmpty() && packetsList.isEmpty()) {
-                        btnSendInvoice.setVisibility(View.GONE);
-                        tvHeaderHint.setVisibility(View.VISIBLE);
-                    } else {
-                        btnSendInvoice.setVisibility(View.VISIBLE);
-                        tvHeaderHint.setVisibility(View.GONE);
-                    }
-
-                } else {
-
-                    recyclerViewVolumes.getChildAt(childPosition).setBackgroundColor(Color.TRANSPARENT);
-
-
-                    if (objects.get(childPosition) instanceof Packet) {
-                        packetsList.remove(((Packet) objects.get(childPosition)).getId());
-                    } else {
-                        labelsList.remove(((Label) objects.get(childPosition)).getId());
-                    }
-
-                    if (labelsList.isEmpty() && packetsList.isEmpty()) {
-
-                        btnSendInvoice.setVisibility(View.GONE);
-                        tvHeaderHint.setVisibility(View.VISIBLE);
-                    } else {
-                        btnSendInvoice.setVisibility(View.VISIBLE);
-                        tvHeaderHint.setVisibility(View.GONE);
-                    }
+                if (objects.get(childPosition) instanceof Packet) {
+                    packetsList.add(((Packet) objects.get(childPosition)).getId());
+                } else if (objects.get(childPosition) instanceof Label) {
+                    labelsList.add(((Label) objects.get(childPosition)).getId());
                 }
+
+                checkLabelPacketListEmpty();
+
+            } else {
+
+                recyclerViewVolumes.getChildAt(childPosition).setBackgroundColor(Color.TRANSPARENT);
+
+                if (objects.get(childPosition) instanceof Packet) {
+                    packetsList.remove(((Packet) objects.get(childPosition)).getId());
+                } else {
+                    labelsList.remove(((Label) objects.get(childPosition)).getId());
+                }
+
+                checkLabelPacketListEmpty();
             }
         });
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
@@ -340,6 +307,89 @@ public class VolumesFragment extends Fragment implements VolumesView {
     }
 
     @Override
+    public void showVolumesData(CollateResponse volumes) {
+
+        packetsArrayList.addAll(volumes.getDto().getPackets());
+        labelsArrayList.addAll(volumes.getDto().getLabels());
+
+        objects = new ArrayList<>();
+        objects.addAll(packetsArrayList);
+        objects.addAll(labelsArrayList);
+
+        collateRVAdapter = new CollateRVAdapter(getActivity(), objects, (childView, isChecked, childPosition) -> {
+
+            if (isChecked) {
+
+                recyclerViewVolumes.getChildAt(childPosition).setBackgroundColor(Color.GREEN);
+
+
+                if (objects.get(childPosition) instanceof Packet) {
+                    packetsList.add(((Packet) objects.get(childPosition)).getId());
+                }
+
+                if (objects.get(childPosition) instanceof Label) {
+                    labelsList.add(((Label) objects.get(childPosition)).getId());
+                }
+
+                checkLabelPacketListEmpty();
+
+
+            } else {
+
+                recyclerViewVolumes.getChildAt(childPosition).setBackgroundColor(Color.TRANSPARENT);
+
+
+                if (objects.get(childPosition) instanceof Packet) {
+                    packetsList.remove(((Packet) objects.get(childPosition)).getId());
+
+                } else {
+                    labelsList.remove(((Label) objects.get(childPosition)).getId());
+                }
+
+                checkLabelPacketListEmpty();
+
+            }
+
+        });
+
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+        recyclerViewVolumes.setLayoutManager(mLayoutManager);
+        recyclerViewVolumes.setAdapter(collateRVAdapter);
+
+    }
+
+    private void checkLabelPacketListEmpty() {
+        if (labelsList.isEmpty() && packetsList.isEmpty()) {
+            hideButtonShowText(true);
+        } else {
+            hideButtonShowText(false);
+        }
+    }
+
+    private void hideButtonShowText(boolean b) {
+        if (b) {
+            btnSendInvoice.setVisibility(View.GONE);
+            tvHeaderHint.setVisibility(View.VISIBLE);
+        } else {
+            btnSendInvoice.setVisibility(View.VISIBLE);
+            tvHeaderHint.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void showRoutesEmptyData() {
+        ll.setVisibility(View.GONE);
+        llbtnHint.setVisibility(View.GONE);
+        tvNoDataVolumes.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void showRoutesError(Throwable throwable) {
+        Log.d("MainAccept", throwable.getMessage());
+        showErrorDialog(throwable.getMessage());
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         if (!packetsList.isEmpty()) packetsList.clear();
@@ -359,93 +409,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
     @Override
     public void hideProgress() {
 
-    }
-
-    @Override
-    public void showVolumesData(CollateResponse volumes) {
-
-        packetsArrayList.addAll(volumes.getDto().getPackets());
-        labelsArrayList.addAll(volumes.getDto().getLabels());
-
-        objects = new ArrayList<Object>();
-        objects.addAll(packetsArrayList);
-        objects.addAll(labelsArrayList);
-
-        collateRVAdapter = new CollateRVAdapter(getActivity(), objects, (childView, isChecked, childPosition) -> {
-
-            if (isChecked) {
-
-                recyclerViewVolumes.getChildAt(childPosition).setBackgroundColor(Color.GREEN);
-
-                           /* Object tempPacket = objects.get(childPosition);
-                            objects.remove(childPosition);
-                            objects.add(0, tempPacket);
-                            collateRVAdapter.notifyDataSetChanged();*/
-
-                if (objects.get(childPosition) instanceof Packet) {
-                    packetsList.add(((Packet) objects.get(childPosition)).getId());
-
-
-//                                    collateRVAdapter.notifyItemMoved(childPosition, 0);
-                } else if (objects.get(childPosition) instanceof Label) {
-                    labelsList.add(((Label) objects.get(childPosition)).getId());
-
-
-                           /*     Label tempLabel = (Label) objects.get(childPosition);
-                                objects.remove(childPosition);
-                                objects.add(0, tempLabel);*/
-                }
-//                                    collateRVAdapter.notifyItemMoved(childPosition, 0);
-                if (labelsList.isEmpty() && packetsList.isEmpty()) {
-                    btnSendInvoice.setVisibility(View.GONE);
-                    tvHeaderHint.setVisibility(View.VISIBLE);
-                } else {
-                    btnSendInvoice.setVisibility(View.VISIBLE);
-                    tvHeaderHint.setVisibility(View.GONE);
-                }
-
-
-            } else {
-
-                recyclerViewVolumes.getChildAt(childPosition).setBackgroundColor(Color.TRANSPARENT);
-
-
-                if (objects.get(childPosition) instanceof Packet) {
-                    packetsList.remove(((Packet) objects.get(childPosition)).getId());
-
-                } else {
-                    labelsList.remove(((Label) objects.get(childPosition)).getId());
-                }
-
-                if (labelsList.isEmpty() && packetsList.isEmpty()) {
-                    btnSendInvoice.setVisibility(View.GONE);
-                    tvHeaderHint.setVisibility(View.VISIBLE);
-                } else {
-                    btnSendInvoice.setVisibility(View.VISIBLE);
-                    tvHeaderHint.setVisibility(View.GONE);
-                }
-                //      collateRVAdapter.notifyItemMoved(0, childPosition);
-            }
-
-        });
-
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-        recyclerViewVolumes.setLayoutManager(mLayoutManager);
-        recyclerViewVolumes.setAdapter(collateRVAdapter);
-
-    }
-
-    @Override
-    public void showRoutesEmptyData() {
-        ll.setVisibility(View.GONE);
-        llbtnHint.setVisibility(View.GONE);
-        tvNoDataVolumes.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void showRoutesError(Throwable throwable) {
-        Log.d("MainAccept", throwable.getMessage());
-        showErrorDialog(throwable.getMessage());
     }
 
 

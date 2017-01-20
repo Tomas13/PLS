@@ -17,4 +17,6 @@ public interface AcceptGenInvoicePresenter {
     void postCollate(IdsCollate idsCollate);
 
     void unSubscribe();
+
+    void retrofitAcceptGeneralInvoice(Long generalInvoiceId);
 }

@@ -82,7 +82,7 @@ public interface GitHubService {
     //    Получение о накладных
     //    /api/mobile/accept-general-invoice?id={id of general invoice}
     @GET("/api/mobile/accept-general-invoice")
-    Call<Oinvoice> acceptGeneralInvoice(
+    Observable<Oinvoice> acceptGeneralInvoice(
             @Query("id") Long genInvoiceID
     );
 

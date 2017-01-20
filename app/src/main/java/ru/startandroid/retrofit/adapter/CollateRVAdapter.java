@@ -25,7 +25,7 @@ import ru.startandroid.retrofit.R;
  * Created by root on 12/29/16.
  */
 
-public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements RecyclerView.OnItemTouchListener{
+public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements RecyclerView.OnItemTouchListener {
 
 
     Context context;
@@ -106,7 +106,7 @@ public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
         int viewType = holder.getItemViewType();
 
@@ -120,12 +120,9 @@ public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             viewHolder1.tvToDeptName1.setText(label.getToDep().getName());
             viewHolder1.tvToDeptNameRu1.setText(label.getToDep().getNameRu());
 
-            viewHolder1.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    listener1.onCheckedChanged(buttonView, isChecked, position);
-                }
-            });
+            viewHolder1.checkBox.setOnCheckedChangeListener(
+                    (buttonView, isChecked) ->
+                            listener1.onCheckedChanged(buttonView, isChecked, position));
 
         } else if (viewType == PACKET) {
 
@@ -138,12 +135,9 @@ public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             viewHolder1.tvToDeptName1.setText(packet.getToDep().getName());
             viewHolder1.tvToDeptNameRu1.setText(packet.getToDep().getNameRu());
 
-            viewHolder1.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    listener1.onCheckedChanged(buttonView, isChecked, position);
-                }
-            });
+            viewHolder1.checkBox.setOnCheckedChangeListener(
+                    (buttonView, isChecked) ->
+                            listener1.onCheckedChanged(buttonView, isChecked, position));
         }
 
     }
@@ -165,13 +159,12 @@ public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
 
-
     @Override
     public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
         View childView = rv.findChildViewUnder(e.getX(), e.getY());
         if (childView != null && listener != null && mGestureDetector.onTouchEvent(e)) {
             listener.onItemClick(childView, rv.getChildAdapterPosition(childView));
-            return  true;
+            return true;
         }
 
         return false;
@@ -192,7 +185,6 @@ public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         void onItemClick(View childView, int childAdapterPosition);
     }
-
 
 
     public interface OnItemCheckedListener {

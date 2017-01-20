@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -78,8 +79,6 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
     private EditText editTextScan;
     int count = 0;
 
-
-
     public AcceptGenInvoiceFragment() {
         // Required empty public constructor
     }
@@ -104,8 +103,8 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
         presenter = new AcceptGenInvoicePresenterImpl(this, new NetworkService());
 
 
-        ids = new ArrayList<Long>();
-        chosenIds = new ArrayList<Long>();
+        ids = new ArrayList<>();
+        chosenIds = new ArrayList<>();
 
         if (getArguments() != null) {
 
@@ -114,7 +113,7 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
             Toast.makeText(getContext(), "id " + id, Toast.LENGTH_SHORT).show();
 
             progressAccept.setVisibility(View.VISIBLE);
-            retrofitAcceptGeneralInvoice(id);
+            presenter.retrofitAcceptGeneralInvoice(id);
         } else {
             progressAccept.setVisibility(View.VISIBLE);
 
@@ -139,11 +138,7 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
 
                 for (int i = 0; i < generalInvoiceIdsList.size(); i++) {
 
-
-
                     if (generalInvoiceIdsList.get(i).equals(s.toString())){
-
-
 
                         count++;
                         String temp = generalInvoiceIdsList.get(i);
@@ -153,8 +148,8 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
                         listViewAcceptGen.getChildAt(count-1).setBackgroundColor(Color.GREEN);
 
                         editTextScan.setText("");
-
-                        chosenIds.add(ids.get(i));
+//TODO UNCOMMENT LINE AFTER MULTICHOICEMODE
+//                        chosenIds.add(ids.get(i));
 
 
                     }
@@ -180,44 +175,30 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
         btnScan.setOnClickListener(v -> startScanActivity());
 
 
-/*
 
+        //TODO COMMENT THIS OUT
         generalInvoiceIdsList.add("First");
         generalInvoiceIdsList.add("Second");
         generalInvoiceIdsList.add("Third");
         generalInvoiceIdsList.add("Four");
         generalInvoiceIdsList.add("Five");
-        listAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, generalInvoiceIdsList);
+//        listAdapter = new ArrayAdapter<>(getContext(), R.layout.custom_textview, generalInvoiceIdsList);
+        listAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_selectable_list_item, generalInvoiceIdsList);
 
-        listViewAcceptGen.setAdapter(listAdapter);*/
+        listViewAcceptGen.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
+        listViewAcceptGen.setOnItemClickListener((parent, view1, position, id1) -> {
+//            listViewAcceptGen.getChildAt(position).setBackgroundColor(Color.YELLOW);
 
-        listViewAcceptGen.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
-            @Override
-            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+            listViewAcceptGen.setItemChecked(position, true);
 
-            }
-
-            @Override
-            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                return false;
-            }
-
-            @Override
-            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                return false;
-            }
-
-            @Override
-            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                return false;
-            }
-
-            @Override
-            public void onDestroyActionMode(ActionMode mode) {
-
-            }
         });
+
+        listViewAcceptGen.setAdapter(listAdapter);
+
+
+
+        listViewAcceptGen.setMultiChoiceModeListener(new CallBack());
         return view;
     }
 
@@ -252,66 +233,27 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
     public void showDestinationList(ResponseDestinationList destinationList) {
 
         for (int i = 0; i < destinationList.getDestinationLists().size(); i++) {
-
             generalInvoiceIdsList.add(destinationList.getDestinationLists().get(i).getDestinationListId());
             ids.add(destinationList.getDestinationLists().get(i).getId());
         }
 
-        listAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, generalInvoiceIdsList);
-
+        listAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, generalInvoiceIdsList);
         listViewAcceptGen.setAdapter(listAdapter);
 
         Log.d("acceptGen", generalInvoiceIdsList.get(0));
     }
 
 
-    private void retrofitAcceptGeneralInvoice(final Long generalInvoiceId) {
+    @Override
+    public void showGeneralInvoiceId(Oinvoice oinvoice) {
 
-        Retrofit retrofitAcceptGenInvoice = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(getUserClient(Const.Token))
-                .build();
+        for (int i = 0; i < oinvoice.getDestinationLists().size(); i++) {
+            generalInvoiceIdsList.add(oinvoice.getDestinationLists().get(i).getDestinationListId());
+            ids.add(oinvoice.getDestinationLists().get(i).getId());
+        }
 
-        GitHubService gitHubServ = retrofitAcceptGenInvoice.create(GitHubService.class);
-
-        gitHubServ.acceptGeneralInvoice(generalInvoiceId).enqueue(new Callback<Oinvoice>() {
-            @Override
-            public void onResponse(Call<Oinvoice> call, Response<Oinvoice> response) {
-
-                progressAccept.setVisibility(View.GONE);
-
-//                Log.d("InvoiceORespo", response.body().getDestinationLists().get(0).getDestinationListId());
-                Log.d("MainAcceptGen", response.message());
-
-                if (response.body() != null) {
-
-                    if (response.isSuccessful() && response.body().getStatus().equals("success")) {
-
-                        for (int i = 0; i < response.body().getDestinationLists().size(); i++) {
-
-                            generalInvoiceIdsList.add(response.body().getDestinationLists().get(i).getDestinationListId());
-
-                            ids.add(response.body().getDestinationLists().get(i).getId());
-                        }
-
-                        listAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, generalInvoiceIdsList);
-
-
-                        listViewAcceptGen.setAdapter(listAdapter);
-
-                    } else {
-
-                        showRoutesEmptyData();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Oinvoice> call, Throwable t) {
-                Log.d("MainAcceptGen", t.getMessage());
-            }
-        });
+        listAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, generalInvoiceIdsList);
+        listViewAcceptGen.setAdapter(listAdapter);
     }
 
 
@@ -402,7 +344,7 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
     public void showRoutesEmptyData() {
         hideProgress();
         btnCollate.setVisibility(View.GONE);
-        tvNoDataAcceptGen.setVisibility(View.VISIBLE);
+//        tvNoDataAcceptGen.setVisibility(View.VISIBLE);
 
     }
 
@@ -410,6 +352,39 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
     public void showRoutesError(Throwable throwable) {
         Log.d("MainAccept", throwable.getMessage());
         Toast.makeText(getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+    }
 
+
+    public class CallBack implements AbsListView.MultiChoiceModeListener{
+
+        @Override
+        public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+            // Prints the count of selected Items in title
+            mode.setTitle(listViewAcceptGen.getCheckedItemCount() + " Selected");
+
+            // Toggle the state of item after every click on it
+//            listAdapter.toggleSelection(position);
+        }
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            mode.getMenuInflater().inflate(R.menu.navigation, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+
+        }
     }
 }

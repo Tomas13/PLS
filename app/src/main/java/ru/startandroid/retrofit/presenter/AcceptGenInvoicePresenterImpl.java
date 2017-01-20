@@ -1,6 +1,7 @@
 package ru.startandroid.retrofit.presenter;
 
 import ru.startandroid.retrofit.Model.IdsCollate;
+import ru.startandroid.retrofit.Model.acceptgen.Oinvoice;
 import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
 import ru.startandroid.retrofit.models.NetworkService;
@@ -116,6 +117,32 @@ public class AcceptGenInvoicePresenterImpl implements AcceptGenInvoicePresenter{
             subscription.unsubscribe();
         }
     }
+
+    @Override
+    public void retrofitAcceptGeneralInvoice(Long generalInvoiceId) {
+        view.showProgress();
+
+        Observable<Oinvoice> acceptGeneralInvoice =
+                service.getApiService().acceptGeneralInvoice(generalInvoiceId);
+
+        subscription = acceptGeneralInvoice.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        response -> {
+                            if (response.getStatus().equals("success")) {
+                                view.hideProgress();
+                                view.showGeneralInvoiceId(response);
+                            } else {
+
+                                view.showRoutesEmptyData();
+
+                            }
+                        },
+                        throwable -> {
+                            view.showRoutesError(throwable);
+                            view.hideProgress();
+                        });
+    }
+
 
     @Override
     public void onDestroy() {
