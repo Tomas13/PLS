@@ -2,10 +2,7 @@ package ru.startandroid.retrofit.ui;
 
 
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.databinding.DataBindingUtil;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -16,29 +13,23 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.Checkable;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import ru.startandroid.retrofit.Application;
 import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoice;
@@ -60,7 +51,6 @@ import ru.startandroid.retrofit.view.VolumesView;
 import static ru.startandroid.retrofit.Const.BASE_URL;
 import static ru.startandroid.retrofit.Const.FLIGHT_ID;
 import static ru.startandroid.retrofit.Const.FLIGHT_SHARED_PREF;
-import static ru.startandroid.retrofit.Const.NAV_SHARED_PREF;
 import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
 /**
@@ -160,32 +150,8 @@ public class VolumesFragment extends Fragment implements VolumesView {
         objects = new ArrayList<>();
         objects.addAll(packetsArrayList);
         objects.addAll(labelsArrayList);
-        collateRVAdapter = new CollateRVAdapter(getActivity(), objects, (childView, isChecked, childPosition) -> {
+        collateRVAdapter = createAdapter();
 
-            if (isChecked) {
-                recyclerViewVolumes.getChildAt(childPosition).setBackgroundColor(Color.GREEN);
-
-                if (objects.get(childPosition) instanceof Packet) {
-                    packetsList.add(((Packet) objects.get(childPosition)).getId());
-                } else if (objects.get(childPosition) instanceof Label) {
-                    labelsList.add(((Label) objects.get(childPosition)).getId());
-                }
-
-                checkLabelPacketListEmpty();
-
-            } else {
-
-                recyclerViewVolumes.getChildAt(childPosition).setBackgroundColor(Color.TRANSPARENT);
-
-                if (objects.get(childPosition) instanceof Packet) {
-                    packetsList.remove(((Packet) objects.get(childPosition)).getId());
-                } else {
-                    labelsList.remove(((Label) objects.get(childPosition)).getId());
-                }
-
-                checkLabelPacketListEmpty();
-            }
-        });
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recyclerViewVolumes.setLayoutManager(mLayoutManager);
         recyclerViewVolumes.setAdapter(collateRVAdapter);
@@ -227,14 +193,13 @@ public class VolumesFragment extends Fragment implements VolumesView {
             }
 
 
-            Toast.makeText(getContext(), "Готово, можете нажать кнопку ОК для закрытия диалога", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getContext(), "Готово, можете нажать кнопку ОК для закрытия диалога", Toast.LENGTH_SHORT).show();
 
         });
 
         Button btnOk = (Button) pointDialog.findViewById(R.id.btn_ok_flight);
         btnOk.setOnClickListener(v -> {
             pointDialog.dismiss();
-
             retrofitPostCreateInvoice();
         });
 
@@ -300,28 +265,17 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
             @Override
             public void onFailure(Call<CreateResponse> call, Throwable t) {
-
                 Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    @Override
-    public void showVolumesData(CollateResponse volumes) {
 
-        packetsArrayList.addAll(volumes.getDto().getPackets());
-        labelsArrayList.addAll(volumes.getDto().getLabels());
+    private CollateRVAdapter createAdapter(){
 
-        objects = new ArrayList<>();
-        objects.addAll(packetsArrayList);
-        objects.addAll(labelsArrayList);
-
-        collateRVAdapter = new CollateRVAdapter(getActivity(), objects, (childView, isChecked, childPosition) -> {
+        return new CollateRVAdapter(getActivity(), objects, (childView, isChecked, childPosition) -> {
 
             if (isChecked) {
-
-                recyclerViewVolumes.getChildAt(childPosition).setBackgroundColor(Color.GREEN);
-
 
                 if (objects.get(childPosition) instanceof Packet) {
                     packetsList.add(((Packet) objects.get(childPosition)).getId());
@@ -333,11 +287,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
                 checkLabelPacketListEmpty();
 
-
             } else {
-
-                recyclerViewVolumes.getChildAt(childPosition).setBackgroundColor(Color.TRANSPARENT);
-
 
                 if (objects.get(childPosition) instanceof Packet) {
                     packetsList.remove(((Packet) objects.get(childPosition)).getId());
@@ -347,10 +297,22 @@ public class VolumesFragment extends Fragment implements VolumesView {
                 }
 
                 checkLabelPacketListEmpty();
-
             }
-
         });
+    }
+
+
+    @Override
+    public void showVolumesData(CollateResponse volumes) {
+
+        packetsArrayList.addAll(volumes.getDto().getPackets());
+        labelsArrayList.addAll(volumes.getDto().getLabels());
+
+        objects = new ArrayList<>();
+        objects.addAll(packetsArrayList);
+        objects.addAll(labelsArrayList);
+
+        collateRVAdapter = createAdapter();
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recyclerViewVolumes.setLayoutManager(mLayoutManager);

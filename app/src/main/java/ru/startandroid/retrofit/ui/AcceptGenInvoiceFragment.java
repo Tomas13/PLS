@@ -148,7 +148,6 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
                         listViewAcceptGen.getChildAt(count-1).setBackgroundColor(Color.GREEN);
 
                         editTextScan.setText("");
-//TODO UNCOMMENT LINE AFTER MULTICHOICEMODE
 //                        chosenIds.add(ids.get(i));
 
 
@@ -183,14 +182,30 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
         generalInvoiceIdsList.add("Four");
         generalInvoiceIdsList.add("Five");
 //        listAdapter = new ArrayAdapter<>(getContext(), R.layout.custom_textview, generalInvoiceIdsList);
-        listAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_selectable_list_item, generalInvoiceIdsList);
+        listAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_multiple_choice, generalInvoiceIdsList);
 
-        listViewAcceptGen.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        listViewAcceptGen.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+        ArrayList<String> pickedNames = new ArrayList<>();
 
         listViewAcceptGen.setOnItemClickListener((parent, view1, position, id1) -> {
-//            listViewAcceptGen.getChildAt(position).setBackgroundColor(Color.YELLOW);
 
-            listViewAcceptGen.setItemChecked(position, true);
+            int j = position - listViewAcceptGen.getFirstVisiblePosition();
+            if (listViewAcceptGen.getChildAt(j) != null){
+                if (pickedNames.contains(generalInvoiceIdsList.get(j))){
+                    listViewAcceptGen.getChildAt(j).setBackgroundColor(Color.TRANSPARENT);
+                    pickedNames.remove(generalInvoiceIdsList.get(j));
+
+//                    chosenIds.add(ids.get(position));
+                }else{
+                    pickedNames.add(generalInvoiceIdsList.get(j));
+                    listViewAcceptGen.getChildAt(j).setBackgroundColor(Color.GREEN);
+//                    chosenIds.remove(ids.get(position));
+
+                }
+
+            }
+
 
         });
 
@@ -198,7 +213,6 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
 
 
 
-        listViewAcceptGen.setMultiChoiceModeListener(new CallBack());
         return view;
     }
 
@@ -354,37 +368,4 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
         Toast.makeText(getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
-
-    public class CallBack implements AbsListView.MultiChoiceModeListener{
-
-        @Override
-        public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-            // Prints the count of selected Items in title
-            mode.setTitle(listViewAcceptGen.getCheckedItemCount() + " Selected");
-
-            // Toggle the state of item after every click on it
-//            listAdapter.toggleSelection(position);
-        }
-
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            mode.getMenuInflater().inflate(R.menu.navigation, menu);
-            return true;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            return false;
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-
-        }
-    }
 }

@@ -2,6 +2,7 @@ package ru.startandroid.retrofit.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -89,6 +91,7 @@ public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         private TextView tvListId1, tvFromDeptName1, tvFromDeptNameRu1, tvToDeptName1, tvToDeptNameRu1;
 
+        private LinearLayout linearLayout;
         private CheckBox checkBox;
 
 
@@ -101,6 +104,7 @@ public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             tvToDeptNameRu1 = (TextView) itemView.findViewById(R.id.tv_to_dept_name_ru_volumes);
             checkBox = (CheckBox) itemView.findViewById(R.id.checkbox_volumes);
 
+            linearLayout = (LinearLayout) itemView.findViewById(R.id.ll_rv_volumes);
         }
     }
 
@@ -122,7 +126,19 @@ public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
             viewHolder1.checkBox.setOnCheckedChangeListener(
                     (buttonView, isChecked) ->
-                            listener1.onCheckedChanged(buttonView, isChecked, position));
+
+                    {
+                        listener1.onCheckedChanged(buttonView, isChecked, position);
+                        if (isChecked) {
+                            viewHolder1.linearLayout.setBackgroundColor(Color.GREEN);
+                        } else {
+                            viewHolder1.linearLayout.setBackgroundColor(Color.TRANSPARENT);
+                        }
+
+                    }
+
+            );
+
 
         } else if (viewType == PACKET) {
 
@@ -137,7 +153,17 @@ public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
             viewHolder1.checkBox.setOnCheckedChangeListener(
                     (buttonView, isChecked) ->
-                            listener1.onCheckedChanged(buttonView, isChecked, position));
+
+                    {
+                        listener1.onCheckedChanged(buttonView, isChecked, position);
+                        if (isChecked) {
+                            viewHolder1.linearLayout.setBackgroundColor(Color.GREEN);
+                        } else {
+                            viewHolder1.linearLayout.setBackgroundColor(Color.TRANSPARENT);
+                        }
+
+                    }
+            );
         }
 
     }
