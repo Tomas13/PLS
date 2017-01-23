@@ -1,6 +1,5 @@
 package ru.startandroid.retrofit;
 
-import android.databinding.DataBindingUtil;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
@@ -29,7 +28,6 @@ import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.Contributor;
 import ru.startandroid.retrofit.Model.Edges;
 import ru.startandroid.retrofit.Model.LastActions;
-import ru.startandroid.retrofit.databinding.ActivityMainBinding;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -40,15 +38,13 @@ import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 
 public class MainActivity extends AppCompatActivity {
 
-    ActivityMainBinding activityMainBinding;
     String TAG = "Main";
     private Looper backgroundLooper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activityMainBinding = DataBindingUtil.setContentView(this,
-                R.layout.activity_main);
+        setContentView(R.layout.activity_main);
 
 
         BackgroundThread backgroundThread = new BackgroundThread();
@@ -116,11 +112,11 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<List<Contributor>> call, Response<List<Contributor>> response) {
                 Toast.makeText(getApplicationContext(), "ok", Toast.LENGTH_SHORT).show();
 
-                activityMainBinding.textView.setText(response.body().toString());
+//                activityMainBinding.textView.setText(response.body().toString());
             }
             @Override
             public void onFailure(Call<List<Contributor>> call, Throwable t) {
-                activityMainBinding.textView.setText("Something went wrong: " + t.getMessage());
+//                activityMainBinding.textView.setText("Something went wrong: " + t.getMessage());
             }
         });
 

@@ -1,11 +1,12 @@
 package ru.startandroid.retrofit.ui;
 
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.honeywell.aidc.AidcManager;
@@ -19,7 +20,6 @@ import com.honeywell.aidc.UnsupportedPropertyException;
 
 import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.R;
-import ru.startandroid.retrofit.databinding.ActivityScannerBinding;
 
 public class ScannerActivity extends AppCompatActivity implements
         BarcodeReader.BarcodeListener, BarcodeReader.TriggerListener {
@@ -30,15 +30,19 @@ public class ScannerActivity extends AppCompatActivity implements
     boolean useTrigger = true;
     boolean btnPressed = false;
 
-    ActivityScannerBinding activityScannerBinding;
+    Button button1, btnSwitch;
+    TextView textView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activityScannerBinding = DataBindingUtil.setContentView(this,
-                R.layout.activity_scanner);
+        setContentView(R.layout.activity_scanner);
 
+        textView = (TextView) findViewById(R.id.textView);
 
+        btnSwitch = (Button) findViewById(R.id.btn_switch);
+        button1 = (Button) findViewById(R.id.button1);
         // create the AidcManager providing a Context and a
         // CreatedCallback implementation.
         AidcManager.create(this, new AidcManager.CreatedCallback() {
@@ -102,35 +106,29 @@ public class ScannerActivity extends AppCompatActivity implements
      * Create buttons to launch demo activities.
      */
     public void ActivitySetting() {
-        activityScannerBinding.button1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        button1.setOnClickListener(v ->
+        {
 
-                if (barcodeReader != null) {
-                    try {
-                        barcodeReader.softwareTrigger(true);
-                    } catch (ScannerNotClaimedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+            if (barcodeReader != null) {
+                try {
+                    barcodeReader.softwareTrigger(true);
+                } catch (ScannerNotClaimedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
 
-                    } catch (ScannerUnavailableException e) {
-                        e.printStackTrace();
-                    }
-
-                } else {
-                    showToastMsg("Barcodereader not available");
+                } catch (ScannerUnavailableException e) {
+                    e.printStackTrace();
                 }
+
+            } else {
+                showToastMsg("Barcodereader not available");
             }
         });
 
 
-        activityScannerBinding.btnSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        btnSwitch.setOnClickListener(view ->
                 startActivityForResult(new Intent(ScannerActivity.this, ScannerSelectionBarcodeActivity.class),
-                        Const.ScannerSelectionBarcodeActivity);
-            }
-        });
+                Const.ScannerSelectionBarcodeActivity));
     }
 
     private void showToastMsg(String msg) {
@@ -163,9 +161,9 @@ public class ScannerActivity extends AppCompatActivity implements
                 String barcodeData = barcodeReadEvent.getBarcodeData();
                 String timestamp = barcodeReadEvent.getTimestamp();
                 // update UI to reflect the data
-                String s = (String) activityScannerBinding.textView.getText();
+                String s = (String) textView.getText();
                 s+="\n"+barcodeData+"\n"+timestamp;
-                activityScannerBinding.textView.setText(s);
+                textView.setText(s);
             }
         });
     }

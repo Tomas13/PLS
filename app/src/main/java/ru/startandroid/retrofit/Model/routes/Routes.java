@@ -6,16 +6,17 @@ import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import ru.startandroid.retrofit.Model.routes.Flight;
+import io.realm.RealmList;
+import io.realm.RealmObject;
 
-public class Routes {
+public class Routes extends RealmObject{
 
     @SerializedName("status")
     @Expose
     private String status;
     @SerializedName("flights")
     @Expose
-    private List<Flight> flights = null;
+    private RealmList<Flight> flights = null;
 
     public String getStatus() {
         return status;
@@ -25,11 +26,11 @@ public class Routes {
         this.status = status;
     }
 
-    public List<Flight> getFlights() {
+    public RealmList<Flight> getFlights() {
         return flights;
     }
 
-    public void setFlights(List<Flight> flights) {
+    public void setFlights(RealmList<Flight> flights) {
         this.flights = flights;
     }
 

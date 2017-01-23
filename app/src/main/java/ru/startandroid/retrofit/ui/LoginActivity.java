@@ -3,21 +3,16 @@ package ru.startandroid.retrofit.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import org.jboss.aerogear.android.authentication.AuthenticationManager;
-import org.jboss.aerogear.android.authentication.digest.HttpDigestAuthenticationConfiguration;
 import org.jboss.aerogear.android.core.Callback;
 
 import ru.startandroid.retrofit.Const;
-import ru.startandroid.retrofit.MainActivity;
 import ru.startandroid.retrofit.R;
-import ru.startandroid.retrofit.databinding.ActivityLoginBinding;
 import ru.startandroid.retrofit.utils.KeycloakHelper;
 
 import static ru.startandroid.retrofit.Const.LOGIN_BOOL;
@@ -28,16 +23,13 @@ import static ru.startandroid.retrofit.Const.Token;
 
 public class LoginActivity extends AppCompatActivity {
 
-    ActivityLoginBinding activityLoginBinding;
     SharedPreferences pref1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        activityLoginBinding = DataBindingUtil.setContentView(this,
-                R.layout.activity_login);
-
+        setContentView(R.layout.activity_login);
 
          pref1 = getApplicationContext().getSharedPreferences(TOKEN_SHARED_PREF, 0); // 0 - for private mode
 

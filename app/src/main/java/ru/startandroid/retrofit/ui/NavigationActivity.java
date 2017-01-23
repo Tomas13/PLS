@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.databinding.DataBindingUtil;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -23,7 +22,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -38,21 +36,13 @@ import java.util.concurrent.TimeUnit;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import ru.startandroid.retrofit.Application;
 import ru.startandroid.retrofit.Const;
-import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.Datum;
 import ru.startandroid.retrofit.Model.Member;
 import ru.startandroid.retrofit.Model.routes.Entry;
 import ru.startandroid.retrofit.Model.routes.Flight;
 import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.R;
-import ru.startandroid.retrofit.databinding.ActivityNavigationBinding;
 import ru.startandroid.retrofit.models.NetworkService;
 import ru.startandroid.retrofit.presenter.NavigationPresenterImpl;
 import ru.startandroid.retrofit.presenter.NavitationPresenter;
@@ -66,7 +56,6 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-import static ru.startandroid.retrofit.Const.BASE_URL;
 import static ru.startandroid.retrofit.Const.FLIGHT_ID;
 import static ru.startandroid.retrofit.Const.FLIGHT_NAME;
 import static ru.startandroid.retrofit.Const.FLIGHT_POS;
@@ -76,12 +65,10 @@ import static ru.startandroid.retrofit.Const.NAV_SHARED_PREF;
 import static ru.startandroid.retrofit.Const.TOKEN;
 import static ru.startandroid.retrofit.Const.TOKEN_SHARED_PREF;
 import static ru.startandroid.retrofit.Const.Token;
-import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
 public class NavigationActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, RoutesView, NavigationActView {
 
-    private ActivityNavigationBinding activityNavigationBinding;
     private ProgressBar navProgressBar;
     private TextView tvFirstName;
     private TextView tvLastName, tvRoleName, tvRouteHeader;
@@ -140,12 +127,9 @@ public class NavigationActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        setContentView(R.layout.activity_navigation);
+        setContentView(R.layout.activity_navigation);
 
-        activityNavigationBinding = DataBindingUtil.setContentView(this,
-                R.layout.activity_navigation);
-
-        Toolbar toolbar = activityNavigationBinding.appBarNavigation.toolbar;
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setTitle("PLS");
 
@@ -155,10 +139,16 @@ public class NavigationActivity extends AppCompatActivity
         navPresenter = new NavigationPresenterImpl(this, new NetworkService());
         navProgressBar = (ProgressBar) findViewById(R.id.activity_navigation_progressbar);
 
-        tvFirstName = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_fname);
-        tvLastName = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_lname);
-        tvRoleName = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_role_name);
-        tvRouteHeader = (TextView) activityNavigationBinding.navView.getHeaderView(0).findViewById(R.id.tv_route_header);
+
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        View navHeaderView = navigationView.getHeaderView(0);
+        tvFirstName = (TextView) navHeaderView.findViewById(R.id.tv_fname);
+        tvLastName = (TextView) navHeaderView.findViewById(R.id.tv_lname);
+        tvRoleName = (TextView) navHeaderView.findViewById(R.id.tv_role_name);
+        tvRouteHeader = (TextView) navHeaderView.findViewById(R.id.tv_route_header);
 
         // Create the Realm instance
         realm = Realm.getDefaultInstance();
@@ -215,8 +205,6 @@ public class NavigationActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
 
     }
 
@@ -470,8 +458,8 @@ public class NavigationActivity extends AppCompatActivity
     private void removeRealm() {
         if (realm != null && !realm.isClosed()) {
 
-            Realm.deleteRealm(realm.getConfiguration());
             realm.close();
+            Realm.deleteRealm(realm.getConfiguration());
 
         }
     }

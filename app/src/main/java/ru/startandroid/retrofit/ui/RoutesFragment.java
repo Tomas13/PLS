@@ -18,6 +18,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
 import ru.startandroid.retrofit.Model.routes.Entry;
 import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.R;
@@ -45,6 +46,7 @@ public class RoutesFragment extends Fragment implements RoutesView {
         // Required empty public constructor
     }
 
+    Realm realm;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,8 +63,15 @@ public class RoutesFragment extends Fragment implements RoutesView {
                 .getSupportActionBar()
                 .setTitle("Маршруты");
 
+        realm = Realm.getDefaultInstance();
+
         presenter = new RoutesPresenterImpl(this, new NetworkService());
-        presenter.loadRoutes();
+
+        if (realm.where(Routes.class).findAll().size() == 0) {
+            presenter.loadRoutes();
+        }else{
+            showRoutesData(realm.where(Routes.class).findAll().first());
+        }
 
         return viewRoot;
     }
@@ -85,6 +94,14 @@ public class RoutesFragment extends Fragment implements RoutesView {
 
     @Override
     public void showRoutesData(Routes routes) {
+
+        if (realm.where(Routes.class).findAll().size() == 0){
+
+            realm.beginTransaction();
+            realm.insert(routes);
+            realm.commitTransaction();
+        }
+
 
         int pos = 0;
         if (isAdded()) {
@@ -121,6 +138,7 @@ public class RoutesFragment extends Fragment implements RoutesView {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        if (!realm.isClosed()) realm.close();
         presenter.unSubscribe();
     }
 }
