@@ -104,7 +104,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
         // Create the Realm instance
         realm = Realm.getDefaultInstance();
-        // Build the query looking at all users:
         queryData = realm.where(Entry.class);
         queryLabel = realm.where(Label.class);
         queryPacket = realm.where(Packet.class);
@@ -165,7 +164,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
         pointDialog.setCancelable(false);
 
         ListView listView = (ListView) pointDialog.findViewById(R.id.list_view_flight);
-        adapter = new ArrayAdapter<String>(getContext(), R.layout.list_view_item, flightName);
+        adapter = new ArrayAdapter<>(getContext(), R.layout.list_view_item, flightName);
 //        adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_activated_1, flightName);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         listView.setAdapter(adapter);
@@ -199,8 +198,8 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
         Button btnOk = (Button) pointDialog.findViewById(R.id.btn_ok_flight);
         btnOk.setOnClickListener(v -> {
+            presenter.postCreateInvoice(body);
             pointDialog.dismiss();
-            retrofitPostCreateInvoice();
         });
 
 
@@ -211,32 +210,19 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
     }
 
+    @Override
+    public void getPostResponse(CreateResponse createResponse) {
+        if (createResponse != null) {
 
-    private void retrofitPostCreateInvoice() {
-        Retrofit retrofitDestList = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(getUserClient(Const.Token))
-                .build();
+            if (createResponse.getStatus().equals("success")) {
 
-        GitHubService gitHubServ = retrofitDestList.create(GitHubService.class);
-        gitHubServ.postCreateGeneralInvoice(body).enqueue(new Callback<CreateResponse>() {
-            @Override
-            public void onResponse(Call<CreateResponse> call, Response<CreateResponse> response) {
+                Toast.makeText(getContext(), "Общая накладная успешно создана", Toast.LENGTH_SHORT).show();
 
-                if (response.body() != null) {
+            } else {
+                showErrorDialog(createResponse.getStatus());
+            }
 
-                    if (response.isSuccessful()) {
-                        if (response.body().getStatus().equals("success")) {
-                            Toast.makeText(getContext(), "Общая накладная успешно создана", Toast.LENGTH_SHORT).show();
-
-                        } else {
-                            showErrorDialog(response.body().getStatus());
-
-                            Toast.makeText(getContext(), response.body().getStatus(), Toast.LENGTH_SHORT).show();
-                        }
-
-                        //TODO THIS SHOULD UPDATE rv items
+            //TODO THIS SHOULD UPDATE rv items
 /*
                         for (int i = 0; i < packetsList.size(); i++) {
 
@@ -258,20 +244,12 @@ public class VolumesFragment extends Fragment implements VolumesView {
                         collateRVAdapter.notifyDataSetChanged();*/
 
 //                        ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
-                    }
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<CreateResponse> call, Throwable t) {
-                Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        }
     }
 
 
-    private CollateRVAdapter createAdapter(){
+
+    private CollateRVAdapter createAdapter() {
 
         return new CollateRVAdapter(getActivity(), objects, (childView, isChecked, childPosition) -> {
 
@@ -319,6 +297,8 @@ public class VolumesFragment extends Fragment implements VolumesView {
         recyclerViewVolumes.setAdapter(collateRVAdapter);
 
     }
+
+
 
     private void checkLabelPacketListEmpty() {
         if (labelsList.isEmpty() && packetsList.isEmpty()) {

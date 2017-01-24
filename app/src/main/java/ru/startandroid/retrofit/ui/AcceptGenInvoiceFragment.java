@@ -122,6 +122,11 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
 
         }
 
+        ArrayList<String> pickedNames = new ArrayList<>();
+
+        ArrayList<String> generalIdsListCopy = new ArrayList<>();
+        generalIdsListCopy.addAll(generalInvoiceIdsList);
+
         editTextScan.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -131,25 +136,79 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
+//                listAdapter.getFilter().filter(s);
+
+
             }
 
             @Override
             public void afterTextChanged(Editable s) {
 
+
                 for (int i = 0; i < generalInvoiceIdsList.size(); i++) {
 
-                    if (generalInvoiceIdsList.get(i).equals(s.toString())){
+                    if (generalInvoiceIdsList.get(i).equals(s.toString())) {
 
-                        count++;
-                        String temp = generalInvoiceIdsList.get(i);
-                        generalInvoiceIdsList.remove(i);
-                        generalInvoiceIdsList.add(0, temp);
-                        listAdapter.notifyDataSetChanged();
-                        listViewAcceptGen.getChildAt(count-1).setBackgroundColor(Color.GREEN);
 
-                        editTextScan.setText("");
+                        if (listViewAcceptGen.isItemChecked(i)){
+
+
+                        }else{
+
+                            //If it's not checked
+
+                            String temp = generalInvoiceIdsList.get(i);
+                            generalInvoiceIdsList.remove(i);
+                            generalInvoiceIdsList.add(0, temp);
+                            listAdapter.notifyDataSetChanged();
+
+                            listViewAcceptGen.getChildAt(0).setBackgroundColor(Color.GREEN);
+                            listViewAcceptGen.setItemChecked(0, true);
+                            pickedNames.add(generalInvoiceIdsList.get(i));
+                            editTextScan.setText("");
+
+                            //chosenIds.add(ids.get(i));
+
+
+                        }
+
+
+
+
+//                        listViewAcceptGen.getChildAt(count-1).setBackgroundColor(Color.GREEN);
+
+
+//                        generalIdsListCopy.remove(i);
+
 //                        chosenIds.add(ids.get(i));
 
+
+                     /*   if (pickedNames.contains(generalInvoiceIdsList.get(i)) && listViewAcceptGen.isItemChecked(count - 1)) {
+                            listViewAcceptGen.getChildAt(count - 1).setBackgroundColor(Color.TRANSPARENT);
+                            pickedNames.remove(generalInvoiceIdsList.get(i));
+                            listViewAcceptGen.setItemChecked(count - 1, false);
+
+                            editTextScan.setText("");
+                            count--;
+                            String temp = generalInvoiceIdsList.get(i);
+                            generalInvoiceIdsList.remove(i);
+                            generalInvoiceIdsList.add(0, temp);
+                            listAdapter.notifyDataSetChanged();
+
+//                    chosenIds.add(ids.get(position));
+                        } else if (!listViewAcceptGen.isItemChecked(count - 1)) {
+                            pickedNames.add(generalInvoiceIdsList.get(i));
+                            listViewAcceptGen.getChildAt(count-1).setBackgroundColor(Color.GREEN);
+                            listViewAcceptGen.setItemChecked(count - 1, true);
+
+                            editTextScan.setText("");
+                            count++;
+                            String temp = generalInvoiceIdsList.get(i);
+                            generalInvoiceIdsList.remove(i);
+                            generalInvoiceIdsList.add(0, temp);
+                            listAdapter.notifyDataSetChanged();
+
+                        }*/
 
                     }
 
@@ -170,9 +229,7 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
             }
         });
 
-
         btnScan.setOnClickListener(v -> startScanActivity());
-
 
 
         //TODO COMMENT THIS OUT
@@ -186,18 +243,18 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
 
         listViewAcceptGen.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
-        ArrayList<String> pickedNames = new ArrayList<>();
 
         listViewAcceptGen.setOnItemClickListener((parent, view1, position, id1) -> {
 
             int j = position - listViewAcceptGen.getFirstVisiblePosition();
-            if (listViewAcceptGen.getChildAt(j) != null){
-                if (pickedNames.contains(generalInvoiceIdsList.get(j))){
+            if (listViewAcceptGen.getChildAt(j) != null) {
+//                if (pickedNames.contains(generalInvoiceIdsList.get(j)) && !listViewAcceptGen.isItemChecked(position)) {
+                if (!listViewAcceptGen.isItemChecked(position)) {
                     listViewAcceptGen.getChildAt(j).setBackgroundColor(Color.TRANSPARENT);
                     pickedNames.remove(generalInvoiceIdsList.get(j));
 
 //                    chosenIds.add(ids.get(position));
-                }else{
+                } else if (!listViewAcceptGen.isItemChecked(position)) {
                     pickedNames.add(generalInvoiceIdsList.get(j));
                     listViewAcceptGen.getChildAt(j).setBackgroundColor(Color.GREEN);
 //                    chosenIds.remove(ids.get(position));
@@ -210,7 +267,6 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
         });
 
         listViewAcceptGen.setAdapter(listAdapter);
-
 
 
         return view;

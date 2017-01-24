@@ -1,5 +1,7 @@
 package ru.startandroid.retrofit.presenter;
 
+import ru.startandroid.retrofit.Model.BodyForCreateInvoice;
+import ru.startandroid.retrofit.Model.CreateResponse;
 import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.models.NetworkService;
 import ru.startandroid.retrofit.view.VolumesView;
@@ -38,10 +40,32 @@ public class VolumesPresenterImpl implements VolumesPresenter {
                             if (response.getStatus().equals("success")) {
                                 view.showVolumesData(response);
                                 view.hideProgress();
-                            }  else {
+                            } else {
                                 view.showRoutesEmptyData();
                                 view.hideProgress();
                             }
+                        },
+                        throwable -> {
+                            view.showRoutesError(throwable);
+                            view.hideProgress();
+                        });
+
+    }
+
+    @Override
+    public void postCreateInvoice(BodyForCreateInvoice bodyForCreateInvoice) {
+        view.showProgress();
+
+        Observable<CreateResponse> callCreate =
+                service.getApiService().postCreateGeneralInvoice(bodyForCreateInvoice);
+
+        subscription = callCreate
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        response -> {
+                            view.getPostResponse(response);
+                            view.hideProgress();
                         },
                         throwable -> {
                             view.showRoutesError(throwable);

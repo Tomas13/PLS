@@ -81,12 +81,7 @@ public class HistoryRVAdapter extends RecyclerView.Adapter<HistoryRVAdapter.Hist
 
             case CREATED_HISTORY_STATUS:
                 holder.tvImage.setImageResource(R.drawable.ic_done_all_black_24dp);
-                holder.tvImage.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Toast.makeText(v.getContext(), "Статус - Создан", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                holder.tvImage.setOnClickListener(v -> Toast.makeText(v.getContext(), "Статус - Создан", Toast.LENGTH_SHORT).show());
                 break;
 
 

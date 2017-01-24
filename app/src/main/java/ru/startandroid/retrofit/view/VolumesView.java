@@ -1,5 +1,6 @@
 package ru.startandroid.retrofit.view;
 
+import ru.startandroid.retrofit.Model.CreateResponse;
 import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 
 /**
@@ -13,6 +14,8 @@ public interface VolumesView {
     void hideProgress();
 
     void showVolumesData(CollateResponse volumes);
+
+    void getPostResponse(CreateResponse createResponse);
 
     void showRoutesEmptyData();
 

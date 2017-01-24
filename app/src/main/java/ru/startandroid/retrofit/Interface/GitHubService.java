@@ -104,7 +104,7 @@ public interface GitHubService {
 
     @POST("/api/mobile/create-general-invoice")
     @Headers("Content-Type: text/plain")
-    Call<CreateResponse> postCreateGeneralInvoice(
+    Observable<CreateResponse> postCreateGeneralInvoice(
             @Body BodyForCreateInvoice bodyForCreateInvoice
     );
 
