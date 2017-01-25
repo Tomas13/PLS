@@ -57,6 +57,8 @@ public class Application extends MultiDexApplication {
 
         Stetho.initializeWithDefaults(getApplicationContext());
 
+        AppJobManager.getJobManager(this);
+
         Realm.init(this);
 
         realmConfiguration = new RealmConfiguration.Builder()

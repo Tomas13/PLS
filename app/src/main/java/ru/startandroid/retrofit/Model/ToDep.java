@@ -5,9 +5,11 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 import io.realm.RealmObject;
 
-public class ToDep extends RealmObject {
+public class ToDep extends RealmObject implements Serializable{
 
     @SerializedName("name")
     @Expose

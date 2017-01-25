@@ -1,9 +1,10 @@
 package ru.startandroid.retrofit.Model;
+import java.io.Serializable;
 import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class LastActions {
+public class LastActions implements Serializable{
     @SerializedName("status")
     @Expose
     private String status;

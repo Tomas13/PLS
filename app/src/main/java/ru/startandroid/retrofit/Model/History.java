@@ -2,7 +2,9 @@ package ru.startandroid.retrofit.Model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class History {
+import java.io.Serializable;
+
+public class History implements Serializable{
 
     @SerializedName("id")
     @Expose

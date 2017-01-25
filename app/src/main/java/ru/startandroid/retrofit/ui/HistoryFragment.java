@@ -13,13 +13,23 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.birbit.android.jobqueue.JobManager;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.startandroid.retrofit.AppJobManager;
+import ru.startandroid.retrofit.Application;
 import ru.startandroid.retrofit.Model.History;
 import ru.startandroid.retrofit.Model.LastActions;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.HistoryRVAdapter;
+import ru.startandroid.retrofit.events.HistoryEvent;
+import ru.startandroid.retrofit.jobs.GetHistoryJob;
 import ru.startandroid.retrofit.models.NetworkService;
 import ru.startandroid.retrofit.presenter.HistoryPresenter;
 import ru.startandroid.retrofit.presenter.HistoryPresenterImpl;
@@ -30,11 +40,12 @@ import ru.startandroid.retrofit.view.HistoryView;
  */
 public class HistoryFragment extends Fragment implements HistoryView {
 
-    private HistoryPresenter presenter;
+//    private HistoryPresenter presenter;
     private RecyclerView rvHistory;
     private TextView tvNoDataHistory;
     private ProgressBar progressHistory;
     private LinearLayout llHistory;
+    private JobManager jobManager;
 
     public HistoryFragment() {
         // Required empty public constructor
@@ -54,11 +65,45 @@ public class HistoryFragment extends Fragment implements HistoryView {
 
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Последние действия");
 
-        presenter = new HistoryPresenterImpl(this, new NetworkService());
-        presenter.loadHistory();
+//        presenter = new HistoryPresenterImpl(this, new NetworkService());
+//        presenter.loadHistory();
 
+        jobManager = AppJobManager.getJobManager();
+
+        jobManager.addJobInBackground(new GetHistoryJob());
         return viewRoot;
     }
+
+    // This method will be called when a MessageEvent is posted (in the UI thread for Toast)
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onHistoryEvent(HistoryEvent event) {
+
+        showHistoryData(event.history);
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onHistoryErrorEvent(Throwable message){
+        showHistoryError(message);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+
+  /*  // This method will be called when a SomeOtherEvent is posted
+    @Subscribe
+    public void handleSomethingElse(SomeOtherEvent event) {
+        doSomethingWith(event);
+    }*/
 
     @Override
     public void showProgress() {
@@ -100,6 +145,6 @@ public class HistoryFragment extends Fragment implements HistoryView {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        presenter.unSubscribe();
+//        presenter.unSubscribe();
     }
 }

@@ -2,9 +2,11 @@ package ru.startandroid.retrofit.Model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 import io.realm.RealmObject;
 
-public class FromDep extends RealmObject{
+public class FromDep extends RealmObject implements Serializable{
 
     @SerializedName("name")
     @Expose

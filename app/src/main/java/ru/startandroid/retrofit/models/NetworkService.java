@@ -1,5 +1,8 @@
 package ru.startandroid.retrofit.models;
 
+import java.io.IOException;
+
+import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -16,7 +19,7 @@ import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 public class NetworkService {
 
     private Retrofit retrofitRoutes;
-    private GitHubService gitHubServ;
+    private static GitHubService gitHubServ;
 
     public NetworkService() {
         retrofitRoutes = new Retrofit.Builder()
@@ -29,8 +32,19 @@ public class NetworkService {
         gitHubServ = retrofitRoutes.create(GitHubService.class);
     }
 
-    public GitHubService getApiService() {
+    public static GitHubService getApiService() {
         return gitHubServ;
     }
+
+    public static <T> T performRequest(Call<T> request) throws IOException, ErrorRequestException {
+        retrofit2.Response<T> response = request.execute();
+
+        if (response == null || !response.isSuccessful() || response.errorBody() != null) {
+            throw new ErrorRequestException(response);
+        }
+
+        return response.body();
+    }
+
 
 }

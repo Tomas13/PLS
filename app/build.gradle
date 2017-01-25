@@ -107,4 +107,9 @@ dependencies {
 
     compile 'com.github.pwittchen:reactivenetwork:0.5.0'
 
+
+    compile 'com.birbit:android-priority-jobqueue:2.0.1'
+
+    compile 'org.greenrobot:eventbus:3.0.0'
+
 }
