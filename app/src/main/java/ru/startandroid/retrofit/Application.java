@@ -73,17 +73,7 @@ public class Application extends MultiDexApplication {
                         .build());
 
 
-/*
-        subscription = ReactiveNetwork.observeNetworkConnectivity(getApplicationContext())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(connectivity -> {
-                    if (connectivity.getState() == NetworkInfo.State.DISCONNECTED) {
-                        LogMessage("dis");
-                    } else {
-                        LogMessage("connected");
-                    }
-                });*/
+
 
 
     }

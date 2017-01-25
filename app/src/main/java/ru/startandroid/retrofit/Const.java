@@ -14,6 +14,7 @@ public class Const {
     public static final int ScannerSelectionBarcodeActivity = 1;
     public static String Token = "Bearer ";
     public static String FLIGHT_ROUTES = "";
+    public static Boolean isConnected = false;
 
 //    public static final String BASE_URL = "http://172.30.75.218/";
     public static final String BASE_URL = "http://pls-test.post.kz/";

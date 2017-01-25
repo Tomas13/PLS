@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -29,6 +30,8 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.github.pwittchen.reactivenetwork.library.ReactiveNetwork;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +68,7 @@ import static ru.startandroid.retrofit.Const.NAV_SHARED_PREF;
 import static ru.startandroid.retrofit.Const.TOKEN;
 import static ru.startandroid.retrofit.Const.TOKEN_SHARED_PREF;
 import static ru.startandroid.retrofit.Const.Token;
+import static ru.startandroid.retrofit.Const.isConnected;
 
 public class NavigationActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, RoutesView, NavigationActView {
@@ -133,7 +137,23 @@ public class NavigationActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
         setTitle("PLS");
 
-        runRefreshToken();
+//        runRefreshToken();
+
+        subscription = ReactiveNetwork.observeNetworkConnectivity(getApplicationContext())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(connectivity -> {
+                    if (connectivity.getState() == NetworkInfo.State.DISCONNECTED) {
+                        Log.d("NavReac", "dis");
+                        isConnected = false;
+                    } else {
+                        Log.d("NavReac", "connects");
+                        isConnected = true;
+
+                    }
+                });
+
+
 
         routesPresenter = new RoutesPresenterImpl(this, new NetworkService());
         navPresenter = new NavigationPresenterImpl(this, new NetworkService());
@@ -475,6 +495,7 @@ public class NavigationActivity extends AppCompatActivity
         super.onDestroy();
         if (realm != null && !realm.isClosed()) realm.close();
 
+        stopSubscription();
         routesPresenter.unSubscribe();
         routesPresenter.onDestroy();
     }

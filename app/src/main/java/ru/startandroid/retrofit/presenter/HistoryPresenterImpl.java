@@ -6,6 +6,7 @@ import ru.startandroid.retrofit.view.HistoryView;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -54,9 +55,12 @@ public class HistoryPresenterImpl implements HistoryPresenter {
                             }
                         },
                         throwable -> {
+//                            callEdges.retryWhen(observable ->)
+
                             view.showHistoryError(throwable);
                             view.hideProgress();
                         });
+
     }
 
     @Override

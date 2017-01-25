@@ -144,8 +144,28 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
             @Override
             public void afterTextChanged(Editable s) {
 
-
                 for (int i = 0; i < generalInvoiceIdsList.size(); i++) {
+
+                    if (generalInvoiceIdsList.get(i).equals(s.toString())){
+
+                        count++;
+                        String temp = generalInvoiceIdsList.get(i);
+                        generalInvoiceIdsList.remove(i);
+                        generalInvoiceIdsList.add(0, temp);
+                        listAdapter.notifyDataSetChanged();
+                        listViewAcceptGen.getChildAt(count-1).setBackgroundColor(Color.GREEN);
+                        listViewAcceptGen.setItemChecked(count-1, true);
+
+                        editTextScan.setText("");
+//                        chosenIds.add(ids.get(i));
+
+
+                    }
+
+                }
+
+
+              /*  for (int i = 0; i < generalInvoiceIdsList.size(); i++) {
 
                     if (generalInvoiceIdsList.get(i).equals(s.toString())) {
 
@@ -157,20 +177,22 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
 
                             //If it's not checked
 
+                            listViewAcceptGen.getChildAt(i).setBackgroundColor(Color.GREEN);
+                            listViewAcceptGen.setItemChecked(i, true);
+                            pickedNames.add(generalInvoiceIdsList.get(i));
+                            editTextScan.setText("");
+
                             String temp = generalInvoiceIdsList.get(i);
                             generalInvoiceIdsList.remove(i);
                             generalInvoiceIdsList.add(0, temp);
                             listAdapter.notifyDataSetChanged();
 
-                            listViewAcceptGen.getChildAt(0).setBackgroundColor(Color.GREEN);
-                            listViewAcceptGen.setItemChecked(0, true);
-                            pickedNames.add(generalInvoiceIdsList.get(i));
-                            editTextScan.setText("");
 
                             //chosenIds.add(ids.get(i));
 
+                    }
 
-                        }
+                        }*/
 
 
 
@@ -210,9 +232,8 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
 
                         }*/
 
-                    }
 
-                }
+
             }
         });
 
@@ -254,7 +275,7 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
                     pickedNames.remove(generalInvoiceIdsList.get(j));
 
 //                    chosenIds.add(ids.get(position));
-                } else if (!listViewAcceptGen.isItemChecked(position)) {
+                } else if (listViewAcceptGen.isItemChecked(position)) {
                     pickedNames.add(generalInvoiceIdsList.get(j));
                     listViewAcceptGen.getChildAt(j).setBackgroundColor(Color.GREEN);
 //                    chosenIds.remove(ids.get(position));
