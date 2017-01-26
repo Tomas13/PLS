@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.NetworkInfo;
+import android.os.Environment;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 import android.support.v7.app.AlertDialog;
@@ -20,6 +21,7 @@ import org.jboss.aerogear.android.authorization.oauth2.OAuth2AuthzSession;
 import org.jboss.aerogear.android.authorization.oauth2.OAuth2FetchAccess;
 import org.jboss.aerogear.android.core.Callback;
 
+import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 import io.realm.Realm;
@@ -44,6 +46,7 @@ import static ru.startandroid.retrofit.Const.Token;
 public class Application extends MultiDexApplication {
     private Subscription subscription;
     public RealmConfiguration realmConfiguration;
+    private static Context context;
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -54,6 +57,9 @@ public class Application extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+
+
+        context = getApplicationContext();
 
         Stetho.initializeWithDefaults(getApplicationContext());
 
@@ -78,6 +84,19 @@ public class Application extends MultiDexApplication {
 
 
 
+    }
+
+
+    public static File getDirectory() {
+        final File root = new File(Environment.getExternalStorageDirectory() + File.separator + "UCC" + File.separator);
+        root.mkdirs();
+        final String fname = Const.CACHE_FILE_NAME;
+        final File sdImageMainDirectory = new File(root, fname);
+        return sdImageMainDirectory;
+    }
+
+    public static Context getContext(){
+        return context;
     }
 
     private void LogMessage(String s) {

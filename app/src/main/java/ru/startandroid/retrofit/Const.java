@@ -12,6 +12,7 @@ import ru.startandroid.retrofit.Model.routes.Routes;
 
 public class Const {
     public static final int ScannerSelectionBarcodeActivity = 1;
+    public static final String CACHE_FILE_NAME = "PLS_FILE";
     public static String Token = "Bearer ";
     public static String FLIGHT_ROUTES = "";
     public static Boolean isConnected = false;

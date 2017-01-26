@@ -78,6 +78,8 @@ public class HistoryFragment extends Fragment implements HistoryView {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onHistoryEvent(HistoryEvent event) {
 
+
+
         showHistoryData(event.history);
     }
 
