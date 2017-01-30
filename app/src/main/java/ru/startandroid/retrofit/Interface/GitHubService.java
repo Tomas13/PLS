@@ -25,6 +25,7 @@ import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
 import ru.startandroid.retrofit.Model.geninvoice.InvoiceMain;
 import ru.startandroid.retrofit.Model.routes.Routes;
+import ru.startandroid.retrofit.models.newOinvoice;
 import rx.Observable;
 
 import static ru.startandroid.retrofit.utils.KeycloakHelper.LOGOUT;
@@ -86,6 +87,10 @@ public interface GitHubService {
             @Query("id") Long genInvoiceID
     );
 
+    @GET("/api/mobile/accept-general-invoice")
+    Observable<newOinvoice> acceptGeneralInvoiceNew(
+            @Query("id") Long genInvoiceID
+    );
 
     //    Получение списка s накладных, которые уже извлекли из О
     @GET("/api/mobile/destination-lists")

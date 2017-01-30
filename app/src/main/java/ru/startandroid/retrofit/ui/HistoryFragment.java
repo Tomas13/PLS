@@ -22,6 +22,8 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
 import ru.startandroid.retrofit.AppJobManager;
 import ru.startandroid.retrofit.Application;
 import ru.startandroid.retrofit.Model.History;
@@ -47,6 +49,8 @@ public class HistoryFragment extends Fragment implements HistoryView {
     private LinearLayout llHistory;
     private JobManager jobManager;
 
+    private Realm realmHistory;
+
     public HistoryFragment() {
         // Required empty public constructor
     }
@@ -68,6 +72,13 @@ public class HistoryFragment extends Fragment implements HistoryView {
 //        presenter = new HistoryPresenterImpl(this, new NetworkService());
 //        presenter.loadHistory();
 
+        RealmConfiguration historyConfig = new RealmConfiguration.Builder()
+                .name("history.realm")
+                .schemaVersion(1)
+                .deleteRealmIfMigrationNeeded()
+                .build();
+        realmHistory = Realm.getInstance(historyConfig);
+
         jobManager = AppJobManager.getJobManager();
 
         jobManager.addJobInBackground(new GetHistoryJob());
@@ -78,9 +89,10 @@ public class HistoryFragment extends Fragment implements HistoryView {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onHistoryEvent(HistoryEvent event) {
 
-
-
         showHistoryData(event.history);
+        realmHistory.executeTransaction(realm -> {
+            realmHistory.insert(event.history);
+        });
     }
 
 

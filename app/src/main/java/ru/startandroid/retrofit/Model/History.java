@@ -4,7 +4,9 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-public class History implements Serializable{
+import io.realm.RealmObject;
+
+public class History extends RealmObject implements Serializable{
 
     @SerializedName("id")
     @Expose

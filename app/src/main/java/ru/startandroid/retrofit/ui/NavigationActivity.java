@@ -79,7 +79,7 @@ public class NavigationActivity extends AppCompatActivity
     private ArrayList<Routes> routesList = new ArrayList<>();
     private ArrayAdapter<String> adapter;
     private ArrayList<String> flights;
-    private int posReturn;
+    private int posReturn = -1;
     private List<Entry> entries;
     private List<Flight> flightArrayList;
     private RoutesPresenter routesPresenter;
@@ -130,7 +130,6 @@ public class NavigationActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_navigation);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -154,12 +153,9 @@ public class NavigationActivity extends AppCompatActivity
                 });
 
 
-
         routesPresenter = new RoutesPresenterImpl(this, new NetworkService());
         navPresenter = new NavigationPresenterImpl(this, new NetworkService());
         navProgressBar = (ProgressBar) findViewById(R.id.activity_navigation_progressbar);
-
-
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -236,9 +232,7 @@ public class NavigationActivity extends AppCompatActivity
             String firstname = member.getData().get(0).getFirstName();
             String lastname = member.getData().get(0).getLastName();
 
-            realm.beginTransaction();
-            realm.insert(member.getData());
-            realm.commitTransaction();
+            realm.executeTransaction(realm -> realm.insert(member.getData()));
 
             tvFirstName.setText(firstname);
             tvLastName.setText(lastname);
@@ -257,7 +251,6 @@ public class NavigationActivity extends AppCompatActivity
 
     @Override
     public void showMemberError(Throwable throwable) {
-        Log.d("Main", throwable.getMessage());
         hideProgress();
 
         Toast.makeText(NavigationActivity.this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
@@ -271,54 +264,50 @@ public class NavigationActivity extends AppCompatActivity
         flightDialog.setCancelable(false);
 
         ListView listView = (ListView) flightDialog.findViewById(R.id.list_view_flight);
-        adapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.list_view_item, flights);
+        adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.list_view_item, flights);
 //        adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_activated_1, flights);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         listView.setAdapter(adapter);
 
         flightDialog.show();
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        listView.setOnItemClickListener((parent, view, position, id) -> {
 
-                flightDialog.setTitle(flights.get(position));
-                listView.setItemChecked(position, true);
+            flightDialog.setTitle(flights.get(position));
+            listView.setItemChecked(position, true);
 
 //                Toast.makeText(getApplicationContext(), "Сохраняем " + flights.get(position), Toast.LENGTH_SHORT).show();
-                //Save Flight Id to shared preferences
-                SharedPreferences pref = getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
-                SharedPreferences.Editor editor = pref.edit();
-                editor.putInt(FLIGHT_POS, position);
-                editor.putLong(FLIGHT_ID, flightArrayList.get(position).getId()); // ;.getItineraryDTO().getEntries().get(0).getDept().getName());
-                editor.apply();
+            //Save Flight Id to shared preferences
+            SharedPreferences pref = getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
+            SharedPreferences.Editor editor = pref.edit();
+            editor.putInt(FLIGHT_POS, position);
+            editor.putLong(FLIGHT_ID, flightArrayList.get(position).getId()); // ;.getItineraryDTO().getEntries().get(0).getDept().getName());
+            editor.apply();
 
-                //Save Flight Id to shared preferences
-                SharedPreferences pref1 = getApplicationContext().getSharedPreferences(NAV_SHARED_PREF, 0); // 0 - for private mode
-                SharedPreferences.Editor editor1 = pref1.edit();
-                editor1.putString(FLIGHT_NAME, flights.get(position));
-                editor1.apply();
+            //Save Flight Id to shared preferences
+            SharedPreferences pref1 = getApplicationContext().getSharedPreferences(NAV_SHARED_PREF, 0); // 0 - for private mode
+            SharedPreferences.Editor editor1 = pref1.edit();
+            editor1.putString(FLIGHT_NAME, flights.get(position));
+            editor1.apply();
 
-                tvRouteHeader.setText(pref1.getString(FLIGHT_NAME, "Путь"));
+            tvRouteHeader.setText(pref1.getString(FLIGHT_NAME, "Путь"));
 
-                posReturn = position;
+            posReturn = position;
 
-                Toast.makeText(NavigationActivity.this, "Готово, можете нажать кнопку ОК для закрытия диалога", Toast.LENGTH_SHORT).show();
+            Toast.makeText(NavigationActivity.this, "Готово, можете нажать кнопку ОК для закрытия диалога", Toast.LENGTH_SHORT).show();
 
-            }
         });
 
         Button btnOk = (Button) flightDialog.findViewById(R.id.btn_ok_flight);
         btnOk.setOnClickListener(v -> {
-            flightDialog.dismiss();
 
-            if (posReturn != 0) {
+            if (posReturn != -1) {
 
                 entries = flightArrayList.get(posReturn).getItineraryDTO().getEntries();
 
-                realm.beginTransaction();
-                realm.insert(entries);
-                realm.commitTransaction();
+                realm.executeTransaction(realm -> realm.insert(entries));
+
+                flightDialog.dismiss();
 
                 startFragment(new HistoryFragment());
 
@@ -342,8 +331,8 @@ public class NavigationActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.navigation, menu);
-        return true;
+//        getMenuInflater().inflate(R.menu.navigation, menu);
+        return false;
     }
 
     @Override
@@ -542,17 +531,14 @@ public class NavigationActivity extends AppCompatActivity
 
                 entries = routes.getFlights().get(0).getItineraryDTO().getEntries();
 
-                realm.beginTransaction();
-                realm.insert(entries);
-                realm.commitTransaction();
+                realm.executeTransaction(realm -> realm.insert(entries));
 
 
                 startFragment(new HistoryFragment());
 
             } else {
-                Toast.makeText(NavigationActivity.this, routes.getFlights().get(0).getName(), Toast.LENGTH_SHORT).show();
 
-                flights = new ArrayList<String>();
+                flights = new ArrayList<>();
                 for (int i = 0; i < routes.getFlights().size(); i++) {
                     flights.add(i, routes.getFlights().get(i).getName());
                 }

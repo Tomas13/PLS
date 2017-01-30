@@ -71,12 +71,7 @@ public class TEST extends AppCompatActivity {
 
 
         observable = Observable.interval(3, TimeUnit.SECONDS)
-                .map(new Func1<Long, String>() {
-                    @Override
-                    public String call(Long o) {
-                        return "Hey " + o;
-                    }
-                }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+                .map(o -> "Hey " + o).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 
     }
 
@@ -88,44 +83,11 @@ public class TEST extends AppCompatActivity {
 
     public void Change(View view) {
 
-        observable.subscribe(new Observable.OnSubscribe() {
-            @Override
-            public void call(Object o) {
-                tv.setText(o.toString() + "\n");
+        observable.subscribe((Observable.OnSubscribe) o -> {
+            tv.setText(o.toString() + "\n");
 
-            }
         });
 
-/*
-        Observer observer = new Observer() {
-            @Override
-            public void onCompleted() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onNext(Object o) {
-                someMethod();
-            }
-        };
-
-        observable.subscribe(observer);
-*/
-
-      /*  tv.setText(arrayList.size() + "\n");
-
-        int temp = arrayList.get(3);
-        arrayList.remove(3);
-        arrayList.add(0, temp);
-
-        for (int a : arrayList) {
-            tv.append(" " + a + " ");
-        }*/
 
 
     }

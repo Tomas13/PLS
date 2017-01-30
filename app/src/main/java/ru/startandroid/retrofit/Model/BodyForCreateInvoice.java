@@ -5,11 +5,14 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+import io.realm.RealmList;
+import io.realm.RealmObject;
+
 /**
  * Created by root on 1/4/17.
  */
 
-public class BodyForCreateInvoice {
+public class BodyForCreateInvoice extends RealmObject {
 
     @SerializedName("flightId")
     @Expose
@@ -25,12 +28,15 @@ public class BodyForCreateInvoice {
     private String fromDepIndex;
     @SerializedName("labelIds")
     @Expose
-    private List<Long> labelIds = null;
+    private RealmList<RealmLong> labelIds = null;
     @SerializedName("packetIds")
     @Expose
-    private List<Long> packetIds = null;
+    private RealmList<RealmLong> packetIds = null;
 
-    public BodyForCreateInvoice(Long flightId, Boolean isDepIndex, String toDepIndex, String fromDepIndex, List<Long> labelIds, List<Long> packetIds) {
+    public BodyForCreateInvoice() {
+    }
+
+    public BodyForCreateInvoice(Long flightId, Boolean isDepIndex, String toDepIndex, String fromDepIndex, RealmList<RealmLong> labelIds, RealmList<RealmLong> packetIds) {
         this.flightId = flightId;
         this.isDepIndex = isDepIndex;
         this.toDepIndex = toDepIndex;
@@ -71,19 +77,19 @@ public class BodyForCreateInvoice {
         this.fromDepIndex = fromDepIndex;
     }
 
-    public List<Long> getLabelIds() {
+    public RealmList<RealmLong> getLabelIds() {
         return labelIds;
     }
 
-    public void setLabelIds(List<Long> labelIds) {
+    public void setLabelIds(RealmList<RealmLong> labelIds) {
         this.labelIds = labelIds;
     }
 
-    public List<Long> getPacketIds() {
+    public RealmList<RealmLong> getPacketIds() {
         return packetIds;
     }
 
-    public void setPacketIds(List<Long> packetIds) {
+    public void setPacketIds(RealmList<RealmLong> packetIds) {
         this.packetIds = packetIds;
     }
 

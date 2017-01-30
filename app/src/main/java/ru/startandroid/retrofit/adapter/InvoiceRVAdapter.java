@@ -16,13 +16,17 @@ import android.widget.Toast;
 
 import java.util.List;
 
+import ru.startandroid.retrofit.Model.SendInvoice;
 import ru.startandroid.retrofit.Model.geninvoice.GeneralInvoice;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.ui.NavigationActivity;
 
 
-public class InvoiceRVAdapter extends RecyclerView.Adapter<InvoiceRVAdapter.InvoiceHolder> implements RecyclerView.OnItemTouchListener  {
+public class InvoiceRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements RecyclerView.OnItemTouchListener  {
     private List<GeneralInvoice> mGeneralInvoice;
+
+    private List<Object> objectList = null;
+    private final int GeneralInvoice  = 0, SendInvoice = 1;
 
 //for on click
 
@@ -30,6 +34,34 @@ public class InvoiceRVAdapter extends RecyclerView.Adapter<InvoiceRVAdapter.Invo
     Activity activity;
     GestureDetector mGestureDetector;
     private OnItemClickListener listener;
+
+
+
+    public static class SendInvoiceHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+        TextView tvGeneralInvoiceID, tvFromDeptName, tvFromDeptNameRu;
+        Button btnRetreive;
+
+        public SendInvoiceHolder(View view) {
+            super(view);
+
+            btnRetreive = (Button) view.findViewById(R.id.btn_retrieve);
+            tvGeneralInvoiceID = (TextView) view.findViewById(R.id.tv_general_invoice_id);
+            tvFromDeptName = (TextView) view.findViewById(R.id.tv_from_dept_name);
+            tvFromDeptNameRu = (TextView) view.findViewById(R.id.tv_from_dept_name_ru);
+            //view.setOnClickListener(this);
+
+//            btnRetreive.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            Log.d("Routes", "Click on " + getAdapterPosition() + " id " +v.getId());
+
+//            v.getRootView().getContext().getApplicationContext().startActivity(new Intent(v.getContext(), NavigationActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        }
+    }
+
 
     public static class InvoiceHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -57,12 +89,7 @@ public class InvoiceRVAdapter extends RecyclerView.Adapter<InvoiceRVAdapter.Invo
     }
 
 
-    public InvoiceRVAdapter(List<GeneralInvoice> routes) {
-        mGeneralInvoice = routes;
-    }
-
-
-    public InvoiceRVAdapter(Activity activity, List<GeneralInvoice> routes, InvoiceRVAdapter.OnItemClickListener listener) {
+   /* public InvoiceRVAdapter(Activity activity, List<GeneralInvoice> routes, InvoiceRVAdapter.OnItemClickListener listener) {
         this.context = activity.getBaseContext();
         this.activity = activity;
         this.listener = listener;
@@ -74,37 +101,92 @@ public class InvoiceRVAdapter extends RecyclerView.Adapter<InvoiceRVAdapter.Invo
                 return true;
             }
         });
-    }
+    }*/
 
-    @Override
-    public InvoiceHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View inflatedView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_rv_invoice, parent, false);
-        return new InvoiceHolder(inflatedView);
-    }
+    public InvoiceRVAdapter(Activity activity, List<Object> objectList, InvoiceRVAdapter.OnItemClickListener listener) {
+        this.context = activity.getBaseContext();
+        this.activity = activity;
+        this.listener = listener;
+        this.objectList = objectList;
 
-    @Override
-    public void onBindViewHolder(InvoiceHolder holder, final int position) {
-        GeneralInvoice generalInvoice = mGeneralInvoice.get(position);
-
-//        Log.d("Main", "onBIND " + route..getStatus() + " ");
-        holder.tvGeneralInvoiceID.setText(generalInvoice.getGeneralInvoiceId());
-        holder.tvFromDeptName.setText(generalInvoice.getFromDep().getName());
-        holder.tvFromDeptNameRu.setText(generalInvoice.getFromDep().getNameRu());
-
-        holder.btnRetreive.setOnClickListener(new View.OnClickListener(){
-
+        mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
             @Override
-            public void onClick(View v) {
-                listener.onItemClick(v, position);
+            public boolean onSingleTapUp(MotionEvent e) {
+                return true;
             }
         });
     }
 
 
     @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
+        if (viewType == GeneralInvoice) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_rv_invoice, parent, false);
+            return new InvoiceRVAdapter.InvoiceHolder(view);
+        } else {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_rv_invoice, parent, false);
+            return new InvoiceRVAdapter.InvoiceHolder(view);
+        }
+
+
+//        View inflatedView = LayoutInflater.from(parent.getContext())
+//                .inflate(R.layout.item_rv_invoice, parent, false);
+//        return new InvoiceHolder(inflatedView);
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+
+        int viewType = holder.getItemViewType();
+
+
+
+        if (viewType == GeneralInvoice) {
+            InvoiceHolder viewHolder1 = (InvoiceHolder) holder;
+
+            GeneralInvoice generalInvoice = (GeneralInvoice) objectList.get(position);
+
+//        Log.d("Main", "onBIND " + route..getStatus() + " ");
+            viewHolder1.tvGeneralInvoiceID.setText(generalInvoice.getGeneralInvoiceId());
+            viewHolder1.tvFromDeptName.setText(generalInvoice.getFromDep().getName());
+            viewHolder1.tvFromDeptNameRu.setText(generalInvoice.getFromDep().getNameRu());
+
+            viewHolder1.btnRetreive.setOnClickListener(v -> listener.onItemClick(v, position));
+
+
+        } else if (viewType == SendInvoice){
+            SendInvoiceHolder viewHolder1 = (SendInvoiceHolder) holder;
+
+            SendInvoice sendInvoice = (SendInvoice) objectList.get(position);
+
+//
+//        Log.d("Main", "onBIND " + route..getStatus() + " ");
+            viewHolder1.tvGeneralInvoiceID.setText("O20170130110809123");
+            viewHolder1.tvFromDeptName.setText(sendInvoice.getWhere());
+//        viewHolder1.tvFromDeptNameRu.setText(generalInvoice.getFromDep().getNameRu());
+
+            viewHolder1.btnRetreive.setText("Отправить");
+            viewHolder1.btnRetreive.setOnClickListener(v -> listener.onItemClick(v, position));
+
+        }
+
+    }
+
+
+    @Override
+    public int getItemViewType(int position) {
+        if (objectList.get(position) instanceof GeneralInvoice) {
+            return GeneralInvoice;
+        } else if (objectList.get(position) instanceof SendInvoice) {
+            return SendInvoice;
+        }
+        return -1;
+    }
+
+    @Override
     public int getItemCount() {
-        return mGeneralInvoice.size();
+        return objectList.size();
     }
 
 

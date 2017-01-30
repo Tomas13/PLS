@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmQuery;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -35,10 +36,13 @@ import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoice;
 import ru.startandroid.retrofit.Model.CreateResponse;
 import ru.startandroid.retrofit.Model.Datum;
+import ru.startandroid.retrofit.Model.RealmLong;
+import ru.startandroid.retrofit.Model.SendInvoice;
 import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.Model.collatedestination.Dto;
 import ru.startandroid.retrofit.Model.collatedestination.Label;
 import ru.startandroid.retrofit.Model.collatedestination.Packet;
+import ru.startandroid.retrofit.Model.geninvoice.GeneralInvoice;
 import ru.startandroid.retrofit.Model.routes.Entry;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.CollateRVAdapter;
@@ -114,7 +118,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
 
         if (!queryData.findAll().isEmpty()) {
-            for (int i = 0; i < queryData.findAll().size(); i++) {
+            for (int i = 0; i < queryData.findAll().distinct("index").size(); i++) {
                 entries.add(queryData.findAll().get(i));
             }
         }
@@ -181,10 +185,31 @@ public class VolumesFragment extends Fragment implements VolumesView {
             if (pref1.contains(FLIGHT_ID)) {
 
                 Long flightId = pref1.getLong(FLIGHT_ID, 1L);
-                Boolean isDepIndex = true;
+//                Boolean isDepIndex = true;
                 String toDeptIndex = entries.get(position).getDept().getName();
                 String fromDeptIndex = entries.get(0).getDept().getName();
-                body = new BodyForCreateInvoice(flightId, isDepIndex, toDeptIndex, fromDeptIndex, labelsList, packetsList);
+
+                RealmList<RealmLong> labelLongList =new RealmList<>();
+                RealmList<RealmLong> packetLongList =new RealmList<>();
+
+                for (int i = 0; i < labelsList.size(); i++) {
+                    RealmLong realmLong = new RealmLong(labelsList.get(i));
+                    labelLongList.add(realmLong);
+                }
+
+                for (int i = 0; i < packetsList.size(); i++) {
+                    RealmLong realmLong = new RealmLong(packetsList.get(i));
+                    packetLongList.add(realmLong);
+                }
+
+                body = new BodyForCreateInvoice(flightId, true, toDeptIndex, fromDeptIndex, labelLongList, packetLongList);
+
+
+                String toName = flightName.get(position);
+                SendInvoice sendInvoice = new SendInvoice();
+                sendInvoice.setWhere(toName);
+                sendInvoice.setBodyForCreateInvoice(body);
+                realm.executeTransaction(realm -> realm.insert(sendInvoice));
 
 
             } else {
@@ -248,7 +273,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
     }
 
 
-
     private CollateRVAdapter createAdapter() {
 
         return new CollateRVAdapter(getActivity(), objects, (childView, isChecked, childPosition) -> {
@@ -297,7 +321,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
         recyclerViewVolumes.setAdapter(collateRVAdapter);
 
     }
-
 
 
     private void checkLabelPacketListEmpty() {

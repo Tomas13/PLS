@@ -45,7 +45,7 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(String data) {
                     Intent intent = new Intent(LoginActivity.this, NavigationActivity.class);
-                    Const.Token += data;
+                    Const.Token = "Bearer " + data;
 
 
                     //Save Token to shared preferences
@@ -73,7 +73,7 @@ public class LoginActivity extends AppCompatActivity {
             Intent intent = new Intent(LoginActivity.this, NavigationActivity.class);
 
             if (pref1.contains(TOKEN)){
-                Token += pref1.getString(TOKEN, "0");
+                Token = "Bearer " + pref1.getString(TOKEN, "0");
             }
 
             Log.d("MainLogin", Const.Token);

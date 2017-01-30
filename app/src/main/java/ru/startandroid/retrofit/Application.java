@@ -61,7 +61,7 @@ public class Application extends MultiDexApplication {
 
         context = getApplicationContext();
 
-        Stetho.initializeWithDefaults(getApplicationContext());
+//        Stetho.initializeWithDefaults(getApplicationContext());
 
         AppJobManager.getJobManager(this);
 

@@ -4,13 +4,16 @@ import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class LastActions implements Serializable{
+import io.realm.RealmList;
+import io.realm.RealmObject;
+
+public class LastActions extends RealmObject implements Serializable {
     @SerializedName("status")
     @Expose
     private String status;
     @SerializedName("history")
     @Expose
-    private List<History> history = null;
+    private RealmList<History> history = null;
 
     public String getStatus() {
         return status;
@@ -20,11 +23,11 @@ public class LastActions implements Serializable{
         this.status = status;
     }
 
-    public List<History> getHistory() {
+    public RealmList<History> getHistory() {
         return history;
     }
 
-    public void setHistory(List<History> history) {
+    public void setHistory(RealmList<History> history) {
         this.history = history;
     }
 }

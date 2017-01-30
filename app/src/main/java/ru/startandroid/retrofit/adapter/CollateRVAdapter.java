@@ -29,14 +29,12 @@ import ru.startandroid.retrofit.R;
 
 public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements RecyclerView.OnItemTouchListener {
 
-
     Context context;
     Activity activity;
     GestureDetector mGestureDetector;
     private CollateRVAdapter.OnItemClickListener listener;
 
     private OnItemCheckedListener listener1;
-
 
     // The items to display in your RecyclerView
     private List<Object> items;

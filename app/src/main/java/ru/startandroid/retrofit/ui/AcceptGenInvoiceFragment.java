@@ -56,6 +56,7 @@ import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.CollateRVAdapter;
 import ru.startandroid.retrofit.models.NetworkService;
+import ru.startandroid.retrofit.models.newOinvoice;
 import ru.startandroid.retrofit.presenter.AcceptGenInvoicePresenter;
 import ru.startandroid.retrofit.presenter.AcceptGenInvoicePresenterImpl;
 import ru.startandroid.retrofit.view.AcceptGenInvoiceView;
@@ -146,15 +147,15 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
 
                 for (int i = 0; i < generalInvoiceIdsList.size(); i++) {
 
-                    if (generalInvoiceIdsList.get(i).equals(s.toString())){
+                    if (generalInvoiceIdsList.get(i).equals(s.toString())) {
 
                         count++;
                         String temp = generalInvoiceIdsList.get(i);
                         generalInvoiceIdsList.remove(i);
                         generalInvoiceIdsList.add(0, temp);
                         listAdapter.notifyDataSetChanged();
-                        listViewAcceptGen.getChildAt(count-1).setBackgroundColor(Color.GREEN);
-                        listViewAcceptGen.setItemChecked(count-1, true);
+                        listViewAcceptGen.getChildAt(count - 1).setBackgroundColor(Color.GREEN);
+                        listViewAcceptGen.setItemChecked(count - 1, true);
 
                         editTextScan.setText("");
 //                        chosenIds.add(ids.get(i));
@@ -195,8 +196,6 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
                         }*/
 
 
-
-
 //                        listViewAcceptGen.getChildAt(count-1).setBackgroundColor(Color.GREEN);
 
 
@@ -233,7 +232,6 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
                         }*/
 
 
-
             }
         });
 
@@ -254,11 +252,11 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
 
 
         //TODO COMMENT THIS OUT
-        generalInvoiceIdsList.add("First");
-        generalInvoiceIdsList.add("Second");
-        generalInvoiceIdsList.add("Third");
-        generalInvoiceIdsList.add("Four");
-        generalInvoiceIdsList.add("Five");
+      //  generalInvoiceIdsList.add("First");
+//        generalInvoiceIdsList.add("Second");
+//        generalInvoiceIdsList.add("Third");
+//        generalInvoiceIdsList.add("Four");
+//        generalInvoiceIdsList.add("Five");
 //        listAdapter = new ArrayAdapter<>(getContext(), R.layout.custom_textview, generalInvoiceIdsList);
         listAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_multiple_choice, generalInvoiceIdsList);
 
@@ -288,7 +286,6 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
         });
 
         listViewAcceptGen.setAdapter(listAdapter);
-
 
         return view;
     }
@@ -347,6 +344,18 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
         listViewAcceptGen.setAdapter(listAdapter);
     }
 
+    @Override
+    public void showGeneralInvoiceId(newOinvoice newoinvoice) {
+
+        for (int i = 0; i < newoinvoice.getDestinations().size(); i++) {
+            generalInvoiceIdsList.add(newoinvoice.getDestinations().get(i).getDestinationListId());
+            ids.add(newoinvoice.getDestinations().get(i).getId());
+        }
+
+        listAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, generalInvoiceIdsList);
+        listViewAcceptGen.setAdapter(listAdapter);
+    }
+
 
     @Override
     public void showCollateResponse(CollateResponse collateResponse) {
@@ -373,11 +382,11 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
         // Create the Realm instance
         realm = Realm.getDefaultInstance();
 
-        realm.beginTransaction();
-        realm.insert(packets);
-        realm.insert(labels);
-//                    realm.insert(collateDtoObject);
-        realm.commitTransaction();
+        realm.executeTransaction(realm -> {
+            realm.insert(packets);
+            realm.insert(labels);
+        });
+
         Log.d("MainAccept", "got response");
 
 
@@ -422,10 +431,10 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
         // Create the Realm instance
         realm = Realm.getDefaultInstance();
 
-        realm.beginTransaction();
-        realm.insert(labelsArrayList);
-        realm.insert(packetsArrayList);
-        realm.commitTransaction();
+        realm.executeTransaction(realm -> {
+            realm.insert(labelsArrayList);
+            realm.insert(packetsArrayList);
+        });
 
         ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
     }

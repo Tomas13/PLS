@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import io.realm.RealmObject;
+import io.realm.annotations.Index;
 import ru.startandroid.retrofit.Model.routes.Dept;
 
 public class Entry extends RealmObject {
@@ -16,6 +17,7 @@ public class Entry extends RealmObject {
     private Boolean isActive;
     @SerializedName("index")
     @Expose
+    @Index
     private Integer index;
     @SerializedName("travelTime")
     @Expose

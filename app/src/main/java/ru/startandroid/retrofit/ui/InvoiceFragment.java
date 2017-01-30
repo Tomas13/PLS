@@ -15,10 +15,14 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
+import ru.startandroid.retrofit.Model.SendInvoice;
 import ru.startandroid.retrofit.Model.geninvoice.GeneralInvoice;
 import ru.startandroid.retrofit.Model.geninvoice.InvoiceMain;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.InvoiceRVAdapter;
+import ru.startandroid.retrofit.adapter.InvoiceRVAdapterSend;
 import ru.startandroid.retrofit.models.NetworkService;
 import ru.startandroid.retrofit.presenter.InvoicePresenter;
 import ru.startandroid.retrofit.presenter.InvoicePresenterImpl;
@@ -34,6 +38,10 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     private InvoicePresenter presenter;
     private ProgressBar progressInvoice;
     private RecyclerView rvInvoice;
+    private Realm realm;
+    private List<SendInvoice> sendInvoiceList;
+
+    private List<Object> objectList;
 
     public InvoiceFragment() {
         // Required empty public constructor
@@ -46,18 +54,42 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
         View viewRoot = inflater.inflate(R.layout.fragment_invoice, container, false);
 
+        sendInvoiceList = new ArrayList<>();
+
+        objectList = new ArrayList<>();
+
         tvNoDataInvoice = (TextView) viewRoot.findViewById(R.id.tv_no_data_invoice);
         tableRowInvoice = (TableRow) viewRoot.findViewById(R.id.tablerow_invoice);
 
-        ((AppCompatActivity) getActivity())
-                .getSupportActionBar()
-                .setTitle("Накладные");
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Накладные");
 
         rvInvoice = (RecyclerView) viewRoot.findViewById(R.id.rv_invoice_fragment);
         progressInvoice = (ProgressBar) viewRoot.findViewById(R.id.progress_invoice);
 
         presenter = new InvoicePresenterImpl(this, new NetworkService());
         presenter.loadGeneralInvoice();
+
+
+        realm = Realm.getDefaultInstance();
+
+        RealmResults<SendInvoice> realmResults = realm.where(SendInvoice.class).findAll();
+        for (int i = 0; i < realmResults.size(); i++) {
+            sendInvoiceList.add(realmResults.get(i));
+        }
+
+        if (!sendInvoiceList.isEmpty()) {
+
+            objectList.add(sendInvoiceList);
+            /*InvoiceRVAdapter adapterSend = new InvoiceRVAdapter(getActivity(), objectList, ((childView, childAdapterPosition) -> {
+
+                Toast.makeText(getContext(), "Send action", Toast.LENGTH_SHORT).show();
+
+            }));
+
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+            rvInvoice.setLayoutManager(mLayoutManager);
+            rvInvoice.setAdapter(adapterSend);*/
+        }
 
         return viewRoot;
     }
@@ -80,20 +112,17 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
         generalInvoiceList.addAll(invoiceMain.getGeneralInvoices());
 
-        InvoiceRVAdapter invoiceRVAdapter = new InvoiceRVAdapter(getActivity(), generalInvoiceList, new InvoiceRVAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View childView, int childAdapterPosition) {
+        objectList.add(generalInvoiceList);
 
-//                Toast.makeText(getContext(), "SHIT OH " + generalInvoiceList.get(childAdapterPosition).getGeneralInvoiceId(), Toast.LENGTH_SHORT).show();
+        InvoiceRVAdapter invoiceRVAdapter = new InvoiceRVAdapter(getActivity(), objectList, (childView, childAdapterPosition) -> {
 
-                Bundle bundle = new Bundle();
-                bundle.putLong("generalInvoiceId", generalInvoiceList.get(childAdapterPosition).getId());
-                Fragment fragment = new AcceptGenInvoiceFragment();
-                fragment.setArguments(bundle);
+            Bundle bundle = new Bundle();
+            bundle.putLong("generalInvoiceId", generalInvoiceList.get(childAdapterPosition).getId());
+            Fragment fragment = new AcceptGenInvoiceFragment();
+            fragment.setArguments(bundle);
 
-                ((NavigationActivity) getActivity()).startFragment(fragment);
+            ((NavigationActivity) getActivity()).startFragment(fragment);
 
-            }
         });
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
@@ -117,5 +146,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     public void onDestroyView() {
         super.onDestroyView();
         presenter.unSubscribe();
+        if (!realm.isClosed()) realm.close();
     }
 }

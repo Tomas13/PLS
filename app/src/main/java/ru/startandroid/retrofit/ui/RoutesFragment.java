@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 import ru.startandroid.retrofit.Model.routes.Entry;
 import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.R;
@@ -59,9 +60,7 @@ public class RoutesFragment extends Fragment implements RoutesView {
         progressBar = (ProgressBar) viewRoot.findViewById(R.id.progress_routes);
         linearLayoutHeader = (LinearLayout) viewRoot.findViewById(R.id.ll_routes);
 
-        ((AppCompatActivity) getActivity())
-                .getSupportActionBar()
-                .setTitle("Маршруты");
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Маршруты");
 
         realm = Realm.getDefaultInstance();
 
@@ -69,7 +68,7 @@ public class RoutesFragment extends Fragment implements RoutesView {
 
         if (realm.where(Routes.class).findAll().size() == 0) {
             presenter.loadRoutes();
-        }else{
+        } else {
             showRoutesData(realm.where(Routes.class).findAll().first());
         }
 
@@ -95,11 +94,11 @@ public class RoutesFragment extends Fragment implements RoutesView {
     @Override
     public void showRoutesData(Routes routes) {
 
-        if (realm.where(Routes.class).findAll().size() == 0){
+        if (realm.where(Routes.class).findAll().size() == 0) {
 
-            realm.beginTransaction();
-            realm.insert(routes);
-            realm.commitTransaction();
+            realm.executeTransaction(realm -> {
+                realm.insert(routes);
+            });
         }
 
 
@@ -109,14 +108,10 @@ public class RoutesFragment extends Fragment implements RoutesView {
             pos = pref.getInt(FLIGHT_POS, 0);
         }
 
-
-        Log.d("MainNav", "got to response" + routes.getFlights().get(pos).getItineraryDTO().getEntries().size() + " pos " + pos);
-
         List<Entry> flights = new ArrayList<>();
 
         flights.addAll(routes.getFlights().get(pos).getItineraryDTO().getEntries());
 
-        Log.d("MainNav", flights.size() + " size");
         RoutesRVAdapter routesRVAdapter = new RoutesRVAdapter(flights);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
