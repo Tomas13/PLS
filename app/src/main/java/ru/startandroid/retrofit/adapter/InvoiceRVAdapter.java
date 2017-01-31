@@ -25,17 +25,15 @@ import ru.startandroid.retrofit.ui.NavigationActivity;
 public class InvoiceRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements RecyclerView.OnItemTouchListener  {
     private List<GeneralInvoice> mGeneralInvoice;
 
-    private List<Object> objectList = null;
-    private final int GeneralInvoice  = 0, SendInvoice = 1;
+    private List<Object> objectList;
+    private final int GENINVOICE  = 0, SENDINVOICE = 1;
 
 //for on click
 
-    Context context;
-    Activity activity;
-    GestureDetector mGestureDetector;
+    private Context context;
+    private Activity activity;
+    private GestureDetector mGestureDetector;
     private OnItemClickListener listener;
-
-
 
     public static class SendInvoiceHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -121,12 +119,12 @@ public class InvoiceRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        if (viewType == GeneralInvoice) {
+        if (viewType == GENINVOICE) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_rv_invoice, parent, false);
             return new InvoiceRVAdapter.InvoiceHolder(view);
         } else {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_rv_invoice, parent, false);
-            return new InvoiceRVAdapter.InvoiceHolder(view);
+            return new InvoiceRVAdapter.SendInvoiceHolder(view);
         }
 
 
@@ -140,9 +138,7 @@ public class InvoiceRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         int viewType = holder.getItemViewType();
 
-
-
-        if (viewType == GeneralInvoice) {
+        if (viewType == GENINVOICE) {
             InvoiceHolder viewHolder1 = (InvoiceHolder) holder;
 
             GeneralInvoice generalInvoice = (GeneralInvoice) objectList.get(position);
@@ -155,7 +151,7 @@ public class InvoiceRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             viewHolder1.btnRetreive.setOnClickListener(v -> listener.onItemClick(v, position));
 
 
-        } else if (viewType == SendInvoice){
+        } else if (viewType == SENDINVOICE){
             SendInvoiceHolder viewHolder1 = (SendInvoiceHolder) holder;
 
             SendInvoice sendInvoice = (SendInvoice) objectList.get(position);
@@ -177,9 +173,9 @@ public class InvoiceRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     @Override
     public int getItemViewType(int position) {
         if (objectList.get(position) instanceof GeneralInvoice) {
-            return GeneralInvoice;
+            return GENINVOICE;
         } else if (objectList.get(position) instanceof SendInvoice) {
-            return SendInvoice;
+            return SENDINVOICE;
         }
         return -1;
     }

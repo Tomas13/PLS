@@ -29,9 +29,9 @@ import ru.startandroid.retrofit.R;
 
 public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements RecyclerView.OnItemTouchListener {
 
-    Context context;
-    Activity activity;
-    GestureDetector mGestureDetector;
+    private Context context;
+    private Activity activity;
+    private GestureDetector mGestureDetector;
     private CollateRVAdapter.OnItemClickListener listener;
 
     private OnItemCheckedListener listener1;

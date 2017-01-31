@@ -41,7 +41,9 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     private Realm realm;
     private List<SendInvoice> sendInvoiceList;
 
-    private List<Object> objectList;
+    private ArrayList<Object> objectList;
+    InvoiceRVAdapter adapterSend;
+
 
     public InvoiceFragment() {
         // Required empty public constructor
@@ -66,8 +68,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         rvInvoice = (RecyclerView) viewRoot.findViewById(R.id.rv_invoice_fragment);
         progressInvoice = (ProgressBar) viewRoot.findViewById(R.id.progress_invoice);
 
-        presenter = new InvoicePresenterImpl(this, new NetworkService());
-        presenter.loadGeneralInvoice();
 
 
         realm = Realm.getDefaultInstance();
@@ -77,10 +77,12 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             sendInvoiceList.add(realmResults.get(i));
         }
 
+
+
         if (!sendInvoiceList.isEmpty()) {
 
-            objectList.add(sendInvoiceList);
-            /*InvoiceRVAdapter adapterSend = new InvoiceRVAdapter(getActivity(), objectList, ((childView, childAdapterPosition) -> {
+            objectList.addAll(sendInvoiceList);
+             adapterSend = new InvoiceRVAdapter(getActivity(), objectList, ((childView, childAdapterPosition) -> {
 
                 Toast.makeText(getContext(), "Send action", Toast.LENGTH_SHORT).show();
 
@@ -88,8 +90,11 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
             rvInvoice.setLayoutManager(mLayoutManager);
-            rvInvoice.setAdapter(adapterSend);*/
+            rvInvoice.setAdapter(adapterSend);
         }
+
+        presenter = new InvoicePresenterImpl(this, new NetworkService());
+        presenter.loadGeneralInvoice();
 
         return viewRoot;
     }
@@ -108,11 +113,11 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     @Override
     public void showGeneralInvoice(InvoiceMain invoiceMain) {
 
-        final List<GeneralInvoice> generalInvoiceList = new ArrayList<GeneralInvoice>();
+        final List<GeneralInvoice> generalInvoiceList = new ArrayList<>();
 
         generalInvoiceList.addAll(invoiceMain.getGeneralInvoices());
 
-        objectList.add(generalInvoiceList);
+        objectList.addAll(generalInvoiceList);
 
         InvoiceRVAdapter invoiceRVAdapter = new InvoiceRVAdapter(getActivity(), objectList, (childView, childAdapterPosition) -> {
 
