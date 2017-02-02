@@ -23,7 +23,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -367,7 +366,7 @@ public class NavigationActivity extends AppCompatActivity
             startFragment(new InvoiceFragment());
         } else if (id == R.id.nav_dest_list) {
 
-            startFragment(new AcceptGenInvoiceFragment());
+            startFragment(new CollateFragment());
 
         } else if (id == R.id.nav_routes) {
 

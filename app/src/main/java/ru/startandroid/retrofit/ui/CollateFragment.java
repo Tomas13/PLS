@@ -10,14 +10,9 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,34 +23,20 @@ import android.widget.Toast;
 
 import com.baozi.Zxing.CaptureActivity;
 import com.baozi.Zxing.ZXingConstants;
-import com.facebook.stetho.Stetho;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import ru.startandroid.retrofit.Const;
-import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.IdsCollate;
 import ru.startandroid.retrofit.Model.acceptgen.Destinations;
-import ru.startandroid.retrofit.Model.acceptgen.Oinvoice;
 import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.Model.collatedestination.Dto;
 import ru.startandroid.retrofit.Model.collatedestination.Label;
 import ru.startandroid.retrofit.Model.collatedestination.Packet;
 import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
 
-import static ru.startandroid.retrofit.Const.BASE_URL;
-import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
-
 import ru.startandroid.retrofit.R;
-import ru.startandroid.retrofit.adapter.CollateRVAdapter;
 import ru.startandroid.retrofit.models.NetworkService;
 import ru.startandroid.retrofit.models.newOinvoice;
 import ru.startandroid.retrofit.presenter.AcceptGenInvoicePresenter;
@@ -65,7 +46,7 @@ import ru.startandroid.retrofit.view.AcceptGenInvoiceView;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoiceView {
+public class CollateFragment extends Fragment implements AcceptGenInvoiceView {
 
     private ListView listViewAcceptGen;
     private TextView tvNoDataAcceptGen;
@@ -81,7 +62,7 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
     private EditText editTextScan;
     int count = 0;
 
-    public AcceptGenInvoiceFragment() {
+    public CollateFragment() {
         // Required empty public constructor
     }
 
@@ -89,7 +70,7 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_accept_gen_invoice, container, false);
+        View view = inflater.inflate(R.layout.fragment_collate, container, false);
 
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Список S-накладных");
 
@@ -159,7 +140,7 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
                         listViewAcceptGen.setItemChecked(count - 1, true);
 
                         editTextScan.setText("");
-//                        chosenIds.add(ids.get(i));
+                        chosenIds.add(ids.get(i));
                     }
                 }
             }
@@ -202,11 +183,11 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
                     listViewAcceptGen.getChildAt(j).setBackgroundColor(Color.TRANSPARENT);
                     pickedNames.remove(generalInvoiceIdsList.get(j));
 
-//                    chosenIds.add(ids.get(position));
+                    chosenIds.add(ids.get(position));
                 } else if (listViewAcceptGen.isItemChecked(position)) {
                     pickedNames.add(generalInvoiceIdsList.get(j));
                     listViewAcceptGen.getChildAt(j).setBackgroundColor(Color.GREEN);
-//                    chosenIds.remove(ids.get(position));
+                    chosenIds.remove(ids.get(position));
 
                 }
 

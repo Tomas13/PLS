@@ -116,7 +116,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
         if (queryPacket.findAll().size() > 0 || queryLabel.findAll().size() > 0) {
             inflateWithRealm();
-        }else{
         }
 
 

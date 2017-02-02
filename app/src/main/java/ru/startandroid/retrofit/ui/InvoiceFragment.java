@@ -125,7 +125,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
 //            Bundle bundle = new Bundle();
 //            bundle.putLong("generalInvoiceId", generalInvoiceList.get(childAdapterPosition).getId());
-//            Fragment fragment = new AcceptGenInvoiceFragment();
+//            Fragment fragment = new CollateFragment();
 //            fragment.setArguments(bundle);
 
             Long generalInvoiceId = generalInvoiceList.get(childAdapterPosition).getId();
