@@ -34,6 +34,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoice;
+import ru.startandroid.retrofit.Model.BodyForCreateInvoiceWithout;
 import ru.startandroid.retrofit.Model.CreateResponse;
 import ru.startandroid.retrofit.Model.Datum;
 import ru.startandroid.retrofit.Model.RealmLong;
@@ -82,6 +83,9 @@ public class VolumesFragment extends Fragment implements VolumesView {
     private ArrayList<Object> objects;
     private CollateRVAdapter collateRVAdapter;
 
+    private BodyForCreateInvoiceWithout bodyWithout;
+
+
     public VolumesFragment() {
         // Required empty public constructor
     }
@@ -112,13 +116,9 @@ public class VolumesFragment extends Fragment implements VolumesView {
         queryLabel = realm.where(Label.class);
         queryPacket = realm.where(Packet.class);
 
-
-
         if (queryPacket.findAll().size() > 0 || queryLabel.findAll().size() > 0) {
             inflateWithRealm();
         }
-
-
 
         if (!queryData.findAll().isEmpty()) {
             for (int i = 0; i < queryData.findAll().distinct("index").size(); i++) {
@@ -134,8 +134,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
         presenter.loadGetListForVpn();
 
         btnSendInvoice.setOnClickListener(v -> showDialog());
-
-
 
         return rootView;
     }
@@ -194,8 +192,8 @@ public class VolumesFragment extends Fragment implements VolumesView {
                 String toDeptIndex = entries.get(position).getDept().getName();
                 String fromDeptIndex = entries.get(0).getDept().getName();
 
-                RealmList<RealmLong> labelLongList =new RealmList<>();
-                RealmList<RealmLong> packetLongList =new RealmList<>();
+                RealmList<RealmLong> labelLongList = new RealmList<>();
+                RealmList<RealmLong> packetLongList = new RealmList<>();
 
                 for (int i = 0; i < labelsList.size(); i++) {
                     RealmLong realmLong = new RealmLong(labelsList.get(i));
@@ -209,6 +207,8 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
                 body = new BodyForCreateInvoice(flightId, true, toDeptIndex, fromDeptIndex, labelLongList, packetLongList);
 
+
+                bodyWithout = new BodyForCreateInvoiceWithout(flightId, true, toDeptIndex, fromDeptIndex, labelsList, packetsList);
 
                 String toName = flightName.get(position);
                 SendInvoice sendInvoice = new SendInvoice();
@@ -228,8 +228,19 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
         Button btnOk = (Button) pointDialog.findViewById(R.id.btn_ok_flight);
         btnOk.setOnClickListener(v -> {
-            presenter.postCreateInvoice(body);
+//            presenter.postCreateInvoice(body);
+
+            presenter.postCreateInvoice(bodyWithout);
+
+            for (int i = 0; i < chosen.size(); i++) {
+
+                objects.remove(chosen.get(i));
+            }
+
+            collateRVAdapter.notifyDataSetChanged();
+
             pointDialog.dismiss();
+
         });
 
 
@@ -239,6 +250,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
         });
 
     }
+
 
     @Override
     public void getPostResponse(CreateResponse createResponse) {
@@ -252,37 +264,19 @@ public class VolumesFragment extends Fragment implements VolumesView {
                 showErrorDialog(createResponse.getStatus());
             }
 
-            //TODO THIS SHOULD UPDATE rv items
-/*
-                        for (int i = 0; i < packetsList.size(); i++) {
-
-                            if (packetsArrayList.get(i).getPacketListId().equals(String.valueOf(packetsList.get(i)))){
-                                packetsArrayList.remove(i);
-                            }
-                        }
-
-                        for (int i = 0; i < labelsList.size(); i++) {
-                            if (labelsArrayList.get(i).getLabelListid().equals(String.valueOf(labelsList.get(i)))){
-                                labelsArrayList.remove(i);
-
-                            }
-                        }
-
-                        objects.clear();
-                        objects.addAll(packetsArrayList);
-                        objects.addAll(labelsArrayList);
-                        collateRVAdapter.notifyDataSetChanged();*/
-
-//                        ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
         }
     }
 
+
+    ArrayList<Object> chosen = new ArrayList<>();
 
     private CollateRVAdapter createAdapter() {
 
         return new CollateRVAdapter(getActivity(), objects, (childView, isChecked, childPosition) -> {
 
             if (isChecked) {
+
+                chosen.add(objects.get(childPosition));
 
                 if (objects.get(childPosition) instanceof Packet) {
                     packetsList.add(((Packet) objects.get(childPosition)).getId());
@@ -295,6 +289,9 @@ public class VolumesFragment extends Fragment implements VolumesView {
                 checkLabelPacketListEmpty();
 
             } else {
+
+                chosen.remove(objects.get(childPosition));
+
 
                 if (objects.get(childPosition) instanceof Packet) {
                     packetsList.remove(((Packet) objects.get(childPosition)).getId());

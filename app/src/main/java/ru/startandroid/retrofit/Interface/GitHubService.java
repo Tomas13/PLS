@@ -14,6 +14,7 @@ import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoice;
+import ru.startandroid.retrofit.Model.BodyForCreateInvoiceWithout;
 import ru.startandroid.retrofit.Model.Contributor;
 import ru.startandroid.retrofit.Model.CreateResponse;
 import ru.startandroid.retrofit.Model.Edges;
@@ -114,6 +115,13 @@ public interface GitHubService {
     @Headers("Content-Type: text/plain")
     Observable<CreateResponse> postCreateGeneralInvoice(
             @Body BodyForCreateInvoice bodyForCreateInvoice
+    );
+
+
+    @POST("/api/mobile/create-general-invoice")
+    @Headers("Content-Type: text/plain")
+    Observable<CreateResponse> postCreateGeneralInvoiceWithout(
+            @Body BodyForCreateInvoiceWithout bodyForCreateInvoiceWithout
     );
 
     //    Получение списка s накладных, которые уже извлекли из О
