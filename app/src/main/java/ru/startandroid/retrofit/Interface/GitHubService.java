@@ -20,6 +20,7 @@ import ru.startandroid.retrofit.Model.Edges;
 import ru.startandroid.retrofit.Model.IdsCollate;
 import ru.startandroid.retrofit.Model.LastActions;
 import ru.startandroid.retrofit.Model.Member;
+import ru.startandroid.retrofit.Model.acceptgen.Destinations;
 import ru.startandroid.retrofit.Model.acceptgen.Oinvoice;
 import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
@@ -87,10 +88,12 @@ public interface GitHubService {
             @Query("id") Long genInvoiceID
     );
 
-    @GET("/api/mobile/accept-general-invoice")
-    Observable<newOinvoice> acceptGeneralInvoiceNew(
+    @GET("/api/mobile/accept-general-invoice-two")
+    Observable<Destinations> acceptGeneralInvoiceNew(
             @Query("id") Long genInvoiceID
     );
+
+
 
     //    Получение списка s накладных, которые уже извлекли из О
     @GET("/api/mobile/destination-lists")

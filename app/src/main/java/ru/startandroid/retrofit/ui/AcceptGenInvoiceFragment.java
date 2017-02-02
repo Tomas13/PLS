@@ -43,6 +43,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.IdsCollate;
+import ru.startandroid.retrofit.Model.acceptgen.Destinations;
 import ru.startandroid.retrofit.Model.acceptgen.Oinvoice;
 import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.Model.collatedestination.Dto;
@@ -125,8 +126,8 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
 
         ArrayList<String> pickedNames = new ArrayList<>();
 
-        ArrayList<String> generalIdsListCopy = new ArrayList<>();
-        generalIdsListCopy.addAll(generalInvoiceIdsList);
+//        ArrayList<String> generalIdsListCopy = new ArrayList<>();
+//        generalIdsListCopy.addAll(generalInvoiceIdsList);
 
         editTextScan.addTextChangedListener(new TextWatcher() {
             @Override
@@ -159,79 +160,8 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
 
                         editTextScan.setText("");
 //                        chosenIds.add(ids.get(i));
-
-
                     }
-
                 }
-
-
-              /*  for (int i = 0; i < generalInvoiceIdsList.size(); i++) {
-
-                    if (generalInvoiceIdsList.get(i).equals(s.toString())) {
-
-
-                        if (listViewAcceptGen.isItemChecked(i)){
-
-
-                        }else{
-
-                            //If it's not checked
-
-                            listViewAcceptGen.getChildAt(i).setBackgroundColor(Color.GREEN);
-                            listViewAcceptGen.setItemChecked(i, true);
-                            pickedNames.add(generalInvoiceIdsList.get(i));
-                            editTextScan.setText("");
-
-                            String temp = generalInvoiceIdsList.get(i);
-                            generalInvoiceIdsList.remove(i);
-                            generalInvoiceIdsList.add(0, temp);
-                            listAdapter.notifyDataSetChanged();
-
-
-                            //chosenIds.add(ids.get(i));
-
-                    }
-
-                        }*/
-
-
-//                        listViewAcceptGen.getChildAt(count-1).setBackgroundColor(Color.GREEN);
-
-
-//                        generalIdsListCopy.remove(i);
-
-//                        chosenIds.add(ids.get(i));
-
-
-                     /*   if (pickedNames.contains(generalInvoiceIdsList.get(i)) && listViewAcceptGen.isItemChecked(count - 1)) {
-                            listViewAcceptGen.getChildAt(count - 1).setBackgroundColor(Color.TRANSPARENT);
-                            pickedNames.remove(generalInvoiceIdsList.get(i));
-                            listViewAcceptGen.setItemChecked(count - 1, false);
-
-                            editTextScan.setText("");
-                            count--;
-                            String temp = generalInvoiceIdsList.get(i);
-                            generalInvoiceIdsList.remove(i);
-                            generalInvoiceIdsList.add(0, temp);
-                            listAdapter.notifyDataSetChanged();
-
-//                    chosenIds.add(ids.get(position));
-                        } else if (!listViewAcceptGen.isItemChecked(count - 1)) {
-                            pickedNames.add(generalInvoiceIdsList.get(i));
-                            listViewAcceptGen.getChildAt(count-1).setBackgroundColor(Color.GREEN);
-                            listViewAcceptGen.setItemChecked(count - 1, true);
-
-                            editTextScan.setText("");
-                            count++;
-                            String temp = generalInvoiceIdsList.get(i);
-                            generalInvoiceIdsList.remove(i);
-                            generalInvoiceIdsList.add(0, temp);
-                            listAdapter.notifyDataSetChanged();
-
-                        }*/
-
-
             }
         });
 
@@ -333,12 +263,16 @@ public class AcceptGenInvoiceFragment extends Fragment implements AcceptGenInvoi
 
 
     @Override
-    public void showGeneralInvoiceId(Oinvoice oinvoice) {
+    public void showGeneralInvoiceId(Destinations destinations) {
 
-        for (int i = 0; i < oinvoice.getDestinationLists().size(); i++) {
-            generalInvoiceIdsList.add(oinvoice.getDestinationLists().get(i).getDestinationListId());
-            ids.add(oinvoice.getDestinationLists().get(i).getId());
+        for (int i = 0; i < destinations.getDestinations().size(); i++) {
+            generalInvoiceIdsList.add(destinations.getDestinations().get(i).getDestinationListId());
+            ids.add(destinations.getDestinations().get(i).getId());
         }
+
+        realm.executeTransaction(realm -> {
+            realm.insert(destinations);
+        });
 
         listAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, generalInvoiceIdsList);
         listViewAcceptGen.setAdapter(listAdapter);

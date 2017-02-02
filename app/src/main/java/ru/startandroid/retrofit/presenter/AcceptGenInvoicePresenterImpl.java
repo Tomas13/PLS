@@ -1,6 +1,7 @@
 package ru.startandroid.retrofit.presenter;
 
 import ru.startandroid.retrofit.Model.IdsCollate;
+import ru.startandroid.retrofit.Model.acceptgen.Destinations;
 import ru.startandroid.retrofit.Model.acceptgen.Oinvoice;
 import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
@@ -123,7 +124,7 @@ public class AcceptGenInvoicePresenterImpl implements AcceptGenInvoicePresenter{
     public void retrofitAcceptGeneralInvoice(Long generalInvoiceId) {
         view.showProgress();
 
-        Observable<newOinvoice> acceptGeneralInvoice =
+        Observable<Destinations> acceptGeneralInvoice =
                 service.getApiService().acceptGeneralInvoiceNew(generalInvoiceId);
 
         subscription = acceptGeneralInvoice.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())

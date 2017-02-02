@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -18,6 +19,7 @@ import java.util.List;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import ru.startandroid.retrofit.Model.SendInvoice;
+import ru.startandroid.retrofit.Model.acceptgen.Destinations;
 import ru.startandroid.retrofit.Model.geninvoice.GeneralInvoice;
 import ru.startandroid.retrofit.Model.geninvoice.InvoiceMain;
 import ru.startandroid.retrofit.R;
@@ -121,12 +123,15 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
         InvoiceRVAdapter invoiceRVAdapter = new InvoiceRVAdapter(getActivity(), objectList, (childView, childAdapterPosition) -> {
 
-            Bundle bundle = new Bundle();
-            bundle.putLong("generalInvoiceId", generalInvoiceList.get(childAdapterPosition).getId());
-            Fragment fragment = new AcceptGenInvoiceFragment();
-            fragment.setArguments(bundle);
+//            Bundle bundle = new Bundle();
+//            bundle.putLong("generalInvoiceId", generalInvoiceList.get(childAdapterPosition).getId());
+//            Fragment fragment = new AcceptGenInvoiceFragment();
+//            fragment.setArguments(bundle);
 
-            ((NavigationActivity) getActivity()).startFragment(fragment);
+            Long generalInvoiceId = generalInvoiceList.get(childAdapterPosition).getId();
+            presenter.retrofitAcceptGeneralInvoice(generalInvoiceId);
+
+//            ((NavigationActivity) getActivity()).startFragment(fragment);
 
         });
 
@@ -134,6 +139,25 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         rvInvoice.setLayoutManager(mLayoutManager);
         rvInvoice.setAdapter(invoiceRVAdapter);
 
+    }
+
+    private List<String> generalInvoiceIdsList = new ArrayList<>();
+    private List<Long> ids;
+
+    @Override
+    public void showGeneralInvoiceId(Destinations destinations) {
+
+        for (int i = 0; i < destinations.getDestinations().size(); i++) {
+            generalInvoiceIdsList.add(destinations.getDestinations().get(i).getDestinationListId());
+            ids.add(destinations.getDestinations().get(i).getId());
+        }
+
+        realm.executeTransaction(realm -> {
+            realm.insert(destinations);
+        });
+
+//        listAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, generalInvoiceIdsList);
+//        listViewAcceptGen.setAdapter(listAdapter);
     }
 
     @Override

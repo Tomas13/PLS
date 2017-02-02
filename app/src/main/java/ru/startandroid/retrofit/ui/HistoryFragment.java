@@ -72,12 +72,12 @@ public class HistoryFragment extends Fragment implements HistoryView {
 //        presenter = new HistoryPresenterImpl(this, new NetworkService());
 //        presenter.loadHistory();
 
-        RealmConfiguration historyConfig = new RealmConfiguration.Builder()
-                .name("history.realm")
-                .schemaVersion(1)
-                .deleteRealmIfMigrationNeeded()
-                .build();
-        realmHistory = Realm.getInstance(historyConfig);
+//        RealmConfiguration historyConfig = new RealmConfiguration.Builder()
+//                .name("history.realm")
+//                .schemaVersion(1)
+//                .deleteRealmIfMigrationNeeded()
+//                .build();
+        realmHistory = Realm.getDefaultInstance();
 
         jobManager = AppJobManager.getJobManager();
 
@@ -86,13 +86,13 @@ public class HistoryFragment extends Fragment implements HistoryView {
     }
 
     // This method will be called when a MessageEvent is posted (in the UI thread for Toast)
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onHistoryEvent(HistoryEvent event) {
 
         showHistoryData(event.history);
-        realmHistory.executeTransaction(realm -> {
-            realmHistory.insert(event.history);
-        });
+//        realmHistory.executeTransaction(realm -> {
+//            realmHistory.insert(event.history);
+//        });
     }
 
 

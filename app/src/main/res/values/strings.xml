@@ -7,6 +7,7 @@
 
     <string name="number_caption">НОМЕР</string>
     <string name="from_caption">ОТКУДА</string>
+    <string name="from_where_caption">ОТКУДА (КУДА)</string>
     <string name="where_caption">КУДА</string>
 
     <string name="number">O20161812183939777</string>
@@ -39,5 +40,6 @@
     <string name="btn_scan_text">Сканировать</string>
     <string name="enter_code">Введите код емкости или просканируйте</string>
     <string name="empty_routes">У вас нет маршрутов</string>
+    <string name="astana17">Астана-17</string>
 
 </resources>

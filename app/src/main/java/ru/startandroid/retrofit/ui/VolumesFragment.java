@@ -112,9 +112,13 @@ public class VolumesFragment extends Fragment implements VolumesView {
         queryLabel = realm.where(Label.class);
         queryPacket = realm.where(Packet.class);
 
+
+
         if (queryPacket.findAll().size() > 0 || queryLabel.findAll().size() > 0) {
             inflateWithRealm();
+        }else{
         }
+
 
 
         if (!queryData.findAll().isEmpty()) {
@@ -127,10 +131,12 @@ public class VolumesFragment extends Fragment implements VolumesView {
             flightName.add(entries.get(i).getDept().getNameRu());
         }
 
-        btnSendInvoice.setOnClickListener(v -> showDialog());
-
         presenter = new VolumesPresenterImpl(this, new NetworkService());
         presenter.loadGetListForVpn();
+
+        btnSendInvoice.setOnClickListener(v -> showDialog());
+
+
 
         return rootView;
     }
@@ -142,11 +148,11 @@ public class VolumesFragment extends Fragment implements VolumesView {
 //        labelsArrayList.addAll(response.body().getDto().getLabels());
 
         if (queryPacket.findAll().size() > 0) {
-            packetsArrayList.addAll(queryPacket.findAll());
+            packetsArrayList.addAll(queryPacket.findAll().distinct("id"));
         }
 
         if (queryLabel.findAll().size() > 0) {
-            labelsArrayList.addAll(queryLabel.findAll());
+            labelsArrayList.addAll(queryLabel.findAll().distinct("id"));
         }
 
 

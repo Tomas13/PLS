@@ -21,8 +21,9 @@
         <TextView
             android:id="@+id/tv_from_dept_name"
             android:layout_width="0dp"
+            android:gravity="center"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="0.7"
             android:text="012010" />
 
         <TextView
@@ -30,7 +31,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="[Тест-19]" />
+            android:text="@string/astana17" />
         <!--<TextView-->
         <!--android:id="@+id/tv_from_dept_name_ru"-->
         <!--android:layout_width="wrap_content"-->

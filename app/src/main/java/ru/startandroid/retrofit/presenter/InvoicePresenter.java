@@ -10,6 +10,9 @@ public interface InvoicePresenter {
 
     void loadGeneralInvoice();
 
+    void retrofitAcceptGeneralInvoice(Long generalInvoiceId);
+
+
     void unSubscribe();
 }
 

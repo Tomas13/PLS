@@ -1,5 +1,6 @@
 package ru.startandroid.retrofit.view;
 
+import ru.startandroid.retrofit.Model.acceptgen.Destinations;
 import ru.startandroid.retrofit.Model.geninvoice.InvoiceMain;
 
 /**
@@ -13,6 +14,8 @@ public interface InvoiceView {
     void hideProgress();
 
     void showGeneralInvoice(InvoiceMain invoiceMain);
+
+    void showGeneralInvoiceId(Destinations destinations);
 
     void showRoutesEmptyData();
 

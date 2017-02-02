@@ -43,7 +43,7 @@ public class GetHistoryJob extends Job {
         // This is a good place to dispatch a UI event to indicate the job will eventually run.
         // In this example, it would be good to update the UI with the newly posted tweet.
         if (history != null) {
-            EventBus.getDefault().post(new HistoryEvent(history));
+            EventBus.getDefault().postSticky(new HistoryEvent(history));
         }
     }
 
@@ -66,14 +66,14 @@ public class GetHistoryJob extends Job {
 
                             if (response.getStatus().equals("success")) {
                                 history = response;
-                                EventBus.getDefault().post(new HistoryEvent(history));
+                                EventBus.getDefault().postSticky(new HistoryEvent(history));
 
                             }
                         },
 
                         throwable -> {
 
-                            EventBus.getDefault().post(new HistoryErrorEvent(throwable));
+                            EventBus.getDefault().postSticky(new HistoryErrorEvent(throwable));
 
                         });
 
