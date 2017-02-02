@@ -41,5 +41,7 @@
     <string name="enter_code">Введите код емкости или просканируйте</string>
     <string name="empty_routes">У вас нет маршрутов</string>
     <string name="astana17">Астана-17</string>
+    <string name="title_volumes_fragment">Для создания Общей накладной выберите емкости из списка</string>
+    <string name="form_general_invoice">Сформировать общую накладную</string>
 
 </resources>

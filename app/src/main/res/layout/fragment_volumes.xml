@@ -16,7 +16,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="10dp"
-            android:text="Для создания Общей накладной просканируйте штрихкод емкости или выберите емкость из списка"
+            android:textSize="18sp"
+            android:text="@string/title_volumes_fragment"
             android:textAlignment="center" />
 
         <Button
@@ -24,9 +25,8 @@
             android:layout_marginBottom="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"
-            android:text="Сформировать общую накладную"
+            android:text="@string/form_general_invoice"
             android:textColorHighlight="@color/colorAccent"
             android:visibility="gone" />
 

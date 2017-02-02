@@ -152,7 +152,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
             labelsArrayList.addAll(queryLabel.findAll().distinct("id"));
         }
 
-
         objects = new ArrayList<>();
         objects.addAll(packetsArrayList);
         objects.addAll(labelsArrayList);
@@ -232,13 +231,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
             presenter.postCreateInvoice(bodyWithout);
 
-            for (int i = 0; i < chosen.size(); i++) {
-
-                objects.remove(chosen.get(i));
-            }
-
-            collateRVAdapter.notifyDataSetChanged();
-
             pointDialog.dismiss();
 
         });
@@ -257,6 +249,14 @@ public class VolumesFragment extends Fragment implements VolumesView {
         if (createResponse != null) {
 
             if (createResponse.getStatus().equals("success")) {
+
+                for (int i = 0; i < chosen.size(); i++) {
+
+                    objects.remove(chosen.get(i));
+                }
+
+                collateRVAdapter.notifyDataSetChanged();
+
 
                 Toast.makeText(getContext(), "Общая накладная успешно создана", Toast.LENGTH_SHORT).show();
 

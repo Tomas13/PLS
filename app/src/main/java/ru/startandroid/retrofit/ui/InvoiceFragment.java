@@ -59,7 +59,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         View viewRoot = inflater.inflate(R.layout.fragment_invoice, container, false);
 
         sendInvoiceList = new ArrayList<>();
-
         objectList = new ArrayList<>();
 
         tvNoDataInvoice = (TextView) viewRoot.findViewById(R.id.tv_no_data_invoice);
@@ -69,8 +68,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
         rvInvoice = (RecyclerView) viewRoot.findViewById(R.id.rv_invoice_fragment);
         progressInvoice = (ProgressBar) viewRoot.findViewById(R.id.progress_invoice);
-
-
 
         realm = Realm.getDefaultInstance();
 
@@ -86,7 +83,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             objectList.addAll(sendInvoiceList);
              adapterSend = new InvoiceRVAdapter(getActivity(), objectList, ((childView, childAdapterPosition) -> {
 
-                Toast.makeText(getContext(), "Send action", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Это для отправки накладной, функционал дорабатывается", Toast.LENGTH_SHORT).show();
 
             }));
 
