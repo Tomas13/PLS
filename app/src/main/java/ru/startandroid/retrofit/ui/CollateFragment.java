@@ -129,25 +129,43 @@ public class CollateFragment extends Fragment implements AcceptGenInvoiceView {
 
                 for (int i = 0; i < generalInvoiceIdsList.size(); i++) {
 
-                    if (generalInvoiceIdsList.get(i).equals(s.toString())) {
+                    if (listViewAcceptGen.getChildAt(count -1) != null){
+                        if (generalInvoiceIdsList.get(i).equals(s.toString())) {
 
-                        count++;
-                        String temp = generalInvoiceIdsList.get(i);
-                        generalInvoiceIdsList.remove(i);
-                        generalInvoiceIdsList.add(0, temp);
-                        listAdapter.notifyDataSetChanged();
-                        listViewAcceptGen.getChildAt(count - 1).setBackgroundColor(Color.GREEN);
-                        listViewAcceptGen.setItemChecked(count - 1, true);
+                            count++;
+                            String temp = generalInvoiceIdsList.get(i);
+                            generalInvoiceIdsList.remove(i);
+                            generalInvoiceIdsList.add(0, temp);
+                            listAdapter.notifyDataSetChanged();
+                            listViewAcceptGen.getChildAt(0).setBackgroundColor(Color.GREEN);
+                            listViewAcceptGen.setItemChecked(0, true);
 
-                        editTextScan.setText("");
-                        chosenIds.add(ids.get(i));
+                            editTextScan.setText("");
+                            chosenIds.add(ids.get(i));
+                        }
+
+                    }else{
+                        if (generalInvoiceIdsList.get(i).equals(s.toString())) {
+
+                            count++;
+                            String temp = generalInvoiceIdsList.get(i);
+                            generalInvoiceIdsList.remove(i);
+                            generalInvoiceIdsList.add(0, temp);
+                            listAdapter.notifyDataSetChanged();
+                            listViewAcceptGen.getChildAt(count - 1).setBackgroundColor(Color.GREEN);
+                            listViewAcceptGen.setItemChecked(count - 1, true);
+
+                            editTextScan.setText("");
+                            chosenIds.add(ids.get(i));
+                        }
+
                     }
                 }
             }
         });
 
         btnCollate.setOnClickListener(v -> {
-            if (!generalInvoiceIdsList.isEmpty()) {
+            if (!chosenIds.isEmpty()) {
                 progressAccept.setVisibility(View.VISIBLE);
 
 //                IdsCollate idsCol = new IdsCollate(ids);
@@ -182,12 +200,15 @@ public class CollateFragment extends Fragment implements AcceptGenInvoiceView {
                 if (!listViewAcceptGen.isItemChecked(position)) {
                     listViewAcceptGen.getChildAt(j).setBackgroundColor(Color.TRANSPARENT);
                     pickedNames.remove(generalInvoiceIdsList.get(j));
+                    listViewAcceptGen.setItemChecked(j, false);
 
-                    chosenIds.add(ids.get(position));
+                    chosenIds.remove(ids.get(position));
                 } else if (listViewAcceptGen.isItemChecked(position)) {
                     pickedNames.add(generalInvoiceIdsList.get(j));
+
+                    listViewAcceptGen.setItemChecked(j, true);
                     listViewAcceptGen.getChildAt(j).setBackgroundColor(Color.GREEN);
-                    chosenIds.remove(ids.get(position));
+                    chosenIds.add(ids.get(position));
 
                 }
 

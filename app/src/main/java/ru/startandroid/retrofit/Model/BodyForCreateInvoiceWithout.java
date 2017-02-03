@@ -16,6 +16,9 @@ public class BodyForCreateInvoiceWithout {
     @SerializedName("flightId")
     @Expose
     private Long flightId;
+    @SerializedName("tlId")
+    @Expose
+    private Long tlId;
     @SerializedName("isDepIndex")
     @Expose
     private Boolean isDepIndex;
@@ -35,8 +38,9 @@ public class BodyForCreateInvoiceWithout {
     public BodyForCreateInvoiceWithout() {
     }
 
-    public BodyForCreateInvoiceWithout(Long flightId, Boolean isDepIndex, String toDepIndex, String fromDepIndex, List<Long> labelIds, List<Long> packetIds) {
+    public BodyForCreateInvoiceWithout(Long flightId, Long tlid, Boolean isDepIndex, String toDepIndex, String fromDepIndex, List<Long> labelIds, List<Long> packetIds) {
         this.flightId = flightId;
+        this.tlId = tlid;
         this.isDepIndex = isDepIndex;
         this.toDepIndex = toDepIndex;
         this.fromDepIndex = fromDepIndex;

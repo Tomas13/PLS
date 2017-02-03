@@ -20,6 +20,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +49,7 @@ import ru.startandroid.retrofit.Model.geninvoice.GeneralInvoice;
 import ru.startandroid.retrofit.Model.routes.Entry;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.CollateRVAdapter;
+import ru.startandroid.retrofit.events.PostBodyEvent;
 import ru.startandroid.retrofit.models.NetworkService;
 import ru.startandroid.retrofit.presenter.InvoicePresenterImpl;
 import ru.startandroid.retrofit.presenter.VolumesPresenter;
@@ -56,6 +59,7 @@ import ru.startandroid.retrofit.view.VolumesView;
 import static ru.startandroid.retrofit.Const.BASE_URL;
 import static ru.startandroid.retrofit.Const.FLIGHT_ID;
 import static ru.startandroid.retrofit.Const.FLIGHT_SHARED_PREF;
+import static ru.startandroid.retrofit.Const.TRANSPONST_LIST_ID;
 import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
 /**
@@ -73,6 +77,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
     private RealmQuery<Entry> queryData;
     private RealmQuery<Packet> queryPacket;
     private RealmQuery<Label> queryLabel;
+    private RealmQuery<SendInvoice> querySendInvoice;
     private VolumesPresenter presenter;
     private RecyclerView recyclerViewVolumes;
     private ArrayAdapter<String> adapter;
@@ -115,6 +120,8 @@ public class VolumesFragment extends Fragment implements VolumesView {
         queryData = realm.where(Entry.class);
         queryLabel = realm.where(Label.class);
         queryPacket = realm.where(Packet.class);
+        querySendInvoice = realm.where(SendInvoice.class);
+
 
         if (queryPacket.findAll().size() > 0 || queryLabel.findAll().size() > 0) {
             inflateWithRealm();
@@ -127,7 +134,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
         }
 
         for (int i = 1; i < entries.size(); i++) {
-            flightName.add(entries.get(i).getDept().getNameRu());
+            //flightName.add(entries.get(i).getDept().getNameRu());
         }
 
         presenter = new VolumesPresenterImpl(this, new NetworkService());
@@ -170,6 +177,12 @@ public class VolumesFragment extends Fragment implements VolumesView {
         pointDialog.setCancelable(false);
 
         ListView listView = (ListView) pointDialog.findViewById(R.id.list_view_flight);
+
+
+        if (!querySendInvoice.findAll().isEmpty()){
+            flightName.add(querySendInvoice.findAll().get(0).getBodyForCreateInvoice().getToDepIndex());
+        }
+
         adapter = new ArrayAdapter<>(getContext(), R.layout.list_view_item, flightName);
 //        adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_activated_1, flightName);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
@@ -186,7 +199,9 @@ public class VolumesFragment extends Fragment implements VolumesView {
             SharedPreferences pref1 = getActivity().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
             if (pref1.contains(FLIGHT_ID)) {
 
-                Long flightId = pref1.getLong(FLIGHT_ID, 1L);
+                Long flightId = pref1.getLong(FLIGHT_ID, 0);
+                Long tlid = pref1.getLong(TRANSPONST_LIST_ID, 0);
+
 //                Boolean isDepIndex = true;
                 String toDeptIndex = entries.get(position).getDept().getName();
                 String fromDeptIndex = entries.get(0).getDept().getName();
@@ -204,16 +219,10 @@ public class VolumesFragment extends Fragment implements VolumesView {
                     packetLongList.add(realmLong);
                 }
 
-                body = new BodyForCreateInvoice(flightId, true, toDeptIndex, fromDeptIndex, labelLongList, packetLongList);
+                body = new BodyForCreateInvoice(flightId, tlid, true, toDeptIndex, fromDeptIndex, labelLongList, packetLongList);
 
 
-                bodyWithout = new BodyForCreateInvoiceWithout(flightId, true, toDeptIndex, fromDeptIndex, labelsList, packetsList);
-
-                String toName = flightName.get(position);
-                SendInvoice sendInvoice = new SendInvoice();
-                sendInvoice.setWhere(toName);
-                sendInvoice.setBodyForCreateInvoice(body);
-                realm.executeTransaction(realm -> realm.insert(sendInvoice));
+                bodyWithout = new BodyForCreateInvoiceWithout(flightId, tlid, true, toDeptIndex, fromDeptIndex, labelsList, packetsList);
 
 
             } else {
@@ -227,9 +236,9 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
         Button btnOk = (Button) pointDialog.findViewById(R.id.btn_ok_flight);
         btnOk.setOnClickListener(v -> {
-//            presenter.postCreateInvoice(body);
 
-            presenter.postCreateInvoice(bodyWithout);
+            InvoiceFragment.setBody(bodyWithout);
+//            presenter.postCreateInvoice(bodyWithout);
 
             pointDialog.dismiss();
 

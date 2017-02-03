@@ -1,5 +1,7 @@
 package ru.startandroid.retrofit.presenter;
 
+import ru.startandroid.retrofit.Model.BodyForCreateInvoiceWithout;
+import ru.startandroid.retrofit.Model.CreateResponse;
 import ru.startandroid.retrofit.Model.acceptgen.Destinations;
 import ru.startandroid.retrofit.Model.geninvoice.InvoiceMain;
 import ru.startandroid.retrofit.models.NetworkService;
@@ -63,7 +65,10 @@ public class InvoicePresenterImpl implements InvoicePresenter {
                             if (response.getStatus().equals("success")) {
                                 view.hideProgress();
                                 view.showGeneralInvoiceId(response);
-                            } else {
+                            } else if (response.getStatus().equals("list-empty")){
+                                view.hideProgress();
+                                view.showEmptyToast("В данной общей накладной нет S-накладных");
+                            } else{
 
                                 view.showRoutesEmptyData();
 
@@ -74,6 +79,34 @@ public class InvoicePresenterImpl implements InvoicePresenter {
                             view.hideProgress();
                         });
     }
+
+
+
+
+    @Override
+    public void postCreateInvoice(BodyForCreateInvoiceWithout bodyForCreateInvoiceWithout) {
+        view.showProgress();
+
+        Observable<CreateResponse> callCreate =
+                NetworkService.getApiService().postCreateGeneralInvoiceWithout(bodyForCreateInvoiceWithout);
+
+        subscription = callCreate
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        response -> {
+                            view.getPostResponse(response);
+                            view.hideProgress();
+                        },
+                        throwable -> {
+                            view.showRoutesError(throwable);
+                            view.hideProgress();
+                        });
+
+    }
+
+
+
 
     @Override
     public void unSubscribe() {

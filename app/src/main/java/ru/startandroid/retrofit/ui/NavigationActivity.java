@@ -58,14 +58,17 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
+import static ru.startandroid.retrofit.Const.CURRENT_ROUTE_POSITION;
 import static ru.startandroid.retrofit.Const.FLIGHT_ID;
 import static ru.startandroid.retrofit.Const.FLIGHT_NAME;
 import static ru.startandroid.retrofit.Const.FLIGHT_POS;
 import static ru.startandroid.retrofit.Const.FLIGHT_SHARED_PREF;
 import static ru.startandroid.retrofit.Const.LOGIN_PREF;
 import static ru.startandroid.retrofit.Const.NAV_SHARED_PREF;
+import static ru.startandroid.retrofit.Const.NUMBER_OF_CITIES;
 import static ru.startandroid.retrofit.Const.TOKEN;
 import static ru.startandroid.retrofit.Const.TOKEN_SHARED_PREF;
+import static ru.startandroid.retrofit.Const.TRANSPONST_LIST_ID;
 import static ru.startandroid.retrofit.Const.Token;
 import static ru.startandroid.retrofit.Const.isConnected;
 
@@ -281,6 +284,10 @@ public class NavigationActivity extends AppCompatActivity
             SharedPreferences.Editor editor = pref.edit();
             editor.putInt(FLIGHT_POS, position);
             editor.putLong(FLIGHT_ID, flightArrayList.get(position).getId()); // ;.getItineraryDTO().getEntries().get(0).getDept().getName());
+            editor.putLong(TRANSPONST_LIST_ID, flightArrayList.get(position).getFlight().getId());
+            editor.putInt(NUMBER_OF_CITIES, flightArrayList.get(position).getFlight().getItineraryDTO().getEntries().size());
+            editor.putInt(CURRENT_ROUTE_POSITION, 0);
+
             editor.apply();
 
             //Save Flight Id to shared preferences
@@ -520,6 +527,10 @@ public class NavigationActivity extends AppCompatActivity
                 SharedPreferences pref = getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
                 SharedPreferences.Editor editor = pref.edit();
                 editor.putLong(FLIGHT_ID, routes.getFlights().get(0).getId());
+                editor.putLong(TRANSPONST_LIST_ID, flightArrayList.get(0).getFlight().getId());
+                editor.putInt(NUMBER_OF_CITIES, routes.getFlights().get(0).getFlight().getItineraryDTO().getEntries().size());
+                editor.putInt(CURRENT_ROUTE_POSITION, 0);
+
                 editor.apply();
 
                 //Save Flight Id to shared preferences
@@ -528,10 +539,12 @@ public class NavigationActivity extends AppCompatActivity
                 editor1.putString(FLIGHT_NAME, routes.getFlights().get(0).getFlight().getName());
                 editor1.apply();
 
+
                 entries = routes.getFlights().get(0).getFlight().getItineraryDTO().getEntries();
 
                 realm.executeTransaction(realm -> realm.insert(entries));
 
+                realm.executeTransaction(realm -> realm.insert(routes));
 
                 startFragment(new HistoryFragment());
 

@@ -1,5 +1,6 @@
 package ru.startandroid.retrofit.ui;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -13,22 +14,41 @@ import android.widget.ProgressBar;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
+import io.realm.RealmList;
+import io.realm.RealmQuery;
 import io.realm.RealmResults;
+import retrofit2.http.POST;
+import ru.startandroid.retrofit.Model.BodyForCreateInvoice;
+import ru.startandroid.retrofit.Model.BodyForCreateInvoiceWithout;
+import ru.startandroid.retrofit.Model.CreateResponse;
+import ru.startandroid.retrofit.Model.RealmLong;
 import ru.startandroid.retrofit.Model.SendInvoice;
 import ru.startandroid.retrofit.Model.acceptgen.Destinations;
 import ru.startandroid.retrofit.Model.geninvoice.GeneralInvoice;
 import ru.startandroid.retrofit.Model.geninvoice.InvoiceMain;
+import ru.startandroid.retrofit.Model.routes.Entry;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.InvoiceRVAdapter;
 import ru.startandroid.retrofit.adapter.InvoiceRVAdapterSend;
+import ru.startandroid.retrofit.events.PostBodyEvent;
 import ru.startandroid.retrofit.models.NetworkService;
 import ru.startandroid.retrofit.presenter.InvoicePresenter;
 import ru.startandroid.retrofit.presenter.InvoicePresenterImpl;
 import ru.startandroid.retrofit.view.InvoiceView;
+
+import static ru.startandroid.retrofit.Const.CURRENT_ROUTE_POSITION;
+import static ru.startandroid.retrofit.Const.FLIGHT_ID;
+import static ru.startandroid.retrofit.Const.FLIGHT_SHARED_PREF;
+import static ru.startandroid.retrofit.Const.NUMBER_OF_CITIES;
+import static ru.startandroid.retrofit.Const.TRANSPONST_LIST_ID;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -43,6 +63,13 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     private RecyclerView rvSendInvoice;
     private Realm realm;
     private List<SendInvoice> sendInvoiceList;
+    private List<Entry> entries = new ArrayList<>();
+    private RealmQuery<Entry> queryData;
+    private ArrayList<String> flightName = new ArrayList<>();
+
+    private int currentRoutePosition;
+    private int maxRouteNumber;
+    SharedPreferences pref;
 
 //    InvoiceRVAdapter adapterGet;
     InvoiceRVAdapterSend adapterSend;
@@ -78,6 +105,24 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         }
 
 
+        pref = getActivity().getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
+        maxRouteNumber = pref.getInt(NUMBER_OF_CITIES, 0);
+        currentRoutePosition = pref.getInt(CURRENT_ROUTE_POSITION, 0);
+
+        //FOR SENDING
+        queryData = realm.where(Entry.class);
+        if (!queryData.findAll().isEmpty()) {
+            for (int i = 0; i < queryData.findAll().distinct("index").size(); i++) {
+                entries.add(queryData.findAll().get(i));
+            }
+        }
+        for (int i = 1; i < entries.size(); i++) {
+            flightName.add(entries.get(i).getDept().getNameRu());
+        }
+
+
+        prepareBodyForPost();
+
 
         if (!sendInvoiceList.isEmpty()) {
 
@@ -85,8 +130,14 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
              adapterSend = new InvoiceRVAdapterSend(getActivity(), sendInvoiceList, ((childView, childAdapterPosition) -> {
 
 
+                 //если дальше чем первый пункт, но не последний
+                 if (currentRoutePosition > 0 && currentRoutePosition < maxRouteNumber){
+                     createEmptyInvoice();
+                 }
 
-                Toast.makeText(getContext(), "Это для отправки накладной, функционал дорабатывается", Toast.LENGTH_SHORT).show();
+                 presenter.postCreateInvoice(body);
+
+//                Toast.makeText(getContext(), "Это для отправки накладной, функционал дорабатывается", Toast.LENGTH_SHORT).show();
 
             }));
 
@@ -99,6 +150,93 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         presenter.loadGeneralInvoice();
 
         return viewRoot;
+    }
+
+    public void prepareBodyForPost(){
+
+        SharedPreferences pref1 = getActivity().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
+        if (pref1.contains(FLIGHT_ID) && pref1.contains(TRANSPONST_LIST_ID)) {
+
+            Long flightId = pref1.getLong(FLIGHT_ID, 0);
+            Long tlid = pref1.getLong(TRANSPONST_LIST_ID, 0);
+
+            ArrayList<Long> labelsList = new ArrayList<>();
+            ArrayList<Long> packetsList = new ArrayList<>();
+            String toDeptIndex = entries.get(currentRoutePosition+1).getDept().getName();
+            String fromDeptIndex = entries.get(currentRoutePosition).getDept().getName();
+
+            body = new BodyForCreateInvoiceWithout(flightId, tlid, true, toDeptIndex, fromDeptIndex, labelsList, packetsList);
+
+
+            //for saving body in realm
+            RealmList<RealmLong> labelLongList = new RealmList<>();
+            RealmList<RealmLong> packetLongList = new RealmList<>();
+
+            for (int i = 0; i < labelsList.size(); i++) {
+                RealmLong realmLong = new RealmLong(labelsList.get(i));
+                labelLongList.add(realmLong);
+            }
+
+            for (int i = 0; i < packetsList.size(); i++) {
+                RealmLong realmLong = new RealmLong(packetsList.get(i));
+                packetLongList.add(realmLong);
+            }
+
+            bodyRealm = new BodyForCreateInvoice(flightId, tlid, true, toDeptIndex, fromDeptIndex, labelLongList, packetLongList);
+            //end for saving body in realm
+
+
+        }else{
+            Toast.makeText(getContext(), "Ошибка. Нет flightID", Toast.LENGTH_SHORT).show();
+
+        }
+        //FOR SENDING
+    }
+
+
+    public static void setBody(BodyForCreateInvoiceWithout body) {
+        InvoiceFragment.body = body;
+    }
+
+    public static BodyForCreateInvoiceWithout body;
+    public static BodyForCreateInvoice bodyRealm;
+
+
+    private void createEmptyInvoice(){
+
+        if (currentRoutePosition > 0 && currentRoutePosition < maxRouteNumber){
+            currentRoutePosition++;
+            pref.edit().putInt(NUMBER_OF_CITIES, currentRoutePosition).apply();
+        }
+
+        String toName = flightName.get(currentRoutePosition);
+        SendInvoice sendInvoice = new SendInvoice();
+        sendInvoice.setWhere(toName);
+        sendInvoice.setBodyForCreateInvoice(bodyRealm);
+        realm.executeTransaction(realm -> realm.insert(sendInvoice));
+    }
+
+    @Override
+    public void getPostResponse(CreateResponse createResponse) {
+        if (createResponse != null) {
+
+            if (createResponse.getStatus().equals("success")) {
+
+//                //update items in rv
+//                for (int i = 0; i < chosen.size(); i++) {
+//                    objects.remove(chosen.get(i));
+//                }
+//
+//                collateRVAdapter.notifyDataSetChanged();
+
+
+                Toast.makeText(getContext(), "Общая накладная успешно создана", Toast.LENGTH_SHORT).show();
+
+            } else {
+                showEmptyToast(createResponse.getStatus());
+            }
+
+        }
     }
 
 
@@ -129,6 +267,13 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
             Long generalInvoiceId = generalInvoiceList.get(childAdapterPosition).getId();
             presenter.retrofitAcceptGeneralInvoice(generalInvoiceId);
+
+            if (currentRoutePosition == 0){
+
+                createEmptyInvoice();
+            }else if(currentRoutePosition == maxRouteNumber){
+
+            }
 
 //            ((NavigationActivity) getActivity()).startFragment(fragment);
 
@@ -168,6 +313,11 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     @Override
     public void showRoutesError(Throwable throwable) {
         Toast.makeText(getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showEmptyToast(String message) {
+        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
     }
 
     @Override

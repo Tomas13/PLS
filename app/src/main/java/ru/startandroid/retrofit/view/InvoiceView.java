@@ -1,5 +1,6 @@
 package ru.startandroid.retrofit.view;
 
+import ru.startandroid.retrofit.Model.CreateResponse;
 import ru.startandroid.retrofit.Model.acceptgen.Destinations;
 import ru.startandroid.retrofit.Model.geninvoice.InvoiceMain;
 
@@ -20,4 +21,9 @@ public interface InvoiceView {
     void showRoutesEmptyData();
 
     void showRoutesError(Throwable throwable);
+
+    void showEmptyToast(String message);
+
+    void getPostResponse(CreateResponse createResponse);
+
 }
