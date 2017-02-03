@@ -4,7 +4,9 @@ package ru.startandroid.retrofit.Model.acceptgen;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class FromDep_ {
+import io.realm.RealmObject;
+
+public class FromDep_  extends RealmObject{
 
     @SerializedName("name")
     @Expose

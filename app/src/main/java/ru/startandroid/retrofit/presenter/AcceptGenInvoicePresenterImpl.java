@@ -2,12 +2,11 @@ package ru.startandroid.retrofit.presenter;
 
 import ru.startandroid.retrofit.Model.IdsCollate;
 import ru.startandroid.retrofit.Model.acceptgen.Destinations;
-import ru.startandroid.retrofit.Model.acceptgen.Oinvoice;
+import ru.startandroid.retrofit.Model.acceptgen.Example;
 import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
 import ru.startandroid.retrofit.models.NetworkService;
-import ru.startandroid.retrofit.models.newOinvoice;
-import ru.startandroid.retrofit.view.AcceptGenInvoiceView;
+import ru.startandroid.retrofit.view.CollateView;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -20,10 +19,10 @@ import rx.schedulers.Schedulers;
 public class AcceptGenInvoicePresenterImpl implements AcceptGenInvoicePresenter{
 
     private Subscription subscription;
-    private AcceptGenInvoiceView view;
+    private CollateView view;
     private NetworkService service;
 
-    public AcceptGenInvoicePresenterImpl(AcceptGenInvoiceView view, NetworkService service) {
+    public AcceptGenInvoicePresenterImpl(CollateView view, NetworkService service) {
         this.view = view;
         this.service = service;
     }
@@ -124,7 +123,7 @@ public class AcceptGenInvoicePresenterImpl implements AcceptGenInvoicePresenter{
     public void retrofitAcceptGeneralInvoice(Long generalInvoiceId) {
         view.showProgress();
 
-        Observable<Destinations> acceptGeneralInvoice =
+        Observable<Example> acceptGeneralInvoice =
                 service.getApiService().acceptGeneralInvoiceNew(generalInvoiceId);
 
         subscription = acceptGeneralInvoice.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())

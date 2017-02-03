@@ -32,6 +32,7 @@ import ru.startandroid.retrofit.Model.CreateResponse;
 import ru.startandroid.retrofit.Model.RealmLong;
 import ru.startandroid.retrofit.Model.SendInvoice;
 import ru.startandroid.retrofit.Model.acceptgen.Destinations;
+import ru.startandroid.retrofit.Model.acceptgen.Example;
 import ru.startandroid.retrofit.Model.geninvoice.GeneralInvoice;
 import ru.startandroid.retrofit.Model.geninvoice.InvoiceMain;
 import ru.startandroid.retrofit.Model.routes.Entry;
@@ -289,7 +290,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     private List<Long> ids;
 
     @Override
-    public void showGeneralInvoiceId(Destinations destinations) {
+    public void showGeneralInvoiceId(Example destinations) {
 
         for (int i = 0; i < destinations.getDestinations().size(); i++) {
             generalInvoiceIdsList.add(destinations.getDestinations().get(i).getDestinationListId());

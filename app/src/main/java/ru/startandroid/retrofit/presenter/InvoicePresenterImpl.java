@@ -3,6 +3,7 @@ package ru.startandroid.retrofit.presenter;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoiceWithout;
 import ru.startandroid.retrofit.Model.CreateResponse;
 import ru.startandroid.retrofit.Model.acceptgen.Destinations;
+import ru.startandroid.retrofit.Model.acceptgen.Example;
 import ru.startandroid.retrofit.Model.geninvoice.InvoiceMain;
 import ru.startandroid.retrofit.models.NetworkService;
 import ru.startandroid.retrofit.view.InvoiceView;
@@ -56,7 +57,7 @@ public class InvoicePresenterImpl implements InvoicePresenter {
     public void retrofitAcceptGeneralInvoice(Long generalInvoiceId) {
         view.showProgress();
 
-        Observable<Destinations> acceptGeneralInvoice =
+        Observable<Example> acceptGeneralInvoice =
                 NetworkService.getApiService().acceptGeneralInvoiceNew(generalInvoiceId);
 
         subscription = acceptGeneralInvoice.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())

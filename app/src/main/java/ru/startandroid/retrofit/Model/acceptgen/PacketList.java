@@ -5,14 +5,18 @@ import com.google.gson.annotations.SerializedName;
 
 import io.realm.RealmObject;
 
-public class LabelList extends RealmObject{
+/**
+ * Created by root on 2/3/17.
+ */
+
+public class PacketList extends RealmObject{
 
     @SerializedName("id")
     @Expose
     private Long id;
     @SerializedName("labelListid")
     @Expose
-    private String labelListid;
+    private String packetListid;
     @SerializedName("fromDep")
     @Expose
     private FromDep_ fromDep;
@@ -29,11 +33,11 @@ public class LabelList extends RealmObject{
     }
 
     public String getLabelListid() {
-        return labelListid;
+        return packetListid;
     }
 
     public void setLabelListid(String labelListid) {
-        this.labelListid = labelListid;
+        this.packetListid = labelListid;
     }
 
     public FromDep_ getFromDep() {

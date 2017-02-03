@@ -1,19 +1,19 @@
 package ru.startandroid.retrofit.Model.acceptgen;
 
-
-
-import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Example {
+import io.realm.RealmList;
+import io.realm.RealmObject;
+
+public class Example extends RealmObject{
 
     @SerializedName("status")
     @Expose
     private String status;
     @SerializedName("destinations")
     @Expose
-    private List<Destination> destinations = null;
+    private RealmList<Destination> destinations = null;
 
     public String getStatus() {
         return status;
@@ -23,11 +23,11 @@ public class Example {
         this.status = status;
     }
 
-    public List<Destination> getDestinations() {
+    public RealmList<Destination> getDestinations() {
         return destinations;
     }
 
-    public void setDestinations(List<Destination> destinations) {
+    public void setDestinations(RealmList<Destination> destinations) {
         this.destinations = destinations;
     }
 

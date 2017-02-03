@@ -1,11 +1,13 @@
 package ru.startandroid.retrofit.Model.acceptgen;
 
 
-import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Destination {
+import io.realm.RealmList;
+import io.realm.RealmObject;
+
+public class Destination extends RealmObject{
 
     @SerializedName("id")
     @Expose
@@ -15,16 +17,16 @@ public class Destination {
     private String destinationListId;
     @SerializedName("fromDep")
     @Expose
-    private FromDep fromDep;
+    private FromDepNew fromDep;
     @SerializedName("toDep")
     @Expose
-    private ToDep toDep;
+    private ToDepNew toDep;
     @SerializedName("packetList")
     @Expose
-    private List<Object> packetList = null;
+    private RealmList<PacketList> packetList = null;
     @SerializedName("labelList")
     @Expose
-    private List<LabelList> labelList = null;
+    private RealmList<LabelList> labelList = null;
 
     public Long getId() {
         return id;
@@ -42,35 +44,35 @@ public class Destination {
         this.destinationListId = destinationListId;
     }
 
-    public FromDep getFromDep() {
+    public FromDepNew getFromDep() {
         return fromDep;
     }
 
-    public void setFromDep(FromDep fromDep) {
+    public void setFromDep(FromDepNew fromDep) {
         this.fromDep = fromDep;
     }
 
-    public ToDep getToDep() {
+    public ToDepNew getToDeNewp() {
         return toDep;
     }
 
-    public void setToDep(ToDep toDep) {
+    public void setToDep(ToDepNew toDep) {
         this.toDep = toDep;
     }
 
-    public List<Object> getPacketList() {
+    public RealmList<PacketList> getPacketList() {
         return packetList;
     }
 
-    public void setPacketList(List<Object> packetList) {
+    public void setPacketList(RealmList<PacketList> packetList) {
         this.packetList = packetList;
     }
 
-    public List<LabelList> getLabelList() {
+    public RealmList<LabelList> getLabelList() {
         return labelList;
     }
 
-    public void setLabelList(List<LabelList> labelList) {
+    public void setLabelList(RealmList<LabelList> labelList) {
         this.labelList = labelList;
     }
 

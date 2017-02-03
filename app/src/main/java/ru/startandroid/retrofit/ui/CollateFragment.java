@@ -29,7 +29,7 @@ import java.util.List;
 
 import io.realm.Realm;
 import ru.startandroid.retrofit.Model.IdsCollate;
-import ru.startandroid.retrofit.Model.acceptgen.Destinations;
+import ru.startandroid.retrofit.Model.acceptgen.Example;
 import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.Model.collatedestination.Dto;
 import ru.startandroid.retrofit.Model.collatedestination.Label;
@@ -41,12 +41,12 @@ import ru.startandroid.retrofit.models.NetworkService;
 import ru.startandroid.retrofit.models.newOinvoice;
 import ru.startandroid.retrofit.presenter.AcceptGenInvoicePresenter;
 import ru.startandroid.retrofit.presenter.AcceptGenInvoicePresenterImpl;
-import ru.startandroid.retrofit.view.AcceptGenInvoiceView;
+import ru.startandroid.retrofit.view.CollateView;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CollateFragment extends Fragment implements AcceptGenInvoiceView {
+public class CollateFragment extends Fragment implements CollateView {
 
     private ListView listViewAcceptGen;
     private TextView tvNoDataAcceptGen;
@@ -265,7 +265,7 @@ public class CollateFragment extends Fragment implements AcceptGenInvoiceView {
 
 
     @Override
-    public void showGeneralInvoiceId(Destinations destinations) {
+    public void showGeneralInvoiceId(Example destinations) {
 
         for (int i = 0; i < destinations.getDestinations().size(); i++) {
             generalInvoiceIdsList.add(destinations.getDestinations().get(i).getDestinationListId());
