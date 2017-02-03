@@ -250,8 +250,8 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
             if (createResponse.getStatus().equals("success")) {
 
+                //update items in rv
                 for (int i = 0; i < chosen.size(); i++) {
-
                     objects.remove(chosen.get(i));
                 }
 

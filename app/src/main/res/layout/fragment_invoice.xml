@@ -58,8 +58,15 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_invoice_fragment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:scrollbars="vertical" />
+
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_send_invoice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical"/>
 
 
     </LinearLayout>

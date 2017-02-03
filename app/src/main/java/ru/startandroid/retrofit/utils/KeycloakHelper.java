@@ -2,6 +2,7 @@ package ru.startandroid.retrofit.utils;
 
 import android.app.Activity;
 import android.util.Log;
+import android.util.Pair;
 
 import org.jboss.aerogear.android.authentication.AuthenticationManager;
 import org.jboss.aerogear.android.authentication.AuthenticationModule;
@@ -45,7 +46,7 @@ public class KeycloakHelper extends HttpDigestAuthenticationConfiguration{
         try {
             List<String> scopes = new ArrayList<>();
             scopes.add("offline_access");
-            AuthorizationManager.config(MODULE_NAME, OAuth2AuthorizationConfiguration.class)
+            authzModule = AuthorizationManager.config(MODULE_NAME, OAuth2AuthorizationConfiguration.class)
                     .setBaseURL(new URL(AUTHZ_URL))
                     .setAuthzEndpoint(AUTHZ_ENDPOINT)
                     .setAccessTokenEndpoint(ACCESS_TOKEN_ENDPOINT)
@@ -53,6 +54,7 @@ public class KeycloakHelper extends HttpDigestAuthenticationConfiguration{
                     .setAccountId(AUTHZ_ACCOUNT_ID)
                     .setClientId(AUTHZ_CLIENT_ID)
                     .setClientSecret(CLIENT_SECRET)
+                    .addAdditionalAuthorizationParam((Pair.create("access_type", "offline")))
                     .setScopes(scopes)
                     .setRedirectURL(AUTHZ_REDIRECT_URL)
                     .asModule();
@@ -62,11 +64,11 @@ public class KeycloakHelper extends HttpDigestAuthenticationConfiguration{
 
     }
 
-    static AuthzModule authzModule;
+    final static AuthzModule authzModule;
 
     public static void connect(final Activity activity, final Callback<String> callback) {
         Log.i(TAG, "Run Connect ");
-        authzModule = AuthorizationManager.getModule(MODULE_NAME);
+//        authzModule = AuthorizationManager.getModule(MODULE_NAME);
         if (!authzModule.isAuthorized()){
             Log.i(TAG, "is Authorized " + authzModule.isAuthorized());
 

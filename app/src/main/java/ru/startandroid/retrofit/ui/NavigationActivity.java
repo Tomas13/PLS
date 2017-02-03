@@ -302,7 +302,7 @@ public class NavigationActivity extends AppCompatActivity
 
             if (posReturn != -1) {
 
-                entries = flightArrayList.get(posReturn).getItineraryDTO().getEntries();
+                entries = flightArrayList.get(posReturn).getFlight().getItineraryDTO().getEntries();
 
                 realm.executeTransaction(realm -> realm.insert(entries));
 
@@ -511,7 +511,7 @@ public class NavigationActivity extends AppCompatActivity
             // Create the Realm instance
             realm = Realm.getDefaultInstance();
 
-            tvRouteHeader.setText(routes.getFlights().get(0).getName());
+            tvRouteHeader.setText(routes.getFlights().get(0).getFlight().getName());
 
             //if one route then go to history fragment
             if (routes.getFlights().size() == 1) {
@@ -525,10 +525,10 @@ public class NavigationActivity extends AppCompatActivity
                 //Save Flight Id to shared preferences
                 SharedPreferences pref1 = getApplicationContext().getSharedPreferences(NAV_SHARED_PREF, 0); // 0 - for private mode
                 SharedPreferences.Editor editor1 = pref1.edit();
-                editor1.putString(FLIGHT_NAME, routes.getFlights().get(0).getName());
+                editor1.putString(FLIGHT_NAME, routes.getFlights().get(0).getFlight().getName());
                 editor1.apply();
 
-                entries = routes.getFlights().get(0).getItineraryDTO().getEntries();
+                entries = routes.getFlights().get(0).getFlight().getItineraryDTO().getEntries();
 
                 realm.executeTransaction(realm -> realm.insert(entries));
 
@@ -539,7 +539,7 @@ public class NavigationActivity extends AppCompatActivity
 
                 flights = new ArrayList<>();
                 for (int i = 0; i < routes.getFlights().size(); i++) {
-                    flights.add(i, routes.getFlights().get(i).getName());
+                    flights.add(i, routes.getFlights().get(i).getFlight().getName());
                 }
 
 //                Bundle bundle = new Bundle();

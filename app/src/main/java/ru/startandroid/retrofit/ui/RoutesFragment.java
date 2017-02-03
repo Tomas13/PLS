@@ -110,7 +110,7 @@ public class RoutesFragment extends Fragment implements RoutesView {
 
         List<Entry> flights = new ArrayList<>();
 
-        flights.addAll(routes.getFlights().get(pos).getItineraryDTO().getEntries());
+        flights.addAll(routes.getFlights().get(pos).getFlight().getItineraryDTO().getEntries());
 
         RoutesRVAdapter routesRVAdapter = new RoutesRVAdapter(flights);
 

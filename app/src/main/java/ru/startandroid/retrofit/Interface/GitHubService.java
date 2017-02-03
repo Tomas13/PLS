@@ -65,7 +65,7 @@ public interface GitHubService {
     );
 
 
-    @GET("api/mobile/flights")
+    @GET("api/mobile/flights-v2")
     Observable<Routes> getRoutesInfo(
 
     );

@@ -9,12 +9,12 @@ public class Flight extends RealmObject{
     @SerializedName("id")
     @Expose
     private Long id;
-    @SerializedName("name")
+    @SerializedName("transportListId")
     @Expose
-    private String name;
-    @SerializedName("itineraryDTO")
+    private String transportListId;
+    @SerializedName("flight")
     @Expose
-    private ItineraryDTO itineraryDTO;
+    private Flight_ flight;
 
     public Long getId() {
         return id;
@@ -24,20 +24,19 @@ public class Flight extends RealmObject{
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getTransportListId() {
+        return transportListId;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTransportListId(String transportListId) {
+        this.transportListId = transportListId;
     }
 
-    public ItineraryDTO getItineraryDTO() {
-        return itineraryDTO;
+    public Flight_ getFlight() {
+        return flight;
     }
 
-    public void setItineraryDTO(ItineraryDTO itineraryDTO) {
-        this.itineraryDTO = itineraryDTO;
+    public void setFlight(Flight_ flight) {
+        this.flight = flight;
     }
-
 }

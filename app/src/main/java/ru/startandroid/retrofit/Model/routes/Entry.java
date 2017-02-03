@@ -22,6 +22,9 @@ public class Entry extends RealmObject {
     @SerializedName("travelTime")
     @Expose
     private String travelTime;
+    @SerializedName("stationTime")
+    @Expose
+    private String stationTime;
     @SerializedName("arrival")
     @Expose
     private String arrival;
@@ -78,4 +81,14 @@ public class Entry extends RealmObject {
     public void setDeparture(String departure) {
         this.departure = departure;
     }
+
+    public String getStationTime() {
+        return stationTime;
+    }
+
+    public void setStationTime(String stationTime) {
+        this.stationTime = stationTime;
+    }
+
+
 }

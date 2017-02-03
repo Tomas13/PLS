@@ -40,11 +40,12 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     private InvoicePresenter presenter;
     private ProgressBar progressInvoice;
     private RecyclerView rvInvoice;
+    private RecyclerView rvSendInvoice;
     private Realm realm;
     private List<SendInvoice> sendInvoiceList;
 
-    private ArrayList<Object> objectList;
-    InvoiceRVAdapter adapterSend;
+//    InvoiceRVAdapter adapterGet;
+    InvoiceRVAdapterSend adapterSend;
 
 
     public InvoiceFragment() {
@@ -59,7 +60,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         View viewRoot = inflater.inflate(R.layout.fragment_invoice, container, false);
 
         sendInvoiceList = new ArrayList<>();
-        objectList = new ArrayList<>();
 
         tvNoDataInvoice = (TextView) viewRoot.findViewById(R.id.tv_no_data_invoice);
         tableRowInvoice = (TableRow) viewRoot.findViewById(R.id.tablerow_invoice);
@@ -67,6 +67,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Накладные");
 
         rvInvoice = (RecyclerView) viewRoot.findViewById(R.id.rv_invoice_fragment);
+        rvSendInvoice = (RecyclerView) viewRoot.findViewById(R.id.rv_send_invoice);
         progressInvoice = (ProgressBar) viewRoot.findViewById(R.id.progress_invoice);
 
         realm = Realm.getDefaultInstance();
@@ -80,16 +81,18 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
         if (!sendInvoiceList.isEmpty()) {
 
-            objectList.addAll(sendInvoiceList);
-             adapterSend = new InvoiceRVAdapter(getActivity(), objectList, ((childView, childAdapterPosition) -> {
+
+             adapterSend = new InvoiceRVAdapterSend(getActivity(), sendInvoiceList, ((childView, childAdapterPosition) -> {
+
+
 
                 Toast.makeText(getContext(), "Это для отправки накладной, функционал дорабатывается", Toast.LENGTH_SHORT).show();
 
             }));
 
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-            rvInvoice.setLayoutManager(mLayoutManager);
-            rvInvoice.setAdapter(adapterSend);
+            rvSendInvoice.setLayoutManager(mLayoutManager);
+            rvSendInvoice.setAdapter(adapterSend);
         }
 
         presenter = new InvoicePresenterImpl(this, new NetworkService());
@@ -116,9 +119,8 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
         generalInvoiceList.addAll(invoiceMain.getGeneralInvoices());
 
-        objectList.addAll(generalInvoiceList);
 
-        InvoiceRVAdapter invoiceRVAdapter = new InvoiceRVAdapter(getActivity(), objectList, (childView, childAdapterPosition) -> {
+        InvoiceRVAdapter invoiceRVAdapter = new InvoiceRVAdapter(getActivity(), generalInvoiceList, (childView, childAdapterPosition) -> {
 
 //            Bundle bundle = new Bundle();
 //            bundle.putLong("generalInvoiceId", generalInvoiceList.get(childAdapterPosition).getId());

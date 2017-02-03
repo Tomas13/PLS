@@ -23,7 +23,7 @@ import static ru.startandroid.retrofit.Const.Token;
 
 public class LoginActivity extends AppCompatActivity {
 
-    SharedPreferences pref1;
+    private SharedPreferences pref1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,11 +31,9 @@ public class LoginActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_login);
 
-         pref1 = getApplicationContext().getSharedPreferences(TOKEN_SHARED_PREF, 0); // 0 - for private mode
-
+        pref1 = getApplicationContext().getSharedPreferences(TOKEN_SHARED_PREF, 0); // 0 - for private mode
 
         startAuth();
-
     }
 
     private void startAuth() {
@@ -46,7 +44,6 @@ public class LoginActivity extends AppCompatActivity {
                 public void onSuccess(String data) {
                     Intent intent = new Intent(LoginActivity.this, NavigationActivity.class);
                     Const.Token = "Bearer " + data;
-
 
                     //Save Token to shared preferences
                     SharedPreferences.Editor editor1 = pref1.edit();
@@ -68,11 +65,11 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                 }
             });
-        }else{
+        } else {
 
             Intent intent = new Intent(LoginActivity.this, NavigationActivity.class);
 
-            if (pref1.contains(TOKEN)){
+            if (pref1.contains(TOKEN)) {
                 Token = "Bearer " + pref1.getString(TOKEN, "0");
             }
 
