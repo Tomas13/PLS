@@ -32,11 +32,11 @@ public class PacketList extends RealmObject{
         this.id = id;
     }
 
-    public String getLabelListid() {
+    public String getPacketListid() {
         return packetListid;
     }
 
-    public void setLabelListid(String labelListid) {
+    public void setPacketListid(String labelListid) {
         this.packetListid = labelListid;
     }
 

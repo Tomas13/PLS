@@ -3,8 +3,8 @@ import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import ru.startandroid.retrofit.Model.collatedestination.Label;
-import ru.startandroid.retrofit.Model.collatedestination.Packet;
+import ru.startandroid.retrofit.Model.acceptgen.LabelList;
+import ru.startandroid.retrofit.Model.acceptgen.PacketList;
 
 public class newOinvoice {
 
@@ -16,10 +16,10 @@ public class newOinvoice {
     private List<Destination> destinations = null;
     @SerializedName("packets")
     @Expose
-    private List<Packet> packets = null;
+    private List<PacketList> packets = null;
     @SerializedName("labels")
     @Expose
-    private List<Label> labels = null;
+    private List<LabelList> labels = null;
 
     public String getStatus() {
         return status;
@@ -37,19 +37,19 @@ public class newOinvoice {
         this.destinations = destinations;
     }
 
-    public List<Packet> getPackets() {
+    public List<PacketList> getPackets() {
         return packets;
     }
 
-    public void setPackets(List<Packet> packets) {
+    public void setPackets(List<PacketList> packets) {
         this.packets = packets;
     }
 
-    public List<Label> getLabels() {
+    public List<LabelList> getLabels() {
         return labels;
     }
 
-    public void setLabels(List<Label> labels) {
+    public void setLabels(List<LabelList> labels) {
         this.labels = labels;
     }
 

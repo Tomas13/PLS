@@ -1,7 +1,6 @@
 package ru.startandroid.retrofit.presenter;
 
 import ru.startandroid.retrofit.Model.IdsCollate;
-import ru.startandroid.retrofit.Model.acceptgen.Destinations;
 import ru.startandroid.retrofit.Model.acceptgen.Example;
 import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;

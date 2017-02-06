@@ -84,7 +84,7 @@ public class InvoiceRVAdapter extends RecyclerView.Adapter<InvoiceRVAdapter.Invo
     }
 
     @Override
-    public void onBindViewHolder(InvoiceHolder holder, final int position) {
+    public void onBindViewHolder(InvoiceHolder holder, int position) {
         GeneralInvoice generalInvoice = mGeneralInvoice.get(position);
 
 //        Log.d("Main", "onBIND " + route..getStatus() + " ");

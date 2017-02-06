@@ -4,7 +4,6 @@ import java.util.List;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
@@ -17,18 +16,14 @@ import ru.startandroid.retrofit.Model.BodyForCreateInvoice;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoiceWithout;
 import ru.startandroid.retrofit.Model.Contributor;
 import ru.startandroid.retrofit.Model.CreateResponse;
-import ru.startandroid.retrofit.Model.Edges;
 import ru.startandroid.retrofit.Model.IdsCollate;
 import ru.startandroid.retrofit.Model.LastActions;
 import ru.startandroid.retrofit.Model.Member;
-import ru.startandroid.retrofit.Model.acceptgen.Destinations;
 import ru.startandroid.retrofit.Model.acceptgen.Example;
-import ru.startandroid.retrofit.Model.acceptgen.Oinvoice;
 import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
 import ru.startandroid.retrofit.Model.geninvoice.InvoiceMain;
 import ru.startandroid.retrofit.Model.routes.Routes;
-import ru.startandroid.retrofit.models.newOinvoice;
 import rx.Observable;
 
 import static ru.startandroid.retrofit.utils.KeycloakHelper.LOGOUT;
@@ -83,12 +78,6 @@ public interface GitHubService {
     );
 
 
-    //    Получение о накладных
-    //    /api/mobile/accept-general-invoice?id={id of general invoice}
-    @GET("/api/mobile/accept-general-invoice")
-    Observable<Oinvoice> acceptGeneralInvoice(
-            @Query("id") Long genInvoiceID
-    );
 
     @GET("/api/mobile/accept-general-invoice-two")
     Observable<Example> acceptGeneralInvoiceNew(

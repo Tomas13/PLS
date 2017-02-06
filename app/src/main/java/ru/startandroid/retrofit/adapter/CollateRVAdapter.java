@@ -10,17 +10,14 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.startandroid.retrofit.Model.collatedestination.Label;
-import ru.startandroid.retrofit.Model.collatedestination.Packet;
+import ru.startandroid.retrofit.Model.acceptgen.LabelList;
+import ru.startandroid.retrofit.Model.acceptgen.PacketList;
 import ru.startandroid.retrofit.R;
 
 /**
@@ -115,7 +112,7 @@ public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         if (viewType == LABEL) {
             ViewHolder1 viewHolder1 = (ViewHolder1) holder;
 
-            Label label = (Label) items.get(position);
+            LabelList label = (LabelList) items.get(position);
             viewHolder1.tvListId1.setText(label.getLabelListid());
             viewHolder1.tvFromDeptName1.setText(label.getFromDep().getName());
             viewHolder1.tvFromDeptNameRu1.setText(label.getFromDep().getNameRu());
@@ -140,8 +137,8 @@ public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
             ViewHolder1 viewHolder1 = (ViewHolder1) holder;
 
-            Packet packet = (Packet) items.get(position);
-            viewHolder1.tvListId1.setText(packet.getPacketListId());
+            PacketList packet = (PacketList) items.get(position);
+            viewHolder1.tvListId1.setText(packet.getPacketListid());
             viewHolder1.tvFromDeptName1.setText(packet.getFromDep().getName());
             viewHolder1.tvFromDeptNameRu1.setText(packet.getFromDep().getNameRu());
             viewHolder1.tvToDeptName1.setText(packet.getToDep().getName());
@@ -170,9 +167,9 @@ public class CollateRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     @Override
     public int getItemViewType(int position) {
-        if (items.get(position) instanceof Label) {
+        if (items.get(position) instanceof LabelList) {
             return LABEL;
-        } else if (items.get(position) instanceof Packet) {
+        } else if (items.get(position) instanceof PacketList) {
             return PACKET;
         }
         return -1;

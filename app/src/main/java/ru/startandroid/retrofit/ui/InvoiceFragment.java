@@ -33,7 +33,6 @@ import ru.startandroid.retrofit.Model.BodyForCreateInvoiceWithout;
 import ru.startandroid.retrofit.Model.CreateResponse;
 import ru.startandroid.retrofit.Model.RealmLong;
 import ru.startandroid.retrofit.Model.SendInvoice;
-import ru.startandroid.retrofit.Model.acceptgen.Destinations;
 import ru.startandroid.retrofit.Model.acceptgen.Example;
 import ru.startandroid.retrofit.Model.geninvoice.GeneralInvoice;
 import ru.startandroid.retrofit.Model.geninvoice.InvoiceMain;
@@ -124,7 +123,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         }
 
 
-        prepareBodyForPost();
+//        prepareBodyForPost();
 
 
         if (!sendInvoiceList.isEmpty()) {
@@ -135,7 +134,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
                 //если дальше чем первый пункт, но не последний
                 if (currentRoutePosition > 0 && currentRoutePosition < maxRouteNumber) {
-                    createEmptyInvoice();
+//                    createEmptyInvoice();
                 }
 
                 presenter.postCreateInvoice(body);
@@ -274,7 +273,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
             if (currentRoutePosition == 0) {
 
-                createEmptyInvoice();
+//                createEmptyInvoice();
             } else if (currentRoutePosition == maxRouteNumber) {
 
             }
@@ -290,7 +289,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     }
 
     private List<String> generalInvoiceIdsList = new ArrayList<>();
-    private List<Long> ids;
+    private List<Long> ids = new ArrayList<>();
 
     @Override
     public void showGeneralInvoiceId(Example destinations) {

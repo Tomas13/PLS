@@ -1,9 +1,6 @@
 package ru.startandroid.retrofit.view;
 
-import ru.startandroid.retrofit.Model.IdsCollate;
-import ru.startandroid.retrofit.Model.acceptgen.Destinations;
 import ru.startandroid.retrofit.Model.acceptgen.Example;
-import ru.startandroid.retrofit.Model.acceptgen.Oinvoice;
 import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
 import ru.startandroid.retrofit.models.newOinvoice;
@@ -19,8 +16,6 @@ public interface CollateView {
     void hideProgress();
 
     void showVolumesData(CollateResponse volumes);
-
-//    void showGeneralInvoiceId(Destinations destinations);
 
     void showGeneralInvoiceId(newOinvoice newoinvoice);
 

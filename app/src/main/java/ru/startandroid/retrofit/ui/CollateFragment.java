@@ -27,13 +27,16 @@ import com.baozi.Zxing.ZXingConstants;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.realm.Realm;
-import ru.startandroid.retrofit.Model.IdsCollate;
+import io.realm.RealmQuery;
+import ru.startandroid.retrofit.Model.acceptgen.Destination;
 import ru.startandroid.retrofit.Model.acceptgen.Example;
+import ru.startandroid.retrofit.Model.acceptgen.LabelList;
+import ru.startandroid.retrofit.Model.acceptgen.PacketList;
 import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.Model.collatedestination.Dto;
-import ru.startandroid.retrofit.Model.collatedestination.Label;
-import ru.startandroid.retrofit.Model.collatedestination.Packet;
 import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
 
 import ru.startandroid.retrofit.R;
@@ -48,80 +51,67 @@ import ru.startandroid.retrofit.view.CollateView;
  */
 public class CollateFragment extends Fragment implements CollateView {
 
-    private ListView listViewAcceptGen;
-    private TextView tvNoDataAcceptGen;
-    private Button btnCollate, btnScan;
+    @BindView(R.id.list_view_accept_gen)
+    ListView listViewAcceptGen;
+
+    @BindView(R.id.btn_scan)
+    Button btnScan;
+
+    @BindView(R.id.tv_no_data_accept_gen)
+    TextView tvNoDataAcceptGen;
+
+    @BindView(R.id.btn_collate)
+    Button btnCollate;
+
+    @BindView(R.id.progress_accept_gen)
+    ProgressBar progressAccept;
+
+
     private List<Long> ids;
     private List<Long> chosenIds;
     private Realm realm;
-    private ProgressBar progressAccept;
     private ArrayAdapter<String> listAdapter;
     private List<String> generalInvoiceIdsList = new ArrayList<>();
     private AcceptGenInvoicePresenter presenter;
     private Dto collateDtoObject;
-    private EditText editTextScan;
+
+
+    @BindView(R.id.et_scan)
+    EditText editTextScan;
+
     int count = 0;
+
+    private RealmQuery<Destination> queryDestination;
 
     public CollateFragment() {
         // Required empty public constructor
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_collate, container, false);
-
+    private void init() {
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Список S-накладных");
 
-
-        btnScan = (Button) view.findViewById(R.id.btn_scan);
-        editTextScan = (EditText) view.findViewById(R.id.et_scan);
-        listViewAcceptGen = (ListView) view.findViewById(R.id.list_view_accept_gen);
-        tvNoDataAcceptGen = (TextView) view.findViewById(R.id.tv_no_data_accept_gen);
-        btnCollate = (Button) view.findViewById(R.id.btn_collate);
-
-        progressAccept = (ProgressBar) view.findViewById(R.id.progress_accept_gen);
-        Long id;
-        presenter = new AcceptGenInvoicePresenterImpl(this, new NetworkService());
-
-
         ids = new ArrayList<>();
+        realm = Realm.getDefaultInstance();
+        queryDestination = realm.where(Destination.class);
+        presenter = new AcceptGenInvoicePresenterImpl(this, new NetworkService());
         chosenIds = new ArrayList<>();
 
-        if (getArguments() != null) {
-
-            id = getArguments().getLong("generalInvoiceId");
-
-            Toast.makeText(getContext(), "id " + id, Toast.LENGTH_SHORT).show();
-
-            progressAccept.setVisibility(View.VISIBLE);
-            presenter.retrofitAcceptGeneralInvoice(id);
-        } else {
-            progressAccept.setVisibility(View.VISIBLE);
-
-//            Toast.makeText(getContext(), "came from menu", Toast.LENGTH_SHORT).show();
-            presenter.loadDestinationList();
-
+        for (int i = 0; i < queryDestination.findAll().size(); i++) {
+            generalInvoiceIdsList.add(queryDestination.findAll().get(i).getDestinationListId());
+            ids.add(queryDestination.findAll().get(i).getId());
         }
 
-        ArrayList<String> pickedNames = new ArrayList<>();
+    }
 
-//        ArrayList<String> generalIdsListCopy = new ArrayList<>();
-//        generalIdsListCopy.addAll(generalInvoiceIdsList);
 
+    private void addTextChangeListener() {
         editTextScan.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-//                listAdapter.getFilter().filter(s);
-
-
             }
 
             @Override
@@ -129,7 +119,7 @@ public class CollateFragment extends Fragment implements CollateView {
 
                 for (int i = 0; i < generalInvoiceIdsList.size(); i++) {
 
-                    if (listViewAcceptGen.getChildAt(count -1) != null){
+                    if (listViewAcceptGen.getChildAt(count - 1) != null) {
                         if (generalInvoiceIdsList.get(i).equals(s.toString())) {
 
                             count++;
@@ -144,7 +134,7 @@ public class CollateFragment extends Fragment implements CollateView {
                             chosenIds.add(ids.get(i));
                         }
 
-                    }else{
+                    } else {
                         if (generalInvoiceIdsList.get(i).equals(s.toString())) {
 
                             count++;
@@ -164,13 +154,51 @@ public class CollateFragment extends Fragment implements CollateView {
             }
         });
 
+    }
+
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_collate, container, false);
+
+        ButterKnife.bind(this, view);
+
+        init();
+
+
+        if (getArguments() != null) {
+
+            Long id = getArguments().getLong("generalInvoiceId");
+            Toast.makeText(getContext(), "id " + id, Toast.LENGTH_SHORT).show();
+
+            progressAccept.setVisibility(View.VISIBLE);
+            presenter.retrofitAcceptGeneralInvoice(id);
+        } else {
+            progressAccept.setVisibility(View.VISIBLE);
+            presenter.loadDestinationList();
+
+        }
+
+        addTextChangeListener();
+
         btnCollate.setOnClickListener(v -> {
             if (!chosenIds.isEmpty()) {
                 progressAccept.setVisibility(View.VISIBLE);
 
-//                IdsCollate idsCol = new IdsCollate(ids);
-                IdsCollate idsCol = new IdsCollate(chosenIds);
-                presenter.postCollate(idsCol);
+//                IdsCollate idsCol = new IdsCollate(chosenIds);
+//                presenter.postCollate(idsCol);
+
+                realm.executeTransaction(realm -> {
+
+                    for (int i = 0; i < queryDestination.findAll().size(); i++) {
+                        realm.insert(queryDestination.findAll().get(i).getLabelList());
+                        realm.insert(queryDestination.findAll().get(i).getPacketList());
+                        queryDestination.findAll().deleteFromRealm(i);
+                        listAdapter.notifyDataSetChanged();
+                    }
+                });
 
             } else {
                 Toast.makeText(getContext(), "Нечего сличать", Toast.LENGTH_SHORT).show();
@@ -181,7 +209,7 @@ public class CollateFragment extends Fragment implements CollateView {
 
 
         //TODO COMMENT THIS OUT
-      //  generalInvoiceIdsList.add("First");
+        //  generalInvoiceIdsList.add("First");
 //        generalInvoiceIdsList.add("Second");
 //        generalInvoiceIdsList.add("Third");
 //        generalInvoiceIdsList.add("Four");
@@ -191,6 +219,7 @@ public class CollateFragment extends Fragment implements CollateView {
 
         listViewAcceptGen.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
+        ArrayList<String> pickedNames = new ArrayList<>();
 
         listViewAcceptGen.setOnItemClickListener((parent, view1, position, id1) -> {
 
@@ -211,10 +240,7 @@ public class CollateFragment extends Fragment implements CollateView {
                     chosenIds.add(ids.get(position));
 
                 }
-
             }
-
-
         });
 
         listViewAcceptGen.setAdapter(listAdapter);
@@ -306,17 +332,15 @@ public class CollateFragment extends Fragment implements CollateView {
 
         collateDtoObject = collateResponse.getDto();
 
-        ArrayList<Label> labels = new ArrayList<Label>();
+        ArrayList<LabelList> labels = new ArrayList<LabelList>();
         labels.addAll(collateDtoObject.getLabels());
 
-        ArrayList<Packet> packets = new ArrayList<>();
+        ArrayList<PacketList> packets = new ArrayList<>();
         packets.addAll(collateDtoObject.getPackets());
 
         ArrayList<CollateResponse> collateResponsesArrayList = new ArrayList<CollateResponse>();
 //                collateResponsesArrayList.addAll(response)
 
-        // Create the Realm instance
-        realm = Realm.getDefaultInstance();
 
         realm.executeTransaction(realm -> {
             realm.insert(packets);
@@ -351,10 +375,10 @@ public class CollateFragment extends Fragment implements CollateView {
         Log.d("MainAccept labels", volumes.getDto().getLabels().size() + " ");
         Log.d("MainAccept packets", volumes.getDto().getPackets().size() + " ");
 
-        ArrayList<Packet> packetsArrayList = new ArrayList<>();
+        ArrayList<PacketList> packetsArrayList = new ArrayList<>();
         packetsArrayList.addAll(volumes.getDto().getPackets());
 
-        ArrayList<Label> labelsArrayList = new ArrayList<>();
+        ArrayList<LabelList> labelsArrayList = new ArrayList<>();
         labelsArrayList.addAll(volumes.getDto().getLabels());
 
         ArrayList<Object> objects = new ArrayList<Object>();
