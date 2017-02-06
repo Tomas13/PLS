@@ -1,8 +1,10 @@
 package ru.startandroid.retrofit.ui;
 
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -72,7 +74,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     private int maxRouteNumber;
     SharedPreferences pref;
 
-//    InvoiceRVAdapter adapterGet;
+    //    InvoiceRVAdapter adapterGet;
     InvoiceRVAdapterSend adapterSend;
 
 
@@ -128,15 +130,15 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         if (!sendInvoiceList.isEmpty()) {
 
 
-             adapterSend = new InvoiceRVAdapterSend(getActivity(), sendInvoiceList, ((childView, childAdapterPosition) -> {
+            adapterSend = new InvoiceRVAdapterSend(getActivity(), sendInvoiceList, ((childView, childAdapterPosition) -> {
 
 
-                 //если дальше чем первый пункт, но не последний
-                 if (currentRoutePosition > 0 && currentRoutePosition < maxRouteNumber){
-                     createEmptyInvoice();
-                 }
+                //если дальше чем первый пункт, но не последний
+                if (currentRoutePosition > 0 && currentRoutePosition < maxRouteNumber) {
+                    createEmptyInvoice();
+                }
 
-                 presenter.postCreateInvoice(body);
+                presenter.postCreateInvoice(body);
 
 //                Toast.makeText(getContext(), "Это для отправки накладной, функционал дорабатывается", Toast.LENGTH_SHORT).show();
 
@@ -153,7 +155,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         return viewRoot;
     }
 
-    public void prepareBodyForPost(){
+    public void prepareBodyForPost() {
 
         SharedPreferences pref1 = getActivity().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
         if (pref1.contains(FLIGHT_ID) && pref1.contains(TRANSPONST_LIST_ID)) {
@@ -163,7 +165,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
             ArrayList<Long> labelsList = new ArrayList<>();
             ArrayList<Long> packetsList = new ArrayList<>();
-            String toDeptIndex = entries.get(currentRoutePosition+1).getDept().getName();
+            String toDeptIndex = entries.get(currentRoutePosition + 1).getDept().getName();
             String fromDeptIndex = entries.get(currentRoutePosition).getDept().getName();
 
             body = new BodyForCreateInvoiceWithout(flightId, tlid, true, toDeptIndex, fromDeptIndex, labelsList, packetsList);
@@ -187,7 +189,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             //end for saving body in realm
 
 
-        }else{
+        } else {
             Toast.makeText(getContext(), "Ошибка. Нет flightID", Toast.LENGTH_SHORT).show();
 
         }
@@ -203,9 +205,9 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     public static BodyForCreateInvoice bodyRealm;
 
 
-    private void createEmptyInvoice(){
+    private void createEmptyInvoice() {
 
-        if (currentRoutePosition > 0 && currentRoutePosition < maxRouteNumber){
+        if (currentRoutePosition > 0 && currentRoutePosition < maxRouteNumber) {
             currentRoutePosition++;
             pref.edit().putInt(NUMBER_OF_CITIES, currentRoutePosition).apply();
         }
@@ -235,6 +237,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
             } else {
                 showEmptyToast(createResponse.getStatus());
+
             }
 
         }
@@ -269,10 +272,10 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             Long generalInvoiceId = generalInvoiceList.get(childAdapterPosition).getId();
             presenter.retrofitAcceptGeneralInvoice(generalInvoiceId);
 
-            if (currentRoutePosition == 0){
+            if (currentRoutePosition == 0) {
 
                 createEmptyInvoice();
-            }else if(currentRoutePosition == maxRouteNumber){
+            } else if (currentRoutePosition == maxRouteNumber) {
 
             }
 
@@ -316,9 +319,25 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         Toast.makeText(getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
+
+    private AlertDialog alertDialog;
+
     @Override
     public void showEmptyToast(String message) {
-        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+        String handledStatus = presenter.handleStatus(message);
+
+        alertDialog = new AlertDialog.Builder(getContext())
+                .setTitle(handledStatus)
+                .setPositiveButton("Ok", (dialog, which) -> {
+                    dismissDialog();
+                }).create();
+
+        alertDialog.show();
+
+    }
+
+    private void dismissDialog() {
+        alertDialog.dismiss();
     }
 
     @Override

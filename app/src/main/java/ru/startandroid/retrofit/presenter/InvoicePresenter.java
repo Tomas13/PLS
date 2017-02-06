@@ -17,5 +17,7 @@ public interface InvoicePresenter {
     void postCreateInvoice(BodyForCreateInvoiceWithout bodyForCreateInvoiceWithout);
 
     void unSubscribe();
+
+    String handleStatus(String message);
 }
 

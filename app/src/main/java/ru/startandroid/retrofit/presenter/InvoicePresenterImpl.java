@@ -5,6 +5,7 @@ import ru.startandroid.retrofit.Model.CreateResponse;
 import ru.startandroid.retrofit.Model.acceptgen.Destinations;
 import ru.startandroid.retrofit.Model.acceptgen.Example;
 import ru.startandroid.retrofit.Model.geninvoice.InvoiceMain;
+import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.models.NetworkService;
 import ru.startandroid.retrofit.view.InvoiceView;
 import rx.Observable;
@@ -114,6 +115,47 @@ public class InvoicePresenterImpl implements InvoicePresenter {
         if (subscription != null && !subscription.isUnsubscribed()) {
             subscription.unsubscribe();
         }
+    }
+
+    @Override
+    public String handleStatus(String message) {
+        String status = "Пустой статус ошибки формирования О";
+
+        switch (message){
+            case "pl-not-found":
+                status = "количество присланных B-накладных и обработанных не совпадает";
+                break;
+            case "ll-not-found":
+                status = "количество присланных G-накладных и обработанных не совпадает";
+                break;
+            case "fl-not-found":
+                status = "присланное расписание не найдено";
+                break;
+            case "tl-not-found":
+                status = "не найдена текущая Т-накладная, которая ищется в Базе \tданных по слудющим параметрам: status = «DEPARTED» и fligh = \tflighId(присланный от клиента);";
+                break;
+            case "fl-id-null":
+                status = "присланный Id расписания null";
+                break;
+            case "from-dep-not-found":
+                status = "не найден департамент, откуда был отправлен транспорт";
+                break;
+            case "dep-not-found":
+                status = "департамент, куда направляется О-накладная, не найден";
+                break;
+            case "empty-data":
+                status = "пришла пустая модель от клиента";
+                break;
+            case "empty-to-dep-index":
+                status = "Вы отправили пустой индекс департамента, куда напраляется О-накладная";
+                break;
+            case "empty-from-dep-index":
+                status = "пришел пустой индекс, откуда был отправлен транспорт";
+                break;
+
+
+        }
+        return status;
     }
 
     @Override
