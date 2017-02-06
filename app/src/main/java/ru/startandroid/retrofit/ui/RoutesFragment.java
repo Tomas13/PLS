@@ -18,6 +18,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import ru.startandroid.retrofit.Model.routes.Entry;
@@ -37,17 +39,33 @@ import static ru.startandroid.retrofit.Const.FLIGHT_SHARED_PREF;
  */
 public class RoutesFragment extends Fragment implements RoutesView {
 
-    private RecyclerView rvRoutes;
-    private TextView tvNoData;
-    private ProgressBar progressBar;
+    @BindView(R.id.rv_routes)
+    RecyclerView rvRoutes;
+
+    @BindView(R.id.tv_no_data_routes)
+    TextView tvNoData;
+
+    @BindView(R.id.progress_routes)
+    ProgressBar progressBar;
+
+    @BindView(R.id.ll_routes)
+    LinearLayout linearLayoutHeader;
+
     private RoutesPresenter presenter;
-    private LinearLayout linearLayoutHeader;
+
+    private Realm realm;
 
     public RoutesFragment() {
         // Required empty public constructor
     }
 
-    Realm realm;
+    private void init(){
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Маршруты");
+
+        realm = Realm.getDefaultInstance();
+        presenter = new RoutesPresenterImpl(this, new NetworkService());
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -55,16 +73,10 @@ public class RoutesFragment extends Fragment implements RoutesView {
         // Inflate the layout for this fragment
 
         View viewRoot = inflater.inflate(R.layout.fragment_routes, container, false);
-        rvRoutes = (RecyclerView) viewRoot.findViewById(R.id.rv_routes);
-        tvNoData = (TextView) viewRoot.findViewById(R.id.tv_no_data_routes);
-        progressBar = (ProgressBar) viewRoot.findViewById(R.id.progress_routes);
-        linearLayoutHeader = (LinearLayout) viewRoot.findViewById(R.id.ll_routes);
+        ButterKnife.bind(this, viewRoot);
 
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Маршруты");
+        init();
 
-        realm = Realm.getDefaultInstance();
-
-        presenter = new RoutesPresenterImpl(this, new NetworkService());
 
         if (realm.where(Routes.class).findAll().size() == 0) {
             presenter.loadRoutes();

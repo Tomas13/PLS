@@ -22,6 +22,8 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import ru.startandroid.retrofit.AppJobManager;
@@ -43,10 +45,18 @@ import ru.startandroid.retrofit.view.HistoryView;
 public class HistoryFragment extends Fragment implements HistoryView {
 
 //    private HistoryPresenter presenter;
-    private RecyclerView rvHistory;
-    private TextView tvNoDataHistory;
-    private ProgressBar progressHistory;
-    private LinearLayout llHistory;
+    @BindView(R.id.rv_fragment_history)
+    RecyclerView rvHistory;
+
+    @BindView(R.id.tv_no_data_history)
+    TextView tvNoDataHistory;
+
+    @BindView(R.id.progress_history)
+    ProgressBar progressHistory;
+
+    @BindView(R.id.ll_history)
+    LinearLayout llHistory;
+
     private JobManager jobManager;
 
     private Realm realmHistory;
@@ -55,19 +65,22 @@ public class HistoryFragment extends Fragment implements HistoryView {
         // Required empty public constructor
     }
 
+    private void init(){
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Последние действия");
+
+        realmHistory = Realm.getDefaultInstance();
+        jobManager = AppJobManager.getJobManager();
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
         View viewRoot = inflater.inflate(R.layout.fragment_last_actions, container, false);
+        ButterKnife.bind(this, viewRoot);
 
-        llHistory = (LinearLayout) viewRoot.findViewById(R.id.ll_history);
-        rvHistory = (RecyclerView) viewRoot.findViewById(R.id.rv_fragment_history);
-        tvNoDataHistory = (TextView) viewRoot.findViewById(R.id.tv_no_data_history);
-        progressHistory = (ProgressBar) viewRoot.findViewById(R.id.progress_history);
-
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Последние действия");
+        init();
 
 //        presenter = new HistoryPresenterImpl(this, new NetworkService());
 //        presenter.loadHistory();
@@ -77,9 +90,6 @@ public class HistoryFragment extends Fragment implements HistoryView {
 //                .schemaVersion(1)
 //                .deleteRealmIfMigrationNeeded()
 //                .build();
-        realmHistory = Realm.getDefaultInstance();
-
-        jobManager = AppJobManager.getJobManager();
 
         jobManager.addJobInBackground(new GetHistoryJob());
         return viewRoot;
