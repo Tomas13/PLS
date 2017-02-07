@@ -15,13 +15,13 @@ import rx.schedulers.Schedulers;
  * Created by root on 1/17/17.
  */
 
-public class AcceptGenInvoicePresenterImpl implements AcceptGenInvoicePresenter{
+public class CollatePresenterImpl implements CollatePresenter {
 
     private Subscription subscription;
     private CollateView view;
     private NetworkService service;
 
-    public AcceptGenInvoicePresenterImpl(CollateView view, NetworkService service) {
+    public CollatePresenterImpl(CollateView view, NetworkService service) {
         this.view = view;
         this.service = service;
     }

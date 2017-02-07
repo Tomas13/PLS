@@ -41,9 +41,8 @@ import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
 
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.models.NetworkService;
-import ru.startandroid.retrofit.models.newOinvoice;
-import ru.startandroid.retrofit.presenter.AcceptGenInvoicePresenter;
-import ru.startandroid.retrofit.presenter.AcceptGenInvoicePresenterImpl;
+import ru.startandroid.retrofit.presenter.CollatePresenter;
+import ru.startandroid.retrofit.presenter.CollatePresenterImpl;
 import ru.startandroid.retrofit.view.CollateView;
 
 /**
@@ -66,21 +65,17 @@ public class CollateFragment extends Fragment implements CollateView {
     @BindView(R.id.progress_accept_gen)
     ProgressBar progressAccept;
 
+    @BindView(R.id.et_scan)
+    EditText editTextScan;
 
     private List<Long> ids;
     private List<Long> chosenIds;
     private Realm realm;
     private ArrayAdapter<String> listAdapter;
     private List<String> generalInvoiceIdsList = new ArrayList<>();
-    private AcceptGenInvoicePresenter presenter;
+    private CollatePresenter presenter;
     private Dto collateDtoObject;
-
-
-    @BindView(R.id.et_scan)
-    EditText editTextScan;
-
     int count = 0;
-
     private RealmQuery<Destination> queryDestination;
 
     public CollateFragment() {
@@ -93,7 +88,7 @@ public class CollateFragment extends Fragment implements CollateView {
         ids = new ArrayList<>();
         realm = Realm.getDefaultInstance();
         queryDestination = realm.where(Destination.class);
-        presenter = new AcceptGenInvoicePresenterImpl(this, new NetworkService());
+        presenter = new CollatePresenterImpl(this, new NetworkService());
         chosenIds = new ArrayList<>();
 
         for (int i = 0; i < queryDestination.findAll().size(); i++) {
@@ -190,15 +185,46 @@ public class CollateFragment extends Fragment implements CollateView {
 //                IdsCollate idsCol = new IdsCollate(chosenIds);
 //                presenter.postCollate(idsCol);
 
-                realm.executeTransaction(realm -> {
+
+
+                for (int i = 0; i < queryDestination.findAll().size(); i++) {
+
+                    for (int j = 0; j < chosenIds.size(); j++) {
+
+                        if (queryDestination.findAll().get(i).getId().equals(chosenIds.get(j))){
+
+                            int k = i;
+                            realm.executeTransaction(realm ->{
+                                if (!queryDestination.findAll().get(k).getLabelList().isEmpty())
+                                    realm.insert(queryDestination.findAll().get(k).getLabelList());
+
+                                if (!queryDestination.findAll().get(k).getPacketList().isEmpty())
+                                    realm.insert(queryDestination.findAll().get(k).getPacketList());
+                            });
+
+                            generalInvoiceIdsList.remove(queryDestination.findAll().get(i).getDestinationListId());
+                            listAdapter.notifyDataSetChanged();
+
+
+                        }
+
+                    }
+                }
+
+                hideProgress();
+
+              /*  realm.executeTransaction(realm -> {
 
                     for (int i = 0; i < queryDestination.findAll().size(); i++) {
                         realm.insert(queryDestination.findAll().get(i).getLabelList());
                         realm.insert(queryDestination.findAll().get(i).getPacketList());
                         queryDestination.findAll().deleteFromRealm(i);
+
+                        generalInvoiceIdsList.remove(queryDestination.findAll().get(i).getDestinationListId());
+
                         listAdapter.notifyDataSetChanged();
                     }
-                });
+                });*/
 
             } else {
                 Toast.makeText(getContext(), "Нечего сличать", Toast.LENGTH_SHORT).show();
@@ -291,15 +317,15 @@ public class CollateFragment extends Fragment implements CollateView {
 
 
     @Override
-    public void showGeneralInvoiceId(Example destinations) {
+    public void showGeneralInvoiceId(Example example) {
 
-        for (int i = 0; i < destinations.getDestinations().size(); i++) {
-            generalInvoiceIdsList.add(destinations.getDestinations().get(i).getDestinationListId());
-            ids.add(destinations.getDestinations().get(i).getId());
+        for (int i = 0; i < example.getDestinations().size(); i++) {
+            generalInvoiceIdsList.add(example.getDestinations().get(i).getDestinationListId());
+            ids.add(example.getDestinations().get(i).getId());
         }
 
         realm.executeTransaction(realm -> {
-            realm.insert(destinations);
+            realm.insert(example);
         });
 
         listAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, generalInvoiceIdsList);
@@ -307,29 +333,9 @@ public class CollateFragment extends Fragment implements CollateView {
     }
 
     @Override
-    public void showGeneralInvoiceId(newOinvoice newoinvoice) {
-
-        for (int i = 0; i < newoinvoice.getDestinations().size(); i++) {
-            generalInvoiceIdsList.add(newoinvoice.getDestinations().get(i).getDestinationListId());
-            ids.add(newoinvoice.getDestinations().get(i).getId());
-        }
-
-        listAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, generalInvoiceIdsList);
-        listViewAcceptGen.setAdapter(listAdapter);
-    }
-
-
-    @Override
     public void showCollateResponse(CollateResponse collateResponse) {
-        Log.d("MainAccept", "got response");
-
-        Log.d("MainAccept", collateResponse.getStatus());
-        Log.d("MainAccept labels", collateResponse.getDto().getLabels().size() + " ");
-        Log.d("MainAccept packets", collateResponse.getDto().getPackets().size() + " ");
-
 
         collateDtoObject = new Dto();
-
         collateDtoObject = collateResponse.getDto();
 
         ArrayList<LabelList> labels = new ArrayList<LabelList>();
@@ -346,9 +352,6 @@ public class CollateFragment extends Fragment implements CollateView {
             realm.insert(packets);
             realm.insert(labels);
         });
-
-        Log.d("MainAccept", "got response");
-
 
         ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
     }
@@ -369,17 +372,13 @@ public class CollateFragment extends Fragment implements CollateView {
     }
 
     @Override
-    public void showVolumesData(CollateResponse volumes) {
-
-        Log.d("MainAccept", volumes.getStatus());
-        Log.d("MainAccept labels", volumes.getDto().getLabels().size() + " ");
-        Log.d("MainAccept packets", volumes.getDto().getPackets().size() + " ");
+    public void showVolumesData(CollateResponse collateResponse) {
 
         ArrayList<PacketList> packetsArrayList = new ArrayList<>();
-        packetsArrayList.addAll(volumes.getDto().getPackets());
+        packetsArrayList.addAll(collateResponse.getDto().getPackets());
 
         ArrayList<LabelList> labelsArrayList = new ArrayList<>();
-        labelsArrayList.addAll(volumes.getDto().getLabels());
+        labelsArrayList.addAll(collateResponse.getDto().getLabels());
 
         ArrayList<Object> objects = new ArrayList<Object>();
         objects.addAll(packetsArrayList);
@@ -389,7 +388,7 @@ public class CollateFragment extends Fragment implements CollateView {
 
 
         // Create the Realm instance
-        realm = Realm.getDefaultInstance();
+//        realm = Realm.getDefaultInstance();
 
         realm.executeTransaction(realm -> {
             realm.insert(labelsArrayList);

@@ -6,7 +6,7 @@ import ru.startandroid.retrofit.Model.IdsCollate;
  * Created by root on 1/17/17.
  */
 
-public interface AcceptGenInvoicePresenter {
+public interface CollatePresenter {
 
     void onDestroy();
 

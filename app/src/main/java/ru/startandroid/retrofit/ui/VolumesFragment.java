@@ -116,8 +116,8 @@ public class VolumesFragment extends Fragment implements VolumesView {
         queryLabel = realm.where(LabelList.class);
         queryPacket = realm.where(PacketList.class);
         querySendInvoice = realm.where(SendInvoice.class);
-        queryDestination = realm.where(Destination.class);
-        realmResults = queryDestination.findAll();
+//        queryDestination = realm.where(Destination.class);
+//        realmResults = queryDestination.findAll();
 
         if (!queryLabel.findAll().isEmpty() || !queryPacket.findAll().isEmpty()){
             inflateWithRealmNew();
