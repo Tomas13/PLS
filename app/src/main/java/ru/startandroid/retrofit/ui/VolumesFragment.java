@@ -119,7 +119,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
         queryDestination = realm.where(Destination.class);
         realmResults = queryDestination.findAll();
 
-        if (!realmResults.isEmpty()){
+        if (!queryLabel.findAll().isEmpty() || !queryPacket.findAll().isEmpty()){
             inflateWithRealmNew();
         }
 
@@ -188,16 +188,17 @@ public class VolumesFragment extends Fragment implements VolumesView {
         List<PacketList> packet= new ArrayList<>();
 
 
-        for (int i = 0; i < realmResults.size(); i++) {
+        for (int i = 0; i < queryLabel.findAll().size(); i++) {
 
-
-            if (queryDestination.findAll().get(i).getLabelList().size() > 0){
-                label.addAll(queryDestination.findAll().get(i).getLabelList());
+            if (queryLabel.findAll().size() > 0){
+                label.add(queryLabel.findAll().get(i));
             }
 
+        }
 
-            if (queryDestination.findAll().get(i).getPacketList().size() > 0){
-                packet.addAll(queryDestination.findAll().get(i).getPacketList());
+        for (int j = 0; j < queryPacket.findAll().size(); j++) {
+            if (queryPacket.findAll().size() > 0){
+                packet.add(queryPacket.findAll().get(j));
             }
         }
 
