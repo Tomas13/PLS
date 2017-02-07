@@ -13,6 +13,10 @@ public class RealmLong  extends RealmObject {
 
     }
 
+    public Long getaLong() {
+        return aLong;
+    }
+
     public RealmLong(Long aLong) {
         this.aLong = aLong;
     }

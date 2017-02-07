@@ -97,5 +97,12 @@ public class BodyForCreateInvoice extends RealmObject {
         this.packetIds = packetIds;
     }
 
+    public Long getTlId() {
+        return tlId;
+    }
+
+    public void setTlId(Long tlId) {
+        this.tlId = tlId;
+    }
 }
 

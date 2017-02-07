@@ -186,7 +186,6 @@ public class CollateFragment extends Fragment implements CollateView {
 //                presenter.postCollate(idsCol);
 
 
-
                 for (int i = 0; i < queryDestination.findAll().size(); i++) {
 
                     for (int j = 0; j < chosenIds.size(); j++) {
@@ -204,6 +203,7 @@ public class CollateFragment extends Fragment implements CollateView {
 
                             generalInvoiceIdsList.remove(queryDestination.findAll().get(i).getDestinationListId());
                             listAdapter.notifyDataSetChanged();
+                            realm.executeTransaction(realm -> queryDestination.findAll().get(k).deleteFromRealm());
 
 
                         }
@@ -212,19 +212,6 @@ public class CollateFragment extends Fragment implements CollateView {
                 }
 
                 hideProgress();
-
-              /*  realm.executeTransaction(realm -> {
-
-                    for (int i = 0; i < queryDestination.findAll().size(); i++) {
-                        realm.insert(queryDestination.findAll().get(i).getLabelList());
-                        realm.insert(queryDestination.findAll().get(i).getPacketList());
-                        queryDestination.findAll().deleteFromRealm(i);
-
-                        generalInvoiceIdsList.remove(queryDestination.findAll().get(i).getDestinationListId());
-
-                        listAdapter.notifyDataSetChanged();
-                    }
-                });*/
 
             } else {
                 Toast.makeText(getContext(), "Нечего сличать", Toast.LENGTH_SHORT).show();

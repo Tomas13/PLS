@@ -32,6 +32,7 @@ import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
+import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoice;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoiceWithout;
 import ru.startandroid.retrofit.Model.CreateResponse;
@@ -49,6 +50,7 @@ import ru.startandroid.retrofit.presenter.VolumesPresenter;
 import ru.startandroid.retrofit.presenter.VolumesPresenterImpl;
 import ru.startandroid.retrofit.view.VolumesView;
 
+import static ru.startandroid.retrofit.Const.CURRENT_ROUTE_POSITION;
 import static ru.startandroid.retrofit.Const.FLIGHT_ID;
 import static ru.startandroid.retrofit.Const.FLIGHT_SHARED_PREF;
 import static ru.startandroid.retrofit.Const.TRANSPONST_LIST_ID;
@@ -74,7 +76,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
     Button btnSendInvoice;
 
     @BindView(R.id.tv_header_hint)
-    TextView tvHeaderHint ;
+    TextView tvHeaderHint;
 
 
     private List<Long> packetsList = new ArrayList<>();
@@ -103,7 +105,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
         // Required empty public constructor
     }
 
-    private void init(){
+    private void init() {
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Ёмкости");
 
         flightName = new ArrayList<>();
@@ -119,7 +121,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
 //        queryDestination = realm.where(Destination.class);
 //        realmResults = queryDestination.findAll();
 
-        if (!queryLabel.findAll().isEmpty() || !queryPacket.findAll().isEmpty()){
+        if (!queryLabel.findAll().isEmpty() || !queryPacket.findAll().isEmpty()) {
             inflateWithRealmNew();
         }
 
@@ -137,9 +139,9 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
         init();
 
-        if (queryPacket.findAll().size() > 0 || queryLabel.findAll().size() > 0) {  //old ones, idk probably delete this
+//        if (queryPacket.findAll().size() > 0 || queryLabel.findAll().size() > 0) {  //old ones, idk probably delete this
 //            inflateWithRealm();
-        }
+//        }
 
         if (!queryData.findAll().isEmpty()) {
             for (int i = 0; i < queryData.findAll().distinct("index").size(); i++) {
@@ -147,9 +149,9 @@ public class VolumesFragment extends Fragment implements VolumesView {
             }
         }
 
-        for (int i = 1; i < entries.size(); i++) {
-            //flightName.add(entries.get(i).getDept().getNameRu());
-        }
+//        for (int i = 1; i < entries.size(); i++) {
+        //flightName.add(entries.get(i).getDept().getNameRu());
+//        }
 
         presenter.loadGetListForVpn();
 
@@ -185,19 +187,19 @@ public class VolumesFragment extends Fragment implements VolumesView {
     private void inflateWithRealmNew() {
 
         List<LabelList> label = new ArrayList<>();
-        List<PacketList> packet= new ArrayList<>();
+        List<PacketList> packet = new ArrayList<>();
 
 
         for (int i = 0; i < queryLabel.findAll().size(); i++) {
 
-            if (queryLabel.findAll().size() > 0){
+            if (queryLabel.findAll().size() > 0) {
                 label.add(queryLabel.findAll().get(i));
             }
 
         }
 
         for (int j = 0; j < queryPacket.findAll().size(); j++) {
-            if (queryPacket.findAll().size() > 0){
+            if (queryPacket.findAll().size() > 0) {
                 packet.add(queryPacket.findAll().get(j));
             }
         }
@@ -222,7 +224,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
         ListView listView = (ListView) pointDialog.findViewById(R.id.list_view_flight);
 
 
-        if (!querySendInvoice.findAll().isEmpty()){
+        if (!querySendInvoice.findAll().isEmpty()) {
             flightName.add(querySendInvoice.findAll().get(0).getBodyForCreateInvoice().getToDepIndex());
         }
 
@@ -240,14 +242,16 @@ public class VolumesFragment extends Fragment implements VolumesView {
             listView.setItemChecked(position, true);
 
             SharedPreferences pref1 = getActivity().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
+            int currentRoutePosition = pref1.getInt(CURRENT_ROUTE_POSITION, 0);
+
             if (pref1.contains(FLIGHT_ID)) {
 
                 Long flightId = pref1.getLong(FLIGHT_ID, 0);
                 Long tlid = pref1.getLong(TRANSPONST_LIST_ID, 0);
 
 //                Boolean isDepIndex = true;
-                String toDeptIndex = entries.get(position).getDept().getName();
-                String fromDeptIndex = entries.get(0).getDept().getName();
+                String toDeptIndex = entries.get(currentRoutePosition + 1).getDept().getName();
+                String fromDeptIndex = entries.get(currentRoutePosition).getDept().getName();
 
                 RealmList<RealmLong> labelLongList = new RealmList<>();
                 RealmList<RealmLong> packetLongList = new RealmList<>();
@@ -280,18 +284,36 @@ public class VolumesFragment extends Fragment implements VolumesView {
         Button btnOk = (Button) pointDialog.findViewById(R.id.btn_ok_flight);
         btnOk.setOnClickListener(v -> {
 
-            InvoiceFragment.setBody(bodyWithout);
+
+//            InvoiceFragment.setBody(bodyWithout);
+
+            RealmResults<BodyForCreateInvoice> queryBody = realm.where(BodyForCreateInvoice.class).findAll();
+                    realm.executeTransaction(
+                            realm -> {
+                                queryBody.deleteAllFromRealm();
+                                realm.insertOrUpdate(body);
+                            }
+
+                    );
 //            presenter.postCreateInvoice(bodyWithout);
 
-            pointDialog.dismiss();
+                    //update recycler view
 
-        });
+                    pointDialog.dismiss();
+
+                }
+
+        );
 
 
         Button btnCancel = (Button) pointDialog.findViewById(R.id.btn_cancel_flight);
-        btnCancel.setOnClickListener(v -> {
-            pointDialog.dismiss();
-        });
+        btnCancel.setOnClickListener(v ->
+
+                {
+                    pointDialog.dismiss();
+                }
+
+        );
 
     }
 
@@ -318,7 +340,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
         }
     }
-
 
 
     private CollateRVAdapter createAdapter() {

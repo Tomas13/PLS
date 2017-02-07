@@ -118,7 +118,7 @@ public class InvoicePresenterImpl implements InvoicePresenter {
 
     @Override
     public String handleStatus(String message) {
-        String status = "Пустой статус ошибки формирования О";
+        String status = message;
 
         switch (message){
             case "pl-not-found":
@@ -151,8 +151,6 @@ public class InvoicePresenterImpl implements InvoicePresenter {
             case "empty-from-dep-index":
                 status = "пришел пустой индекс, откуда был отправлен транспорт";
                 break;
-
-
         }
         return status;
     }
