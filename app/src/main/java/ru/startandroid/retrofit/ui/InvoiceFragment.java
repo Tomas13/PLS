@@ -160,6 +160,10 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
                 presenter.postCreateInvoice(body);
 
+
+                removeRealm();
+
+
             }));
 
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
@@ -192,6 +196,9 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
                 labelLong.add(realmLong.getaLong());
             }
             bodyForCreateInvoiceWithout.setLabelIds(labelLong);
+        }else{
+            bodyForCreateInvoiceWithout.setLabelIds(new ArrayList<>());
+
         }
 
 
@@ -207,6 +214,9 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             }
 
             bodyForCreateInvoiceWithout.setPacketIds(packetLong);
+        }else{
+            bodyForCreateInvoiceWithout.setPacketIds(new ArrayList<>());
+
         }
 
         return bodyForCreateInvoiceWithout;
@@ -279,7 +289,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
                 updateItemsRV();
 
-                removeRealm();
             } else {
                 showEmptyToast(createResponse.getStatus());
 
@@ -312,15 +321,10 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
         InvoiceRVAdapter invoiceRVAdapter = new InvoiceRVAdapter(getActivity(), generalInvoiceList, (childView, childAdapterPosition) -> {
 
-//            Bundle bundle = new Bundle();
-//            bundle.putLong("generalInvoiceId", generalInvoiceList.get(childAdapterPosition).getId());
-//            Fragment fragment = new CollateFragment();
-//            fragment.setArguments(bundle);
-
             Long generalInvoiceId = generalInvoiceList.get(childAdapterPosition).getId();
-            createEmptyInvoice();
             presenter.retrofitAcceptGeneralInvoice(generalInvoiceId);
 
+            createEmptyInvoice();
 /*
             if (currentRoutePosition == 0) {
 
@@ -330,14 +334,23 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             }
 */
 
-
-//            ((NavigationActivity) getActivity()).startFragment(fragment);
+            startCollateFragment();
 
         });
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         rvInvoice.setLayoutManager(mLayoutManager);
         rvInvoice.setAdapter(invoiceRVAdapter);
+
+    }
+
+    private void startCollateFragment() {
+
+//            Bundle bundle = new Bundle();
+//            bundle.putLong("generalInvoiceId", generalInvoiceList.get(childAdapterPosition).getId());
+        Fragment fragment = new CollateFragment();
+//            fragment.setArguments(bundle);
+        ((NavigationActivity) getActivity()).startFragment(fragment);
 
     }
 

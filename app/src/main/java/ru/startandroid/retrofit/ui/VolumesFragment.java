@@ -239,21 +239,19 @@ public class VolumesFragment extends Fragment implements VolumesView {
             }
 
 
-//            Toast.makeText(getContext(), "Готово, можете нажать кнопку ОК для закрытия диалога", Toast.LENGTH_SHORT).show();
-
         });
 
         Button btnOk = (Button) pointDialog.findViewById(R.id.btn_ok_flight);
         btnOk.setOnClickListener(v -> {
 
-//                    RealmResults<BodyForCreateInvoice> queryBody = realm.where(BodyForCreateInvoice.class).findAll();
-//                    realm.executeTransaction(
-//                            realm -> {
+                    RealmResults<BodyForCreateInvoice> queryBody = realm.where(BodyForCreateInvoice.class).findAll();
+                    realm.executeTransaction(
+                            realm -> {
 //                                queryBody.deleteAllFromRealm();
-//                                realm.insertOrUpdate(body);
-//                            }
-//
-//                    );
+                                realm.insertOrUpdate(body);
+                            }
+
+                    );
 
                     updateItemsRV();
 
@@ -316,6 +314,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
     }
 
 
+    //RESPONSE WHICH IS NOT MADE
     @Override
     public void showVolumesData(CollateResponse volumes) {
 

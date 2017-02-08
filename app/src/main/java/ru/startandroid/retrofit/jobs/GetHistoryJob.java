@@ -1,7 +1,6 @@
 package ru.startandroid.retrofit.jobs;
 
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.birbit.android.jobqueue.CancelReason;
 import com.birbit.android.jobqueue.Job;
@@ -10,16 +9,15 @@ import com.birbit.android.jobqueue.RetryConstraint;
 
 import org.greenrobot.eventbus.EventBus;
 
-import ru.startandroid.retrofit.Model.History;
 import ru.startandroid.retrofit.Model.LastActions;
 import ru.startandroid.retrofit.events.HistoryErrorEvent;
 import ru.startandroid.retrofit.events.HistoryEvent;
 import ru.startandroid.retrofit.models.NetworkService;
-import ru.startandroid.retrofit.presenter.HistoryPresenter;
-import ru.startandroid.retrofit.ui.HistoryFragment;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+
+import static ru.startandroid.retrofit.Const.HISTORY_PRIORITY;
 
 /**
  * Created by root on 1/25/17.
@@ -28,12 +26,11 @@ import rx.schedulers.Schedulers;
 // A job to send a tweet
 public class GetHistoryJob extends Job {
 
-    public static final int PRIORITY = 1;
 
     public GetHistoryJob() {
         // This job requires network connectivity,
         // and should be persisted in case the application exits before job is completed.
-        super(new Params(PRIORITY).requireNetwork().persist());
+        super(new Params(HISTORY_PRIORITY).requireNetwork().persist());
 
     }
 

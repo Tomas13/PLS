@@ -99,7 +99,7 @@ public class HistoryFragment extends Fragment implements HistoryView {
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onHistoryEvent(HistoryEvent event) {
 
-        showHistoryData(event.history);
+        showHistoryData(event.getHistory());
 //        realmHistory.executeTransaction(realm -> {
 //            realmHistory.insert(event.history);
 //        });

@@ -38,4 +38,12 @@ public class Const {
     public static final String FLIGHT_POS = "FLIGHT_POS";
     public static final String LOGIN_PREF = "LOGIN_PREF";
     public static final String LOGIN_BOOL = "LOGIN_BOOL";
+
+
+
+    public static final int COLLATE_PRIORITY = 2;
+
+
+    public static final int HISTORY_PRIORITY = 1;
+
 }

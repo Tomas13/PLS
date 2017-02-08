@@ -22,6 +22,11 @@ import android.widget.Toast;
 
 import com.baozi.Zxing.CaptureActivity;
 import com.baozi.Zxing.ZXingConstants;
+import com.birbit.android.jobqueue.JobManager;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +35,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmQuery;
+import ru.startandroid.retrofit.AppJobManager;
 import ru.startandroid.retrofit.Model.IdsCollate;
 import ru.startandroid.retrofit.Model.acceptgen.Destination;
 import ru.startandroid.retrofit.Model.acceptgen.Example;
@@ -40,6 +46,8 @@ import ru.startandroid.retrofit.Model.collatedestination.Dto;
 import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
 
 import ru.startandroid.retrofit.R;
+import ru.startandroid.retrofit.events.CollateEvent;
+import ru.startandroid.retrofit.jobs.CollateJob;
 import ru.startandroid.retrofit.models.NetworkService;
 import ru.startandroid.retrofit.presenter.CollatePresenter;
 import ru.startandroid.retrofit.presenter.CollatePresenterImpl;
@@ -77,6 +85,7 @@ public class CollateFragment extends Fragment implements CollateView {
     private Dto collateDtoObject;
     int count = 0;
     private RealmQuery<Destination> queryDestination;
+    private JobManager jobManager;
 
     public CollateFragment() {
         // Required empty public constructor
@@ -95,6 +104,9 @@ public class CollateFragment extends Fragment implements CollateView {
             generalInvoiceIdsList.add(queryDestination.findAll().get(i).getDestinationListId());
             ids.add(queryDestination.findAll().get(i).getId());
         }
+
+        jobManager = AppJobManager.getJobManager();
+
 
     }
 
@@ -164,61 +176,13 @@ public class CollateFragment extends Fragment implements CollateView {
 
 
 //        showProgress();
-      //  presenter.loadDestinationList();
+        //  presenter.loadDestinationList();
 
         loadSRealm();
 
         addTextChangeListener();
 
-        btnCollate.setOnClickListener(v -> {
-            if (!chosenIds.isEmpty()) {
-                progressAccept.setVisibility(View.VISIBLE);
-
-                IdsCollate idsCol = new IdsCollate(chosenIds);
-                presenter.postCollate(idsCol);
-
-
-                for (int i = 0; i < queryDestination.findAll().size(); i++) {
-
-                    for (int j = 0; j < chosenIds.size(); j++) {
-
-                        if (queryDestination.findAll().get(i).getId().equals(chosenIds.get(j))) {
-
-                            int k = i;
-                            realm.executeTransaction(realm -> {
-                                if (!queryDestination.findAll().get(k).getLabelList().isEmpty()){
-
-                                    for (int l = 0; l < queryDestination.findAll().get(k).getLabelList().size(); l++) {
-                                        queryDestination.findAll().get(k).getLabelList().get(l).setIsCollated(true);
-                                    }
-                                    realm.insert(queryDestination.findAll().get(k).getLabelList());
-                                }
-
-                                if (!queryDestination.findAll().get(k).getPacketList().isEmpty()){
-                                    for (int l = 0; l < queryDestination.findAll().get(k).getPacketList().size(); l++) {
-                                        queryDestination.findAll().get(k).getPacketList().get(l).setIsCollated(true);
-                                    }
-
-                                    realm.insert(queryDestination.findAll().get(k).getPacketList());
-                                }
-                            });
-
-                            generalInvoiceIdsList.remove(queryDestination.findAll().get(i).getDestinationListId());
-                            listAdapter.notifyDataSetChanged();
-                            realm.executeTransaction(realm -> queryDestination.findAll().get(k).deleteFromRealm());
-
-
-                        }
-
-                    }
-                }
-
-                hideProgress();
-
-            } else {
-                Toast.makeText(getContext(), "Нечего сличать", Toast.LENGTH_SHORT).show();
-            }
-        });
+        btnCollate.setOnClickListener(v -> onButtonCollateClick());
 
         btnScan.setOnClickListener(v -> startScanActivity());
 
@@ -261,6 +225,62 @@ public class CollateFragment extends Fragment implements CollateView {
         listViewAcceptGen.setAdapter(listAdapter);
 
         return view;
+    }
+
+    private void onButtonCollateClick() {
+
+        if (!chosenIds.isEmpty()) {
+            progressAccept.setVisibility(View.VISIBLE);
+
+            IdsCollate idsCol = new IdsCollate(chosenIds);
+//            presenter.postCollate(idsCol);
+
+            jobManager.addJobInBackground(new CollateJob(idsCol));
+
+
+            for (int i = 0; i < queryDestination.findAll().size(); i++) {
+
+                for (int j = 0; j < chosenIds.size(); j++) {
+
+                    if (queryDestination.findAll().get(i).getId().equals(chosenIds.get(j))) {
+
+                        int k = i;
+                        realm.executeTransaction(realm -> {
+                            if (!queryDestination.findAll().get(k).getLabelList().isEmpty()) {
+
+                                for (int l = 0; l < queryDestination.findAll().get(k).getLabelList().size(); l++) {
+                                    queryDestination.findAll().get(k).getLabelList().get(l).setIsCollated(true);
+                                }
+                                realm.insert(queryDestination.findAll().get(k).getLabelList());
+                            }
+
+                            if (!queryDestination.findAll().get(k).getPacketList().isEmpty()) {
+                                for (int l = 0; l < queryDestination.findAll().get(k).getPacketList().size(); l++) {
+                                    queryDestination.findAll().get(k).getPacketList().get(l).setIsCollated(true);
+                                }
+
+                                realm.insert(queryDestination.findAll().get(k).getPacketList());
+                            }
+                        });
+
+                        generalInvoiceIdsList.remove(queryDestination.findAll().get(i).getDestinationListId());
+                        listAdapter.notifyDataSetChanged();
+                        realm.executeTransaction(realm -> queryDestination.findAll().get(k).deleteFromRealm());
+                    }
+                }
+            }
+
+            hideProgress();
+
+        } else {
+            Toast.makeText(getContext(), "Нечего сличать", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onCollateEvent(CollateEvent collateEvent){
+        showCollateResponse(collateEvent.getCollateResponse());
+        //probably no need for that, to show results
     }
 
 
@@ -329,6 +349,7 @@ public class CollateFragment extends Fragment implements CollateView {
         listViewAcceptGen.setAdapter(listAdapter);
 
     }
+
 
 
     @Override
@@ -401,6 +422,18 @@ public class CollateFragment extends Fragment implements CollateView {
     @Override
     public void hideProgress() {
         progressAccept.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
     }
 
 

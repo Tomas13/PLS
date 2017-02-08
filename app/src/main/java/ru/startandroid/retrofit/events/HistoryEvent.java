@@ -9,11 +9,14 @@ import ru.startandroid.retrofit.Model.LastActions;
 
 public class HistoryEvent {
 
-    public final LastActions history;
+    private LastActions history;
 
     public HistoryEvent(LastActions history) {
         this.history = history;
     }
 
 
+    public LastActions getHistory() {
+        return history;
+    }
 }
