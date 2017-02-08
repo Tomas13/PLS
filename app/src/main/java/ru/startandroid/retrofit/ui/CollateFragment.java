@@ -1,6 +1,5 @@
 package ru.startandroid.retrofit.ui;
 
-
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -31,6 +30,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmQuery;
+import ru.startandroid.retrofit.Model.IdsCollate;
 import ru.startandroid.retrofit.Model.acceptgen.Destination;
 import ru.startandroid.retrofit.Model.acceptgen.Example;
 import ru.startandroid.retrofit.Model.acceptgen.LabelList;
@@ -182,8 +182,8 @@ public class CollateFragment extends Fragment implements CollateView {
             if (!chosenIds.isEmpty()) {
                 progressAccept.setVisibility(View.VISIBLE);
 
-//                IdsCollate idsCol = new IdsCollate(chosenIds);
-//                presenter.postCollate(idsCol);
+                IdsCollate idsCol = new IdsCollate(chosenIds);
+                presenter.postCollate(idsCol);
 
 
                 for (int i = 0; i < queryDestination.findAll().size(); i++) {

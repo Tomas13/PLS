@@ -1,43 +1,19 @@
 package ru.startandroid.retrofit;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.net.NetworkInfo;
 import android.os.Environment;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.facebook.stetho.Stetho;
-import com.github.pwittchen.reactivenetwork.library.ReactiveNetwork;
 import com.uphyca.stetho_realm.RealmInspectorModulesProvider;
 
-import org.jboss.aerogear.android.authorization.oauth2.OAuth2AuthorizationConfiguration;
-import org.jboss.aerogear.android.authorization.oauth2.OAuth2AuthzService;
-import org.jboss.aerogear.android.authorization.oauth2.OAuth2AuthzSession;
-import org.jboss.aerogear.android.authorization.oauth2.OAuth2FetchAccess;
-import org.jboss.aerogear.android.core.Callback;
-
 import java.io.File;
-import java.util.concurrent.TimeUnit;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
-import ru.startandroid.retrofit.ui.LoginActivity;
-import ru.startandroid.retrofit.ui.NavigationActivity;
-import ru.startandroid.retrofit.utils.KeycloakHelper;
-import rx.Observable;
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
-
-import static ru.startandroid.retrofit.Const.TOKEN;
-import static ru.startandroid.retrofit.Const.TOKEN_SHARED_PREF;
-import static ru.startandroid.retrofit.Const.Token;
 
 /**
  * Created by root on 12/29/16.
@@ -46,7 +22,6 @@ import static ru.startandroid.retrofit.Const.Token;
 public class Application extends MultiDexApplication {
     private Subscription subscription;
     public RealmConfiguration realmConfiguration;
-    private static Context context;
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -57,11 +32,6 @@ public class Application extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-
-
-        context = getApplicationContext();
-
-//        Stetho.initializeWithDefaults(getApplicationContext());
 
         AppJobManager.getJobManager(this);
 
@@ -80,10 +50,6 @@ public class Application extends MultiDexApplication {
                         .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
                         .build());
 
-
-
-
-
     }
 
 
@@ -93,10 +59,6 @@ public class Application extends MultiDexApplication {
         final String fname = Const.CACHE_FILE_NAME;
         final File sdImageMainDirectory = new File(root, fname);
         return sdImageMainDirectory;
-    }
-
-    public static Context getContext(){
-        return context;
     }
 
     private void LogMessage(String s) {

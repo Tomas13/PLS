@@ -20,22 +20,17 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.bouncycastle.crypto.util.Pack;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
-import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoice;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoiceWithout;
-import ru.startandroid.retrofit.Model.CreateResponse;
 import ru.startandroid.retrofit.Model.RealmLong;
 import ru.startandroid.retrofit.Model.SendInvoice;
 import ru.startandroid.retrofit.Model.acceptgen.Destination;
@@ -125,6 +120,12 @@ public class VolumesFragment extends Fragment implements VolumesView {
             inflateWithRealmNew();
         }
 
+        if (!queryData.findAll().isEmpty()) {
+            for (int i = 0; i < queryData.findAll().distinct("index").size(); i++) {
+                entries.add(queryData.findAll().get(i));
+            }
+        }
+
         btnSendInvoice.setOnClickListener(v -> showDialog());
         chosen = new ArrayList<>();
 
@@ -139,49 +140,13 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
         init();
 
-//        if (queryPacket.findAll().size() > 0 || queryLabel.findAll().size() > 0) {  //old ones, idk probably delete this
-//            inflateWithRealm();
-//        }
-
-        if (!queryData.findAll().isEmpty()) {
-            for (int i = 0; i < queryData.findAll().distinct("index").size(); i++) {
-                entries.add(queryData.findAll().get(i));
-            }
-        }
-
 //        for (int i = 1; i < entries.size(); i++) {
         //flightName.add(entries.get(i).getDept().getNameRu());
 //        }
 
         presenter.loadGetListForVpn();
 
-
         return rootView;
-    }
-
-    private void inflateWithRealm() {
-        ArrayList<PacketList> packetsArrayList = new ArrayList<>();
-
-        final ArrayList<LabelList> labelsArrayList = new ArrayList<>();
-//        labelsArrayList.addAll(response.body().getDto().getLabels());
-
-        if (queryPacket.findAll().size() > 0) {
-            packetsArrayList.addAll(queryPacket.findAll().distinct("id"));
-        }
-
-        if (queryLabel.findAll().size() > 0) {
-            labelsArrayList.addAll(queryLabel.findAll().distinct("id"));
-        }
-
-        objects = new ArrayList<>();
-        objects.addAll(packetsArrayList);
-        objects.addAll(labelsArrayList);
-        collateRVAdapter = createAdapter();
-
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-        recyclerViewVolumes.setLayoutManager(mLayoutManager);
-        recyclerViewVolumes.setAdapter(collateRVAdapter);
-
     }
 
     private void inflateWithRealmNew() {
@@ -189,13 +154,10 @@ public class VolumesFragment extends Fragment implements VolumesView {
         List<LabelList> label = new ArrayList<>();
         List<PacketList> packet = new ArrayList<>();
 
-
         for (int i = 0; i < queryLabel.findAll().size(); i++) {
-
             if (queryLabel.findAll().size() > 0) {
                 label.add(queryLabel.findAll().get(i));
             }
-
         }
 
         for (int j = 0; j < queryPacket.findAll().size(); j++) {
@@ -284,20 +246,16 @@ public class VolumesFragment extends Fragment implements VolumesView {
         Button btnOk = (Button) pointDialog.findViewById(R.id.btn_ok_flight);
         btnOk.setOnClickListener(v -> {
 
+//                    RealmResults<BodyForCreateInvoice> queryBody = realm.where(BodyForCreateInvoice.class).findAll();
+//                    realm.executeTransaction(
+//                            realm -> {
+//                                queryBody.deleteAllFromRealm();
+//                                realm.insertOrUpdate(body);
+//                            }
+//
+//                    );
 
-//            InvoiceFragment.setBody(bodyWithout);
-
-            RealmResults<BodyForCreateInvoice> queryBody = realm.where(BodyForCreateInvoice.class).findAll();
-                    realm.executeTransaction(
-                            realm -> {
-                                queryBody.deleteAllFromRealm();
-                                realm.insertOrUpdate(body);
-                            }
-
-                    );
-//            presenter.postCreateInvoice(bodyWithout);
-
-                    //update recycler view
+                    updateItemsRV();
 
                     pointDialog.dismiss();
 
@@ -307,38 +265,18 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
 
         Button btnCancel = (Button) pointDialog.findViewById(R.id.btn_cancel_flight);
-        btnCancel.setOnClickListener(v ->
-
-                {
-                    pointDialog.dismiss();
-                }
-
-        );
+        btnCancel.setOnClickListener(v -> pointDialog.dismiss());
 
     }
 
-
-    @Override
-    public void getPostResponse(CreateResponse createResponse) {
-        if (createResponse != null) {
-
-            if (createResponse.getStatus().equals("success")) {
-
-                //update items in rv
-                for (int i = 0; i < chosen.size(); i++) {
-                    objects.remove(chosen.get(i));
-                }
-
-                collateRVAdapter.notifyDataSetChanged();
-
-
-                Toast.makeText(getContext(), "Общая накладная успешно создана", Toast.LENGTH_SHORT).show();
-
-            } else {
-                showErrorDialog(createResponse.getStatus());
-            }
-
+    private void updateItemsRV() {
+        //update items in rv
+        for (int i = 0; i < chosen.size(); i++) {
+            objects.remove(chosen.get(i));
         }
+
+        collateRVAdapter.notifyDataSetChanged();
+
     }
 
 

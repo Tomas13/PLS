@@ -1,6 +1,5 @@
 package ru.startandroid.retrofit.ui;
 
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,18 +7,13 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +24,6 @@ import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
-import retrofit2.http.POST;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoice;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoiceWithout;
 import ru.startandroid.retrofit.Model.CreateResponse;
@@ -43,7 +36,6 @@ import ru.startandroid.retrofit.Model.routes.Entry;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.InvoiceRVAdapter;
 import ru.startandroid.retrofit.adapter.InvoiceRVAdapterSend;
-import ru.startandroid.retrofit.events.PostBodyEvent;
 import ru.startandroid.retrofit.models.NetworkService;
 import ru.startandroid.retrofit.presenter.InvoicePresenter;
 import ru.startandroid.retrofit.presenter.InvoicePresenterImpl;
@@ -87,6 +79,10 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     private int currentRoutePosition;
     private int maxRouteNumber;
     private SharedPreferences pref;
+
+    public BodyForCreateInvoiceWithout body;
+    public BodyForCreateInvoice bodyRealm;
+
 
     //    InvoiceRVAdapter adapterGet;
     InvoiceRVAdapterSend adapterSend;
@@ -149,11 +145,18 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             adapterSend = new InvoiceRVAdapterSend(getActivity(), sendInvoiceList, ((childView, childAdapterPosition) -> {
 
                 //если дальше чем первый пункт, но не последний
-                if (currentRoutePosition > 0 && currentRoutePosition < maxRouteNumber) {
-                    createEmptyInvoice();
-                }
+//                if (currentRoutePosition > 0 && currentRoutePosition < maxRouteNumber) {
+//                    createEmptyInvoice();
+//                }
 
                 if (queryBody.findAll().size() > 0) body = realmToBody(bodyRealm);
+
+
+                //TODO
+                sendInvoiceList.remove(childAdapterPosition);
+                adapterSend.notifyDataSetChanged();
+                //TODO
+
 
                 presenter.postCreateInvoice(body);
 
@@ -251,15 +254,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         //FOR SENDING
     }
 
-
-    public static void setBody(BodyForCreateInvoiceWithout body) {
-        InvoiceFragment.body = body;
-    }
-
-    public static BodyForCreateInvoiceWithout body = null;
-    public static BodyForCreateInvoice bodyRealm;
-
-
     private void createEmptyInvoice() {
 
         if (currentRoutePosition > 0 && currentRoutePosition < maxRouteNumber) {
@@ -280,22 +274,32 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
             if (createResponse.getStatus().equals("success")) {
 
-//                //update items in rv
-//                for (int i = 0; i < chosen.size(); i++) {
-//                    objects.remove(chosen.get(i));
-//                }
-//
-//                collateRVAdapter.notifyDataSetChanged();
-
 
                 Toast.makeText(getContext(), "Общая накладная успешно создана", Toast.LENGTH_SHORT).show();
 
+                updateItemsRV();
+
+                removeRealm();
             } else {
                 showEmptyToast(createResponse.getStatus());
 
             }
 
         }
+    }
+
+    private void removeRealm() {
+        realm.executeTransaction(realm1 -> {
+            queryBody.findAll().deleteAllFromRealm();
+            RealmResults<SendInvoice> qure = realm.where(SendInvoice.class).findAll();
+            qure.deleteAllFromRealm();
+
+        });
+    }
+
+    private void updateItemsRV() {
+
+
     }
 
     @Override
@@ -314,14 +318,18 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 //            fragment.setArguments(bundle);
 
             Long generalInvoiceId = generalInvoiceList.get(childAdapterPosition).getId();
+            createEmptyInvoice();
             presenter.retrofitAcceptGeneralInvoice(generalInvoiceId);
 
+/*
             if (currentRoutePosition == 0) {
 
                 createEmptyInvoice();
             } else if (currentRoutePosition == maxRouteNumber) {
 
             }
+*/
+
 
 //            ((NavigationActivity) getActivity()).startFragment(fragment);
 
@@ -337,15 +345,15 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     private List<Long> ids = new ArrayList<>();
 
     @Override
-    public void showGeneralInvoiceId(Example destinations) {
+    public void showGeneralInvoiceId(Example examples) {
 
-        for (int i = 0; i < destinations.getDestinations().size(); i++) {
-            generalInvoiceIdsList.add(destinations.getDestinations().get(i).getDestinationListId());
-            ids.add(destinations.getDestinations().get(i).getId());
+        for (int i = 0; i < examples.getDestinations().size(); i++) {
+            generalInvoiceIdsList.add(examples.getDestinations().get(i).getDestinationListId());
+            ids.add(examples.getDestinations().get(i).getId());
         }
 
         realm.executeTransaction(realm -> {
-            realm.insert(destinations);
+            realm.insert(examples);
         });
 
 //        listAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, generalInvoiceIdsList);
@@ -372,6 +380,10 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
                 .setPositiveButton("Ok", (dialog, which) -> {
                     dismissDialog();
                 }).create();
+
+
+        //TODO REMOVE THIS LINE
+//        removeRealm();
 
         alertDialog.show();
 

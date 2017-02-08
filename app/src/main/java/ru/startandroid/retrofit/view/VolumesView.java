@@ -14,9 +14,7 @@ public interface VolumesView {
     void hideProgress();
 
     void showVolumesData(CollateResponse volumes);
-
-    void getPostResponse(CreateResponse createResponse);
-
+    
     void showRoutesEmptyData();
 
     void showRoutesError(Throwable throwable);
