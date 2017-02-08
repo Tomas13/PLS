@@ -144,7 +144,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
         //flightName.add(entries.get(i).getDept().getNameRu());
 //        }
 
-        presenter.loadGetListForVpn();
+//        presenter.loadGetListForVpn();
 
         return rootView;
     }
@@ -155,13 +155,13 @@ public class VolumesFragment extends Fragment implements VolumesView {
         List<PacketList> packet = new ArrayList<>();
 
         for (int i = 0; i < queryLabel.findAll().size(); i++) {
-            if (queryLabel.findAll().size() > 0) {
+            if (queryLabel.findAll().size() > 0 && queryLabel.findAll().get(i).getIsCollated() != null) {
                 label.add(queryLabel.findAll().get(i));
             }
         }
 
         for (int j = 0; j < queryPacket.findAll().size(); j++) {
-            if (queryPacket.findAll().size() > 0) {
+            if (queryPacket.findAll().size() > 0 && queryPacket.findAll().get(j).getIsCollated() != null) {
                 packet.add(queryPacket.findAll().get(j));
             }
         }

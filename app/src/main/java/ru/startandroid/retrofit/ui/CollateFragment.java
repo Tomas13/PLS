@@ -163,18 +163,10 @@ public class CollateFragment extends Fragment implements CollateView {
         init();
 
 
-        if (getArguments() != null) {
+//        showProgress();
+      //  presenter.loadDestinationList();
 
-            Long id = getArguments().getLong("generalInvoiceId");
-            Toast.makeText(getContext(), "id " + id, Toast.LENGTH_SHORT).show();
-
-            progressAccept.setVisibility(View.VISIBLE);
-            presenter.retrofitAcceptGeneralInvoice(id);
-        } else {
-            progressAccept.setVisibility(View.VISIBLE);
-            presenter.loadDestinationList();
-
-        }
+        loadSRealm();
 
         addTextChangeListener();
 
@@ -190,15 +182,25 @@ public class CollateFragment extends Fragment implements CollateView {
 
                     for (int j = 0; j < chosenIds.size(); j++) {
 
-                        if (queryDestination.findAll().get(i).getId().equals(chosenIds.get(j))){
+                        if (queryDestination.findAll().get(i).getId().equals(chosenIds.get(j))) {
 
                             int k = i;
-                            realm.executeTransaction(realm ->{
-                                if (!queryDestination.findAll().get(k).getLabelList().isEmpty())
-                                    realm.insert(queryDestination.findAll().get(k).getLabelList());
+                            realm.executeTransaction(realm -> {
+                                if (!queryDestination.findAll().get(k).getLabelList().isEmpty()){
 
-                                if (!queryDestination.findAll().get(k).getPacketList().isEmpty())
+                                    for (int l = 0; l < queryDestination.findAll().get(k).getLabelList().size(); l++) {
+                                        queryDestination.findAll().get(k).getLabelList().get(l).setIsCollated(true);
+                                    }
+                                    realm.insert(queryDestination.findAll().get(k).getLabelList());
+                                }
+
+                                if (!queryDestination.findAll().get(k).getPacketList().isEmpty()){
+                                    for (int l = 0; l < queryDestination.findAll().get(k).getPacketList().size(); l++) {
+                                        queryDestination.findAll().get(k).getPacketList().get(l).setIsCollated(true);
+                                    }
+
                                     realm.insert(queryDestination.findAll().get(k).getPacketList());
+                                }
                             });
 
                             generalInvoiceIdsList.remove(queryDestination.findAll().get(i).getDestinationListId());
@@ -261,6 +263,33 @@ public class CollateFragment extends Fragment implements CollateView {
         return view;
     }
 
+
+    private void loadSRealm() {
+
+        ArrayList<LabelList> labels = new ArrayList<LabelList>();
+
+        for (int i = 0; i < queryDestination.findAll().size(); i++) {
+            if (queryDestination.findAll().get(i).getLabelList().size() > 0) {
+                labels.addAll(queryDestination.findAll().get(i).getLabelList());
+            }
+        }
+
+        ArrayList<PacketList> packets = new ArrayList<>();
+
+        for (int i = 0; i < queryDestination.findAll().size(); i++) {
+            if (queryDestination.findAll().get(i).getPacketList().size() > 0) {
+                packets.addAll(queryDestination.findAll().get(i).getPacketList());
+            }
+        }
+
+        realm.executeTransaction(realm -> {
+            realm.insert(packets);
+            realm.insert(labels);
+        });
+
+    }
+
+
     private void startScanActivity() {
         Intent intent = new Intent(getContext(), CaptureActivity.class);
         intent.putExtra(ZXingConstants.ScanIsShowHistory, true);
@@ -299,25 +328,8 @@ public class CollateFragment extends Fragment implements CollateView {
         listAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, generalInvoiceIdsList);
         listViewAcceptGen.setAdapter(listAdapter);
 
-        Log.d("acceptGen", generalInvoiceIdsList.get(0));
     }
 
-
-    @Override
-    public void showGeneralInvoiceId(Example example) {
-
-        for (int i = 0; i < example.getDestinations().size(); i++) {
-            generalInvoiceIdsList.add(example.getDestinations().get(i).getDestinationListId());
-            ids.add(example.getDestinations().get(i).getId());
-        }
-
-        realm.executeTransaction(realm -> {
-            realm.insert(example);
-        });
-
-        listAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, generalInvoiceIdsList);
-        listViewAcceptGen.setAdapter(listAdapter);
-    }
 
     @Override
     public void showCollateResponse(CollateResponse collateResponse) {
@@ -331,31 +343,12 @@ public class CollateFragment extends Fragment implements CollateView {
         ArrayList<PacketList> packets = new ArrayList<>();
         packets.addAll(collateDtoObject.getPackets());
 
-        ArrayList<CollateResponse> collateResponsesArrayList = new ArrayList<CollateResponse>();
-//                collateResponsesArrayList.addAll(response)
-
-
         realm.executeTransaction(realm -> {
             realm.insert(packets);
             realm.insert(labels);
         });
 
         ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    public void showProgress() {
-        progressAccept.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void hideProgress() {
-        progressAccept.setVisibility(View.GONE);
     }
 
     @Override
@@ -370,12 +363,6 @@ public class CollateFragment extends Fragment implements CollateView {
         ArrayList<Object> objects = new ArrayList<Object>();
         objects.addAll(packetsArrayList);
         objects.addAll(labelsArrayList);
-
-//                    CollateRVAdapter collateRVAdapter = new CollateRVAdapter(objects);
-
-
-        // Create the Realm instance
-//        realm = Realm.getDefaultInstance();
 
         realm.executeTransaction(realm -> {
             realm.insert(labelsArrayList);
@@ -399,5 +386,22 @@ public class CollateFragment extends Fragment implements CollateView {
         Log.d("MainAccept", throwable.getMessage());
         Toast.makeText(getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
     }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    public void showProgress() {
+        progressAccept.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideProgress() {
+        progressAccept.setVisibility(View.GONE);
+    }
+
 
 }

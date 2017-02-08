@@ -118,30 +118,6 @@ public class CollatePresenterImpl implements CollatePresenter {
         }
     }
 
-    @Override
-    public void retrofitAcceptGeneralInvoice(Long generalInvoiceId) {
-        view.showProgress();
-
-        Observable<Example> acceptGeneralInvoice =
-                service.getApiService().acceptGeneralInvoiceNew(generalInvoiceId);
-
-        subscription = acceptGeneralInvoice.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        response -> {
-                            if (response.getStatus().equals("success")) {
-                                view.hideProgress();
-                                view.showGeneralInvoiceId(response);
-                            } else {
-
-                                view.showRoutesEmptyData();
-
-                            }
-                        },
-                        throwable -> {
-                            view.showRoutesError(throwable);
-                            view.hideProgress();
-                        });
-    }
 
 
     @Override

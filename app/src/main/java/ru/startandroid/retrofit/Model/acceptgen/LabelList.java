@@ -20,6 +20,16 @@ public class LabelList extends RealmObject{
     @Expose
     private ToDep_ toDep;
 
+    private Boolean isCollated;
+
+    public Boolean getIsCollated() {
+        return isCollated;
+    }
+
+    public void setIsCollated(Boolean collated) {
+        isCollated = collated;
+    }
+
     public Long getId() {
         return id;
     }

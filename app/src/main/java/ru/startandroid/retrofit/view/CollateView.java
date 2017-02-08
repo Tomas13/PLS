@@ -16,9 +16,6 @@ public interface CollateView {
 
     void showVolumesData(CollateResponse volumes);
 
-    void showGeneralInvoiceId(Example destinations);
-
-
     void showCollateResponse(CollateResponse collateResponse);
 
     void showDestinationList(ResponseDestinationList destinationList);

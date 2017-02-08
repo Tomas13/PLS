@@ -52,7 +52,6 @@ public class RoutesFragment extends Fragment implements RoutesView {
     LinearLayout linearLayoutHeader;
 
     private RoutesPresenter presenter;
-
     private Realm realm;
 
     public RoutesFragment() {
