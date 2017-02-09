@@ -15,6 +15,12 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.birbit.android.jobqueue.JobManager;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +30,7 @@ import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
+import ru.startandroid.retrofit.AppJobManager;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoice;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoiceWithout;
 import ru.startandroid.retrofit.Model.CreateResponse;
@@ -36,6 +43,15 @@ import ru.startandroid.retrofit.Model.routes.Entry;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.InvoiceRVAdapter;
 import ru.startandroid.retrofit.adapter.InvoiceRVAdapterSend;
+import ru.startandroid.retrofit.events.AcceptEmptyEvent;
+import ru.startandroid.retrofit.events.AcceptGenInvoiceEvent;
+import ru.startandroid.retrofit.events.CollateEvent;
+import ru.startandroid.retrofit.events.InvoiceEvent;
+import ru.startandroid.retrofit.events.PostBodyEvent;
+import ru.startandroid.retrofit.events.ShowGeneralInvoiceEvent;
+import ru.startandroid.retrofit.jobs.AcceptGeneralInvoiceJob;
+import ru.startandroid.retrofit.jobs.LoadGeneralInvoiceJob;
+import ru.startandroid.retrofit.jobs.PostCreateInvoiceJob;
 import ru.startandroid.retrofit.models.NetworkService;
 import ru.startandroid.retrofit.presenter.InvoicePresenter;
 import ru.startandroid.retrofit.presenter.InvoicePresenterImpl;
@@ -83,6 +99,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     public BodyForCreateInvoiceWithout body;
     public BodyForCreateInvoice bodyRealm;
 
+    private JobManager jobManager;
 
     //    InvoiceRVAdapter adapterGet;
     InvoiceRVAdapterSend adapterSend;
@@ -109,6 +126,8 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         maxRouteNumber = pref.getInt(NUMBER_OF_CITIES, 0);
         currentRoutePosition = pref.getInt(CURRENT_ROUTE_POSITION, 0);
 
+        jobManager = AppJobManager.getJobManager();
+
     }
 
     @Override
@@ -134,7 +153,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
         queryBody = realm.where(BodyForCreateInvoice.class);
         for (int i = 0; i < queryBody.findAll().size(); i++) {
-            bodyRealm = queryBody.findAll().first();
+            bodyRealm = queryBody.findAll().last();
         }
 
         if (queryBody.findAll().size() == 0) prepareBodyForPost();
@@ -158,10 +177,11 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
                 //TODO
 
 
-                presenter.postCreateInvoice(body);
+                showProgress();
+                jobManager.addJobInBackground(new PostCreateInvoiceJob(body));
+//                presenter.postCreateInvoice(body);
 
 
-                removeRealm();
 
 
             }));
@@ -171,11 +191,47 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             rvSendInvoice.setAdapter(adapterSend);
         }
 
-        presenter.loadGeneralInvoice();
+//        presenter.loadGeneralInvoice();
+
+        jobManager.addJobInBackground(new LoadGeneralInvoiceJob());
 
         return viewRoot;
     }
 
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onLoadGeneralInvoice(ShowGeneralInvoiceEvent event){
+        final List<GeneralInvoice> generalInvoiceList = new ArrayList<>();
+
+        generalInvoiceList.addAll(event.getInvoiceMain().getGeneralInvoices());
+
+
+        InvoiceRVAdapter invoiceRVAdapter = new InvoiceRVAdapter(getActivity(), generalInvoiceList, (childView, childAdapterPosition) -> {
+
+            Long generalInvoiceId = generalInvoiceList.get(childAdapterPosition).getId();
+//            presenter.retrofitAcceptGeneralInvoice(generalInvoiceId);
+
+            showProgress();
+            jobManager.addJobInBackground(new AcceptGeneralInvoiceJob(generalInvoiceId));
+
+            createEmptyInvoice();
+/*
+            if (currentRoutePosition == 0) {
+
+                createEmptyInvoice();
+            } else if (currentRoutePosition == maxRouteNumber) {
+
+            }
+*/
+
+            startCollateFragment();
+
+        });
+
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+        rvInvoice.setLayoutManager(mLayoutManager);
+        rvInvoice.setAdapter(invoiceRVAdapter);
+    }
 
     private BodyForCreateInvoiceWithout realmToBody(BodyForCreateInvoice bodyRealm) {
 
@@ -196,7 +252,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
                 labelLong.add(realmLong.getaLong());
             }
             bodyForCreateInvoiceWithout.setLabelIds(labelLong);
-        }else{
+        } else {
             bodyForCreateInvoiceWithout.setLabelIds(new ArrayList<>());
 
         }
@@ -214,7 +270,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             }
 
             bodyForCreateInvoiceWithout.setPacketIds(packetLong);
-        }else{
+        } else {
             bodyForCreateInvoiceWithout.setPacketIds(new ArrayList<>());
 
         }
@@ -278,26 +334,36 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         realm.executeTransaction(realm -> realm.insert(sendInvoice));
     }
 
-    @Override
-    public void getPostResponse(CreateResponse createResponse) {
-        if (createResponse != null) {
 
-            if (createResponse.getStatus().equals("success")) {
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onPostCreateInvoiceJob(InvoiceEvent invoiceEvent) {
+        if (invoiceEvent.getCreateResponse() != null){
+            if (invoiceEvent.getCreateResponse().getStatus().equals("success")) {
 
 
                 Toast.makeText(getContext(), "Общая накладная успешно создана", Toast.LENGTH_SHORT).show();
 
                 updateItemsRV();
 
+                hideProgress();
+//                removeRealm();
+
+
             } else {
-                showEmptyToast(createResponse.getStatus());
+                showEmptyToast(invoiceEvent.getCreateResponse().getStatus());
 
             }
 
         }
     }
 
-    private void removeRealm() {
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onInvoiceErrorEvent(Throwable message){
+        showEmptyToast(message.getMessage());
+        hideProgress();
+    }
+
+     private void removeRealm() {
         realm.executeTransaction(realm1 -> {
             queryBody.findAll().deleteAllFromRealm();
             RealmResults<SendInvoice> qure = realm.where(SendInvoice.class).findAll();
@@ -308,39 +374,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
     private void updateItemsRV() {
 
-
-    }
-
-    @Override
-    public void showGeneralInvoice(InvoiceMain invoiceMain) {
-
-        final List<GeneralInvoice> generalInvoiceList = new ArrayList<>();
-
-        generalInvoiceList.addAll(invoiceMain.getGeneralInvoices());
-
-
-        InvoiceRVAdapter invoiceRVAdapter = new InvoiceRVAdapter(getActivity(), generalInvoiceList, (childView, childAdapterPosition) -> {
-
-            Long generalInvoiceId = generalInvoiceList.get(childAdapterPosition).getId();
-            presenter.retrofitAcceptGeneralInvoice(generalInvoiceId);
-
-            createEmptyInvoice();
-/*
-            if (currentRoutePosition == 0) {
-
-                createEmptyInvoice();
-            } else if (currentRoutePosition == maxRouteNumber) {
-
-            }
-*/
-
-            startCollateFragment();
-
-        });
-
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-        rvInvoice.setLayoutManager(mLayoutManager);
-        rvInvoice.setAdapter(invoiceRVAdapter);
 
     }
 
@@ -357,21 +390,33 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     private List<String> generalInvoiceIdsList = new ArrayList<>();
     private List<Long> ids = new ArrayList<>();
 
-    @Override
-    public void showGeneralInvoiceId(Example examples) {
 
-        for (int i = 0; i < examples.getDestinations().size(); i++) {
-            generalInvoiceIdsList.add(examples.getDestinations().get(i).getDestinationListId());
-            ids.add(examples.getDestinations().get(i).getId());
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onAcceptGenInvoiceResponce(AcceptGenInvoiceEvent acceptGenInvoiceEvent){
+        for (int i = 0; i < acceptGenInvoiceEvent.getExample().getDestinations().size(); i++) {
+            generalInvoiceIdsList.add(acceptGenInvoiceEvent.getExample().getDestinations().get(i).getDestinationListId());
+            ids.add(acceptGenInvoiceEvent.getExample().getDestinations().get(i).getId());
         }
 
+        hideProgress();
         realm.executeTransaction(realm -> {
-            realm.insert(examples);
+            realm.insert(acceptGenInvoiceEvent.getExample());
         });
-
-//        listAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, generalInvoiceIdsList);
-//        listViewAcceptGen.setAdapter(listAdapter);
     }
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public  void onAcceptErrorEvent(Throwable throwable){
+        showEmptyToast(throwable.getMessage());
+        hideProgress();
+    }
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public  void onAcceptEmptyEvent(AcceptEmptyEvent emptyEvent){
+        showEmptyToast(emptyEvent.getEmptyMessage());
+        showRoutesEmptyData();
+        hideProgress();
+    }
+
 
     @Override
     public void showRoutesEmptyData() {
@@ -414,6 +459,18 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     @Override
     public void hideProgress() {
         progressInvoice.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
     }
 
     @Override

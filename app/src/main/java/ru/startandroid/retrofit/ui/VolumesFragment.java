@@ -83,7 +83,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
     private RealmQuery<PacketList> queryPacket;
     private RealmQuery<LabelList> queryLabel;
     private RealmQuery<SendInvoice> querySendInvoice;
-    private VolumesPresenter presenter;
+//    private VolumesPresenter presenter;
     private ArrayAdapter<String> adapter;
     private List<Entry> entries;
     private ArrayList<String> flightName;
@@ -105,7 +105,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
         flightName = new ArrayList<>();
         entries = new ArrayList<>();
-        presenter = new VolumesPresenterImpl(this, new NetworkService());
+//        presenter = new VolumesPresenterImpl(this, new NetworkService());
 
         // Create the Realm instance
         realm = Realm.getDefaultInstance();
@@ -141,7 +141,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
         init();
 
 //        for (int i = 1; i < entries.size(); i++) {
-        //flightName.add(entries.get(i).getDept().getNameRu());
+//        flightName.add(entries.get(i).getDept().getNameRu());
 //        }
 
 //        presenter.loadGetListForVpn();
@@ -155,13 +155,15 @@ public class VolumesFragment extends Fragment implements VolumesView {
         List<PacketList> packet = new ArrayList<>();
 
         for (int i = 0; i < queryLabel.findAll().size(); i++) {
-            if (queryLabel.findAll().size() > 0 && queryLabel.findAll().get(i).getIsCollated() != null) {
+            if (queryLabel.findAll().size() > 0 && queryLabel.findAll().get(i).getIsCollated() != null
+                    && !queryLabel.findAll().get(i).getAddedToInvoice()) {
                 label.add(queryLabel.findAll().get(i));
             }
         }
 
         for (int j = 0; j < queryPacket.findAll().size(); j++) {
-            if (queryPacket.findAll().size() > 0 && queryPacket.findAll().get(j).getIsCollated() != null) {
+            if (queryPacket.findAll().size() > 0 && queryPacket.findAll().get(j).getIsCollated() != null
+                    && !queryPacket.findAll().get(j).getAddedToInvoice()) {
                 packet.add(queryPacket.findAll().get(j));
             }
         }
@@ -187,7 +189,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
 
         if (!querySendInvoice.findAll().isEmpty()) {
-            flightName.add(querySendInvoice.findAll().get(0).getBodyForCreateInvoice().getToDepIndex());
+            flightName.add(querySendInvoice.findAll().last().getBodyForCreateInvoice().getToDepIndex());
         }
 
         adapter = new ArrayAdapter<>(getContext(), R.layout.list_view_item, flightName);
@@ -200,7 +202,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
         listView.setOnItemClickListener((parent, view, position, id) -> {
 
             pointDialog.setTitle(flightName.get(position));
-
             listView.setItemChecked(position, true);
 
             SharedPreferences pref1 = getActivity().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
@@ -231,7 +232,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
                 body = new BodyForCreateInvoice(flightId, tlid, true, toDeptIndex, fromDeptIndex, labelLongList, packetLongList);
 
 
-                bodyWithout = new BodyForCreateInvoiceWithout(flightId, tlid, true, toDeptIndex, fromDeptIndex, labelsList, packetsList);
+//                bodyWithout = new BodyForCreateInvoiceWithout(flightId, tlid, true, toDeptIndex, fromDeptIndex, labelsList, packetsList);
 
 
             } else {
@@ -247,8 +248,8 @@ public class VolumesFragment extends Fragment implements VolumesView {
                     RealmResults<BodyForCreateInvoice> queryBody = realm.where(BodyForCreateInvoice.class).findAll();
                     realm.executeTransaction(
                             realm -> {
-//                                queryBody.deleteAllFromRealm();
                                 realm.insertOrUpdate(body);
+//                                queryBody.deleteAllFromRealm();
                             }
 
                     );
@@ -288,10 +289,12 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
                 if (objects.get(childPosition) instanceof PacketList) {
                     packetsList.add(((PacketList) objects.get(childPosition)).getId());
+                    ((PacketList) objects.get(childPosition)).setAddedToInvoice(true);
                 }
 
                 if (objects.get(childPosition) instanceof LabelList) {
                     labelsList.add(((LabelList) objects.get(childPosition)).getId());
+                    ((LabelList) objects.get(childPosition)).setAddedToInvoice(true);
                 }
 
                 checkLabelPacketListEmpty();
@@ -303,9 +306,11 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
                 if (objects.get(childPosition) instanceof PacketList) {
                     packetsList.remove(((PacketList) objects.get(childPosition)).getId());
+                    ((PacketList) objects.get(childPosition)).setAddedToInvoice(false);
 
                 } else {
                     labelsList.remove(((LabelList) objects.get(childPosition)).getId());
+                    ((LabelList) objects.get(childPosition)).setAddedToInvoice(false);
                 }
 
                 checkLabelPacketListEmpty();
@@ -373,8 +378,8 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
         if (realm != null && !realm.isClosed()) realm.close();
 
-        presenter.unSubscribe();
-        presenter.onDestroy();
+//        presenter.unSubscribe();
+//        presenter.onDestroy();
     }
 
     @Override

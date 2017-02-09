@@ -91,6 +91,7 @@ public class HistoryFragment extends Fragment implements HistoryView {
 //                .deleteRealmIfMigrationNeeded()
 //                .build();
 
+        showProgress();
         jobManager.addJobInBackground(new GetHistoryJob());
         return viewRoot;
     }
@@ -100,6 +101,8 @@ public class HistoryFragment extends Fragment implements HistoryView {
     public void onHistoryEvent(HistoryEvent event) {
 
         showHistoryData(event.getHistory());
+
+        hideProgress();
 //        realmHistory.executeTransaction(realm -> {
 //            realmHistory.insert(event.history);
 //        });

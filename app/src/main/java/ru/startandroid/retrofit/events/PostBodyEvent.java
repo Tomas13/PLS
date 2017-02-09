@@ -7,7 +7,7 @@ import ru.startandroid.retrofit.Model.BodyForCreateInvoiceWithout;
  */
 
 public class PostBodyEvent {
-    BodyForCreateInvoiceWithout bodyForCreateInvoiceWithout;
+    private BodyForCreateInvoiceWithout bodyForCreateInvoiceWithout;
 
     public PostBodyEvent(BodyForCreateInvoiceWithout bodyForCreateInvoiceWithout) {
         this.bodyForCreateInvoiceWithout = bodyForCreateInvoiceWithout;

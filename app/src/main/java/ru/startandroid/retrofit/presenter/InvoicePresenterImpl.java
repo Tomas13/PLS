@@ -25,7 +25,7 @@ public class InvoicePresenterImpl implements InvoicePresenter {
         this.view = view;
     }
 
-    @Override
+    /*@Override
     public void loadGeneralInvoice() {
 
         view.showProgress();
@@ -51,9 +51,9 @@ public class InvoicePresenterImpl implements InvoicePresenter {
                             view.hideProgress();
                         });
 
-    }
+    }*/
 
-    @Override
+    /*@Override
     public void retrofitAcceptGeneralInvoice(Long generalInvoiceId) {
         view.showProgress();
 
@@ -79,12 +79,12 @@ public class InvoicePresenterImpl implements InvoicePresenter {
                             view.showRoutesError(throwable);
                             view.hideProgress();
                         });
-    }
+    }*/
 
 
 
 
-    @Override
+  /*  @Override
     public void postCreateInvoice(BodyForCreateInvoiceWithout bodyForCreateInvoiceWithout) {
         view.showProgress();
 
@@ -105,7 +105,7 @@ public class InvoicePresenterImpl implements InvoicePresenter {
                         });
 
     }
-
+*/
 
 
 

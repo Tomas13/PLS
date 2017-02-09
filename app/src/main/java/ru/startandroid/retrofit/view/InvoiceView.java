@@ -14,9 +14,9 @@ public interface InvoiceView {
 
     void hideProgress();
 
-    void showGeneralInvoice(InvoiceMain invoiceMain);
+//    void showGeneralInvoice(InvoiceMain invoiceMain);
 
-    void showGeneralInvoiceId(Example destinations);
+//    void showGeneralInvoiceId(Example destinations);
 
     void showRoutesEmptyData();
 
@@ -24,6 +24,6 @@ public interface InvoiceView {
 
     void showEmptyToast(String message);
 
-    void getPostResponse(CreateResponse createResponse);
+//    void getPostResponse(CreateResponse createResponse);
 
 }

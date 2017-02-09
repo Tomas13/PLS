@@ -20,7 +20,17 @@ public class LabelList extends RealmObject{
     @Expose
     private ToDep_ toDep;
 
+    private Boolean isAddedToInvoice;
+
     private Boolean isCollated;
+
+    public Boolean getAddedToInvoice() {
+        return isAddedToInvoice;
+    }
+
+    public void setAddedToInvoice(Boolean addedToInvoice) {
+        isAddedToInvoice = addedToInvoice;
+    }
 
     public Boolean getIsCollated() {
         return isCollated;

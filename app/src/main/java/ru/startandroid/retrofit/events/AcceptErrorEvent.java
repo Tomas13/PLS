@@ -1,14 +1,15 @@
 package ru.startandroid.retrofit.events;
 
 /**
- * Created by root on 2/8/17.
+ * Created by root on 2/9/17.
  */
 
-public class CollateErrorEvent {
+public class AcceptErrorEvent {
 
     private Throwable error;
 
-    public CollateErrorEvent(Throwable error) {
+    public AcceptErrorEvent(Throwable error) {
         this.error = error;
     }
+
 }

@@ -3,6 +3,7 @@ package ru.startandroid.retrofit.Model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
 import io.realm.RealmObject;
@@ -11,7 +12,7 @@ import io.realm.RealmObject;
  * Created by root on 1/4/17.
  */
 
-public class BodyForCreateInvoiceWithout {
+public class BodyForCreateInvoiceWithout implements Serializable{
 
     @SerializedName("flightId")
     @Expose
