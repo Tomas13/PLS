@@ -9,28 +9,26 @@ import com.birbit.android.jobqueue.RetryConstraint;
 
 import org.greenrobot.eventbus.EventBus;
 
-import ru.startandroid.retrofit.Model.BodyForCreateInvoiceWithout;
-import ru.startandroid.retrofit.Model.CreateResponse;
-import ru.startandroid.retrofit.adapter.InvoiceErrorEvent;
-import ru.startandroid.retrofit.events.InvoiceEvent;
+import ru.startandroid.retrofit.Model.routes.Routes;
+import ru.startandroid.retrofit.events.LoadRoutesEvent;
+import ru.startandroid.retrofit.events.RoutesEmptyEvent;
+import ru.startandroid.retrofit.events.RoutesEventError;
 import ru.startandroid.retrofit.models.NetworkService;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-import static ru.startandroid.retrofit.Const.CREATE_INVOICE_PRIORITY;
+import static ru.startandroid.retrofit.Const.LOAD_ROUTES_PRIORITY;
 
 /**
  * Created by root on 2/9/17.
  */
 
-public class PostCreateInvoiceJob extends Job {
+public class LoadRoutesJob extends Job {
 
-    private BodyForCreateInvoiceWithout bodyForCreateInvoiceWithout;
+    public LoadRoutesJob() {
+        super(new Params(LOAD_ROUTES_PRIORITY).requireNetwork().persist());
 
-    public PostCreateInvoiceJob(BodyForCreateInvoiceWithout bodyForCreateInvoiceWithout) {
-        super(new Params(CREATE_INVOICE_PRIORITY).requireNetwork().persist());
-        this.bodyForCreateInvoiceWithout = bodyForCreateInvoiceWithout;
     }
 
     @Override
@@ -40,23 +38,23 @@ public class PostCreateInvoiceJob extends Job {
 
     @Override
     public void onRun() throws Throwable {
+        Observable<Routes> callEdges =
+                NetworkService.getApiService().getRoutesInfo();
 
-        Observable<CreateResponse> callCreate =
-                NetworkService.getApiService().postCreateGeneralInvoiceWithout(bodyForCreateInvoiceWithout);
-
-        callCreate
+        callEdges
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         response -> {
+                            if (response.getStatus().equals("success")) {
 
-                            EventBus.getDefault().post(new InvoiceEvent(response));
-
+                                EventBus.getDefault().postSticky(new LoadRoutesEvent(response));
+                            } else {
+                                EventBus.getDefault().postSticky(new RoutesEmptyEvent());
+                            }
                         },
                         throwable -> {
-
-                            EventBus.getDefault().post(new InvoiceErrorEvent(throwable));
-
+                            EventBus.getDefault().post(new RoutesEventError(throwable));
                         });
     }
 

@@ -44,7 +44,7 @@ public class RoutesPresenterImpl implements RoutesPresenter {
                 .subscribe(
                         response -> {
                             if (response.getStatus().equals("success")) {
-                                view.showRoutesData(response);
+//                                view.showRoutesData(response);
                                 view.hideProgress();
                             } else {
                                 view.showRoutesEmptyData();

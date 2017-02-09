@@ -1,11 +1,10 @@
 package ru.startandroid.retrofit.Model.routes;
-import java.util.List;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
-import ru.startandroid.retrofit.Model.routes.Entry;
 
 public class ItineraryDTO extends RealmObject{
 

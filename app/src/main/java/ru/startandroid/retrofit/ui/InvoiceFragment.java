@@ -33,21 +33,16 @@ import io.realm.RealmResults;
 import ru.startandroid.retrofit.AppJobManager;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoice;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoiceWithout;
-import ru.startandroid.retrofit.Model.CreateResponse;
 import ru.startandroid.retrofit.Model.RealmLong;
 import ru.startandroid.retrofit.Model.SendInvoice;
-import ru.startandroid.retrofit.Model.acceptgen.Example;
 import ru.startandroid.retrofit.Model.geninvoice.GeneralInvoice;
-import ru.startandroid.retrofit.Model.geninvoice.InvoiceMain;
 import ru.startandroid.retrofit.Model.routes.Entry;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.InvoiceRVAdapter;
 import ru.startandroid.retrofit.adapter.InvoiceRVAdapterSend;
 import ru.startandroid.retrofit.events.AcceptEmptyEvent;
 import ru.startandroid.retrofit.events.AcceptGenInvoiceEvent;
-import ru.startandroid.retrofit.events.CollateEvent;
 import ru.startandroid.retrofit.events.InvoiceEvent;
-import ru.startandroid.retrofit.events.PostBodyEvent;
 import ru.startandroid.retrofit.events.ShowGeneralInvoiceEvent;
 import ru.startandroid.retrofit.jobs.AcceptGeneralInvoiceJob;
 import ru.startandroid.retrofit.jobs.LoadGeneralInvoiceJob;
@@ -205,7 +200,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
         generalInvoiceList.addAll(event.getInvoiceMain().getGeneralInvoices());
 
-
         InvoiceRVAdapter invoiceRVAdapter = new InvoiceRVAdapter(getActivity(), generalInvoiceList, (childView, childAdapterPosition) -> {
 
             Long generalInvoiceId = generalInvoiceList.get(childAdapterPosition).getId();
@@ -340,7 +334,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         if (invoiceEvent.getCreateResponse() != null){
             if (invoiceEvent.getCreateResponse().getStatus().equals("success")) {
 
-
                 Toast.makeText(getContext(), "Общая накладная успешно создана", Toast.LENGTH_SHORT).show();
 
                 updateItemsRV();
@@ -412,7 +405,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public  void onAcceptEmptyEvent(AcceptEmptyEvent emptyEvent){
-        showEmptyToast(emptyEvent.getEmptyMessage());
+//        showEmptyToast(emptyEvent.getEmptyMessage());
         showRoutesEmptyData();
         hideProgress();
     }

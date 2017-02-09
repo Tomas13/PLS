@@ -38,19 +38,14 @@ import io.realm.RealmQuery;
 import ru.startandroid.retrofit.AppJobManager;
 import ru.startandroid.retrofit.Model.IdsCollate;
 import ru.startandroid.retrofit.Model.acceptgen.Destination;
-import ru.startandroid.retrofit.Model.acceptgen.Example;
 import ru.startandroid.retrofit.Model.acceptgen.LabelList;
 import ru.startandroid.retrofit.Model.acceptgen.PacketList;
 import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.Model.collatedestination.Dto;
 import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
-
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.events.CollateEvent;
 import ru.startandroid.retrofit.jobs.CollateJob;
-import ru.startandroid.retrofit.models.NetworkService;
-import ru.startandroid.retrofit.presenter.CollatePresenter;
-import ru.startandroid.retrofit.presenter.CollatePresenterImpl;
 import ru.startandroid.retrofit.view.CollateView;
 
 /**
@@ -81,7 +76,6 @@ public class CollateFragment extends Fragment implements CollateView {
     private Realm realm;
     private ArrayAdapter<String> listAdapter;
     private List<String> generalInvoiceIdsList = new ArrayList<>();
-    private CollatePresenter presenter;
     private Dto collateDtoObject;
     int count = 0;
     private RealmQuery<Destination> queryDestination;
@@ -97,7 +91,6 @@ public class CollateFragment extends Fragment implements CollateView {
         ids = new ArrayList<>();
         realm = Realm.getDefaultInstance();
         queryDestination = realm.where(Destination.class);
-        presenter = new CollatePresenterImpl(this, new NetworkService());
         chosenIds = new ArrayList<>();
 
         for (int i = 0; i < queryDestination.findAll().size(); i++) {

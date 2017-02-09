@@ -198,7 +198,6 @@ public class NavigationActivity extends AppCompatActivity
         }
 
         //If VPN didn't choose flight then getRoutesInfo
-        //TODO gotta remove shared pref value when needed (onLogout)
         SharedPreferences pref = getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
 
         SharedPreferences pref1 = getApplicationContext().getSharedPreferences(NAV_SHARED_PREF, 0); // 0 - for private mode
@@ -230,7 +229,6 @@ public class NavigationActivity extends AppCompatActivity
     @Override
     public void getMembershipData(Member member) {
         if (member != null) {
-
             String firstname = member.getData().get(0).getFirstName();
             String lastname = member.getData().get(0).getLastName();
 
@@ -238,11 +236,6 @@ public class NavigationActivity extends AppCompatActivity
 
             tvFirstName.setText(firstname);
             tvLastName.setText(lastname);
-
-//                    HistoryFragment fragment = new HistoryFragment();
-//                startFragment(fragment);
-
-            Log.d("Main", Const.Token);
         }
     }
 
@@ -254,9 +247,7 @@ public class NavigationActivity extends AppCompatActivity
     @Override
     public void showMemberError(Throwable throwable) {
         hideProgress();
-
         Toast.makeText(NavigationActivity.this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
-
     }
 
     private void createDialog() {
@@ -584,12 +575,6 @@ public class NavigationActivity extends AppCompatActivity
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(error)
                 .setPositiveButton(R.string.ok, (dialog, id) -> dialog.dismiss());
-//                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int id) {
-//                         User cancelled the dialog
-//                    }
-
-        // Create the AlertDialog object and return it
         builder.create().show();
     }
 }

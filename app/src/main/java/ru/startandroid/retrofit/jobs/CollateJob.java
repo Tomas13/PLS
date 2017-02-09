@@ -54,13 +54,13 @@ public class CollateJob extends Job {
                         response -> {
                             if (response.getStatus().equals("success")) {
 
-                                EventBus.getDefault().postSticky(new CollateEvent(response));
+                                EventBus.getDefault().post(new CollateEvent(response));
 
                             }
                         },
                         throwable -> {
 
-                            EventBus.getDefault().postSticky(new CollateErrorEvent(throwable));
+                            EventBus.getDefault().post(new CollateErrorEvent(throwable));
 
                         });
 

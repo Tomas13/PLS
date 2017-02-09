@@ -9,16 +9,11 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.textservice.TextInfo;
-import android.widget.AdapterView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import ru.startandroid.retrofit.Model.routes.Entry;
-import ru.startandroid.retrofit.Model.routes.Flight;
-import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.R;
 
 /**

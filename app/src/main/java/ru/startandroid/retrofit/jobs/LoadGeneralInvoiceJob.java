@@ -48,17 +48,17 @@ public class LoadGeneralInvoiceJob extends Job {
                         response -> {
                             if (response.getStatus().equals("success")) {
 
-                                EventBus.getDefault().postSticky(new ShowGeneralInvoiceEvent(response));
+                                EventBus.getDefault().post(new ShowGeneralInvoiceEvent(response));
                             } else {
 
-                                EventBus.getDefault().postSticky(new AcceptEmptyEvent(""));
+                                EventBus.getDefault().post(new AcceptEmptyEvent(""));
 
 //                                view.showRoutesEmptyData();
                             }
                         },
                         throwable -> {
 
-                            EventBus.getDefault().postSticky(new LoadGeneralErrorEvent(throwable));
+                            EventBus.getDefault().post(new LoadGeneralErrorEvent(throwable));
                         });
     }
 

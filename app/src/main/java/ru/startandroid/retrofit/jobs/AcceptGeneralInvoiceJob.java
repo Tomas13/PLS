@@ -49,7 +49,7 @@ public class AcceptGeneralInvoiceJob extends Job {
                         response -> {
                             if (response.getStatus().equals("success")) {
 
-                                EventBus.getDefault().postSticky(new AcceptGenInvoiceEvent(response));
+                                EventBus.getDefault().post(new AcceptGenInvoiceEvent(response));
 
                             } else if (response.getStatus().equals("list-empty")){
 
