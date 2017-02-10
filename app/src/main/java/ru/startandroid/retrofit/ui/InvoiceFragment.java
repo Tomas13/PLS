@@ -33,9 +33,13 @@ import io.realm.RealmResults;
 import ru.startandroid.retrofit.AppJobManager;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoice;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoiceWithout;
+import ru.startandroid.retrofit.Model.CreateResponse;
 import ru.startandroid.retrofit.Model.RealmLong;
 import ru.startandroid.retrofit.Model.SendInvoice;
+import ru.startandroid.retrofit.Model.acceptgen.Example;
+import ru.startandroid.retrofit.Model.acceptgen.LabelList;
 import ru.startandroid.retrofit.Model.geninvoice.GeneralInvoice;
+import ru.startandroid.retrofit.Model.geninvoice.InvoiceMain;
 import ru.startandroid.retrofit.Model.routes.Entry;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.InvoiceRVAdapter;
@@ -186,9 +190,9 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             rvSendInvoice.setAdapter(adapterSend);
         }
 
-//        presenter.loadGeneralInvoice();
+        presenter.loadGeneralInvoice();
 
-        jobManager.addJobInBackground(new LoadGeneralInvoiceJob());
+//        jobManager.addJobInBackground(new LoadGeneralInvoiceJob());
 
         return viewRoot;
     }
@@ -196,35 +200,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onLoadGeneralInvoice(ShowGeneralInvoiceEvent event){
-        final List<GeneralInvoice> generalInvoiceList = new ArrayList<>();
 
-        generalInvoiceList.addAll(event.getInvoiceMain().getGeneralInvoices());
-
-        InvoiceRVAdapter invoiceRVAdapter = new InvoiceRVAdapter(getActivity(), generalInvoiceList, (childView, childAdapterPosition) -> {
-
-            Long generalInvoiceId = generalInvoiceList.get(childAdapterPosition).getId();
-//            presenter.retrofitAcceptGeneralInvoice(generalInvoiceId);
-
-            showProgress();
-            jobManager.addJobInBackground(new AcceptGeneralInvoiceJob(generalInvoiceId));
-
-            createEmptyInvoice();
-/*
-            if (currentRoutePosition == 0) {
-
-                createEmptyInvoice();
-            } else if (currentRoutePosition == maxRouteNumber) {
-
-            }
-*/
-
-            startCollateFragment();
-
-        });
-
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-        rvInvoice.setLayoutManager(mLayoutManager);
-        rvInvoice.setAdapter(invoiceRVAdapter);
     }
 
     private BodyForCreateInvoiceWithout realmToBody(BodyForCreateInvoice bodyRealm) {
@@ -339,7 +315,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
                 updateItemsRV();
 
                 hideProgress();
-//                removeRealm();
+                removeRealm();
 
 
             } else {
@@ -386,15 +362,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onAcceptGenInvoiceResponce(AcceptGenInvoiceEvent acceptGenInvoiceEvent){
-        for (int i = 0; i < acceptGenInvoiceEvent.getExample().getDestinations().size(); i++) {
-            generalInvoiceIdsList.add(acceptGenInvoiceEvent.getExample().getDestinations().get(i).getDestinationListId());
-            ids.add(acceptGenInvoiceEvent.getExample().getDestinations().get(i).getId());
-        }
 
-        hideProgress();
-        realm.executeTransaction(realm -> {
-            realm.insert(acceptGenInvoiceEvent.getExample());
-        });
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
@@ -433,11 +401,32 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
                 }).create();
 
 
-        //TODO REMOVE THIS LINE
-//        removeRealm();
-
         alertDialog.show();
 
+        hideProgress();
+
+
+    }
+
+    @Override
+    public void getPostResponse(CreateResponse createResponse) {
+        if (createResponse != null){
+            if (createResponse.getStatus().equals("success")) {
+
+                Toast.makeText(getContext(), "Общая накладная успешно создана", Toast.LENGTH_SHORT).show();
+
+                updateItemsRV();
+
+                hideProgress();
+//                removeRealm();
+
+
+            } else {
+                showEmptyToast(createResponse.getStatus());
+
+            }
+
+        }
     }
 
     private void dismissDialog() {
@@ -452,6 +441,54 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     @Override
     public void hideProgress() {
         progressInvoice.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showGeneralInvoice(InvoiceMain invoiceMain) {
+        final List<GeneralInvoice> generalInvoiceList = new ArrayList<>();
+
+        generalInvoiceList.addAll(invoiceMain.getGeneralInvoices());
+
+        InvoiceRVAdapter invoiceRVAdapter = new InvoiceRVAdapter(getActivity(), generalInvoiceList, (childView, childAdapterPosition) -> {
+
+            Long generalInvoiceId = generalInvoiceList.get(childAdapterPosition).getId();
+            presenter.retrofitAcceptGeneralInvoice(generalInvoiceId);
+
+            showProgress();
+//            jobManager.addJobInBackground(new AcceptGeneralInvoiceJob(generalInvoiceId));
+
+            createEmptyInvoice();
+/*
+            if (currentRoutePosition == 0) {
+
+                createEmptyInvoice();
+            } else if (currentRoutePosition == maxRouteNumber) {
+
+            }
+*/
+
+            //startCollateFragment();
+
+        });
+
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+        rvInvoice.setLayoutManager(mLayoutManager);
+        rvInvoice.setAdapter(invoiceRVAdapter);
+    }
+
+    @Override
+    public void showGeneralInvoiceId(Example example) {
+        for (int i = 0; i < example.getDestinations().size(); i++) {
+            generalInvoiceIdsList.add(example.getDestinations().get(i).getDestinationListId());
+            ids.add(example.getDestinations().get(i).getId());
+        }
+
+        hideProgress();
+        realm.executeTransaction(realm -> {
+            realm.insert(example);
+        });
+
+        startCollateFragment();
     }
 
     @Override

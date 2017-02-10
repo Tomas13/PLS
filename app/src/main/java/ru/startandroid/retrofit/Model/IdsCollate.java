@@ -2,6 +2,7 @@ package ru.startandroid.retrofit.Model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.sql.Array;
 import java.util.List;
 
@@ -9,7 +10,7 @@ import java.util.List;
  * Created by root on 12/28/16.
  */
 
-public class IdsCollate {
+public class IdsCollate implements Serializable{
     @SerializedName("ids")
     List<Long> id;
 

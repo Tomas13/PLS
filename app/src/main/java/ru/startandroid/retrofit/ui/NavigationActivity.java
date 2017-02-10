@@ -295,6 +295,8 @@ public class NavigationActivity extends AppCompatActivity
 
         });
 
+//        Button btnCancel = (Button) flightDialog.findViewById(R.id.btn_cancel_flight);
+
         Button btnOk = (Button) flightDialog.findViewById(R.id.btn_ok_flight);
         btnOk.setOnClickListener(v -> {
 

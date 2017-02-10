@@ -130,16 +130,18 @@ public class VolumesFragment extends Fragment implements VolumesView {
         List<LabelList> label = new ArrayList<>();
         List<PacketList> packet = new ArrayList<>();
 
+
         for (int i = 0; i < queryLabel.findAll().size(); i++) {
             if (queryLabel.findAll().size() > 0 && queryLabel.findAll().get(i).getIsCollated() != null
-                    && !queryLabel.findAll().get(i).getAddedToInvoice()) {
+                    && queryLabel.findAll().get(i).getAddedToInvoice() == null) {
                 label.add(queryLabel.findAll().get(i));
             }
         }
 
+
         for (int j = 0; j < queryPacket.findAll().size(); j++) {
             if (queryPacket.findAll().size() > 0 && queryPacket.findAll().get(j).getIsCollated() != null
-                    && !queryPacket.findAll().get(j).getAddedToInvoice()) {
+                    && queryPacket.findAll().get(j).getAddedToInvoice() == null) {
                 packet.add(queryPacket.findAll().get(j));
             }
         }
@@ -264,12 +266,17 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
                 if (objects.get(childPosition) instanceof PacketList) {
                     packetsList.add(((PacketList) objects.get(childPosition)).getId());
-                    ((PacketList) objects.get(childPosition)).setAddedToInvoice(true);
+                    realm.executeTransaction(realm1 -> {
+
+                        ((PacketList) objects.get(childPosition)).setAddedToInvoice(true);
+                    });
                 }
 
                 if (objects.get(childPosition) instanceof LabelList) {
                     labelsList.add(((LabelList) objects.get(childPosition)).getId());
-                    ((LabelList) objects.get(childPosition)).setAddedToInvoice(true);
+                    realm.executeTransaction(realm1 -> {
+                        ((LabelList) objects.get(childPosition)).setAddedToInvoice(true);
+                    });
                 }
 
                 checkLabelPacketListEmpty();
@@ -281,11 +288,14 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
                 if (objects.get(childPosition) instanceof PacketList) {
                     packetsList.remove(((PacketList) objects.get(childPosition)).getId());
-                    ((PacketList) objects.get(childPosition)).setAddedToInvoice(false);
-
+                    realm.executeTransaction(realm1 -> {
+                        ((PacketList) objects.get(childPosition)).setAddedToInvoice(false);
+                    });
                 } else {
                     labelsList.remove(((LabelList) objects.get(childPosition)).getId());
-                    ((LabelList) objects.get(childPosition)).setAddedToInvoice(false);
+                    realm.executeTransaction(realm1 -> {
+                        ((LabelList) objects.get(childPosition)).setAddedToInvoice(false);
+                    });
                 }
 
                 checkLabelPacketListEmpty();

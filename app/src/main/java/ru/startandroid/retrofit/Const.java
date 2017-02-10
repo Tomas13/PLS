@@ -41,13 +41,13 @@ public class Const {
 
 
 
-    public static final int COLLATE_PRIORITY = 2;
-    public static final int CREATE_INVOICE_PRIORITY = 3;
-    public static final int ACCEPT_INVOICE_PRIORITY = 3;
-    public static final int LOAD_INVOICE_PRIORITY = 3;
-    public static final int LOAD_ROUTES_PRIORITY = 1;
+    public static final int COLLATE_PRIORITY = 5;
+    public static final int CREATE_INVOICE_PRIORITY = 5;
+    public static final int ACCEPT_INVOICE_PRIORITY = 5;
+    public static final int LOAD_INVOICE_PRIORITY = 5;
+    public static final int LOAD_ROUTES_PRIORITY = 5;
 
 
-    public static final int HISTORY_PRIORITY = 1;
+    public static final int HISTORY_PRIORITY = 5;
 
 }

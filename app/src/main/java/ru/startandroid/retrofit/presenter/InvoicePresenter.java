@@ -10,11 +10,11 @@ public interface InvoicePresenter {
 
     void onDestroy();
 
-//    void loadGeneralInvoice();
+    void loadGeneralInvoice();
 
-//    void retrofitAcceptGeneralInvoice(Long generalInvoiceId);
+    void retrofitAcceptGeneralInvoice(Long generalInvoiceId);
 
-//    void postCreateInvoice(BodyForCreateInvoiceWithout bodyForCreateInvoiceWithout);
+    void postCreateInvoice(BodyForCreateInvoiceWithout bodyForCreateInvoiceWithout);
 
     void unSubscribe();
 
