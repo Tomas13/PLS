@@ -30,19 +30,13 @@ import io.realm.RealmList;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoice;
-import ru.startandroid.retrofit.Model.BodyForCreateInvoiceWithout;
 import ru.startandroid.retrofit.Model.RealmLong;
 import ru.startandroid.retrofit.Model.SendInvoice;
-import ru.startandroid.retrofit.Model.acceptgen.Destination;
 import ru.startandroid.retrofit.Model.acceptgen.LabelList;
 import ru.startandroid.retrofit.Model.acceptgen.PacketList;
-import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.Model.routes.Entry;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.CollateRVAdapter;
-import ru.startandroid.retrofit.models.NetworkService;
-import ru.startandroid.retrofit.presenter.VolumesPresenter;
-import ru.startandroid.retrofit.presenter.VolumesPresenterImpl;
 import ru.startandroid.retrofit.view.VolumesView;
 
 import static ru.startandroid.retrofit.Const.CURRENT_ROUTE_POSITION;
@@ -76,25 +70,18 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
     private List<Long> packetsList = new ArrayList<>();
     private List<Long> labelsList = new ArrayList<>();
-    private ArrayList<LabelList> labelsArrayList = new ArrayList<>();
-    private ArrayList<PacketList> packetsArrayList = new ArrayList<>();
     private Realm realm;
     private RealmQuery<Entry> queryData;
     private RealmQuery<PacketList> queryPacket;
     private RealmQuery<LabelList> queryLabel;
     private RealmQuery<SendInvoice> querySendInvoice;
-//    private VolumesPresenter presenter;
     private ArrayAdapter<String> adapter;
     private List<Entry> entries;
     private ArrayList<String> flightName;
     private BodyForCreateInvoice body;
     private ArrayList<Object> objects;
     private CollateRVAdapter collateRVAdapter;
-    private RealmQuery<Destination> queryDestination;
     ArrayList<Object> chosen;
-
-    private BodyForCreateInvoiceWithout bodyWithout;
-    RealmResults<Destination> realmResults;
 
     public VolumesFragment() {
         // Required empty public constructor
@@ -105,16 +92,11 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
         flightName = new ArrayList<>();
         entries = new ArrayList<>();
-//        presenter = new VolumesPresenterImpl(this, new NetworkService());
-
-        // Create the Realm instance
         realm = Realm.getDefaultInstance();
         queryData = realm.where(Entry.class);
         queryLabel = realm.where(LabelList.class);
         queryPacket = realm.where(PacketList.class);
         querySendInvoice = realm.where(SendInvoice.class);
-//        queryDestination = realm.where(Destination.class);
-//        realmResults = queryDestination.findAll();
 
         if (!queryLabel.findAll().isEmpty() || !queryPacket.findAll().isEmpty()) {
             inflateWithRealmNew();
@@ -139,12 +121,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
         ButterKnife.bind(this, rootView);
 
         init();
-
-//        for (int i = 1; i < entries.size(); i++) {
-//        flightName.add(entries.get(i).getDept().getNameRu());
-//        }
-
-//        presenter.loadGetListForVpn();
 
         return rootView;
     }
@@ -212,7 +188,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
                 Long flightId = pref1.getLong(FLIGHT_ID, 0);
                 Long tlid = pref1.getLong(TRANSPONST_LIST_ID, 0);
 
-//                Boolean isDepIndex = true;
                 String toDeptIndex = entries.get(currentRoutePosition + 1).getDept().getName();
                 String fromDeptIndex = entries.get(currentRoutePosition).getDept().getName();
 
@@ -319,26 +294,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
     }
 
 
-    //RESPONSE WHICH IS NOT MADE
-    @Override
-    public void showVolumesData(CollateResponse volumes) {
-
-        packetsArrayList.addAll(volumes.getDto().getPackets());
-        labelsArrayList.addAll(volumes.getDto().getLabels());
-
-        objects = new ArrayList<>();
-        objects.addAll(packetsArrayList);
-        objects.addAll(labelsArrayList);
-
-        collateRVAdapter = createAdapter();
-
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-        recyclerViewVolumes.setLayoutManager(mLayoutManager);
-        recyclerViewVolumes.setAdapter(collateRVAdapter);
-
-    }
-
-
     private void checkLabelPacketListEmpty() {
         if (labelsList.isEmpty() && packetsList.isEmpty()) {
             hideButtonShowText(true);
@@ -378,8 +333,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
         if (realm != null && !realm.isClosed()) realm.close();
 
-//        presenter.unSubscribe();
-//        presenter.onDestroy();
     }
 
     @Override

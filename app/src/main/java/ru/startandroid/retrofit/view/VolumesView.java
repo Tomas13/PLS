@@ -13,7 +13,7 @@ public interface VolumesView {
 
     void hideProgress();
 
-    void showVolumesData(CollateResponse volumes);
+//    void showVolumesData(CollateResponse volumes);
     
     void showRoutesEmptyData();
 

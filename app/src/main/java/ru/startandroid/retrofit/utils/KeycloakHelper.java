@@ -32,7 +32,7 @@ public class KeycloakHelper extends HttpDigestAuthenticationConfiguration{
     private static final String AUTHZ_CLIENT_ID = "toolpar-mobile";
     private static final String CLIENT_SECRET = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoRQ3u++H9gcdIyhmDGVeQtT2Yd0WeGZh1zDWFuQ5XUpLmcJ3kpVUCGa8ikZ6zvkrD0hGzHZIl2pLLHnl54UZkDys09lrwbOGl9bdaq+/F4ilGrb5w7C0aVI+HRc8uUDeOB+woaRtKsCw3smXuuVAsFt0x0o1r88/sL1m7CSlAtAfFP45XCc7bIanhCYPfO3W2UCLE0Fkiuz78e0OqYV6qfBEmZqsFBJHIi01ciPn2NfJcd6i+PkyT3d9kslUZJ/6juiJ/cf3nESJ0TG5KAJS4poptzfRTv8mCZw3EZuuiEy6vNHJkVDPx6mjRDoQZ5QQ5YaJUI7o4YUw2WbTRI5NNQIDAQAB";
 
-    private static final String AUTHZ_REDIRECT_URL = "http://oauth2callback";//,"http://oauth2callback","org.aerogear.shoot:/oauth2Callback"];
+    private static final String AUTHZ_REDIRECT_URL = "org.aerogear.shoot:/oauth2Callback";//,"http://oauth2callback","org.aerogear.shoot:/oauth2Callback"];
     private static final String AUTHZ_ACCOUNT_ID = "keycloak-token";
     private static final String MODULE_NAME = "KeyCloakAuthz";
     private static final String TAG = KeycloakHelper.class.getSimpleName();

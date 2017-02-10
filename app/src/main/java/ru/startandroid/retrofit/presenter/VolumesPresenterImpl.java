@@ -36,7 +36,7 @@ public class VolumesPresenterImpl implements VolumesPresenter {
                 .subscribe(
                         response -> {
                             if (response.getStatus().equals("success")) {
-                                view.showVolumesData(response);
+//                                view.showVolumesData(response);
                                 view.hideProgress();
                             } else {
                                 view.showRoutesEmptyData();
