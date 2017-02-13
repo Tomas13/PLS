@@ -45,6 +45,7 @@ public class KeycloakHelper extends HttpDigestAuthenticationConfiguration{
     static {
         try {
             List<String> scopes = new ArrayList<>();
+//            scopes.add("offline_access");
             scopes.add("offline_access");
             authzModule = AuthorizationManager.config(MODULE_NAME, OAuth2AuthorizationConfiguration.class)
                     .setBaseURL(new URL(AUTHZ_URL))

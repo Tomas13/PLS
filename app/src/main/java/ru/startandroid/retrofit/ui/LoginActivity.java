@@ -33,7 +33,16 @@ public class LoginActivity extends AppCompatActivity {
 
         pref1 = getApplicationContext().getSharedPreferences(TOKEN_SHARED_PREF, 0); // 0 - for private mode
 
-        startAuth();
+//        if (!pref1.contains(TOKEN)){
+
+            startAuth();
+//        }else{
+//            Intent intent = new Intent(LoginActivity.this, NavigationActivity.class);
+//            Const.Token = "Bearer " + pref1.getString(TOKEN, "empty");
+//            startActivity(intent);
+//            finish();
+//
+//        }
     }
 
     private void startAuth() {
