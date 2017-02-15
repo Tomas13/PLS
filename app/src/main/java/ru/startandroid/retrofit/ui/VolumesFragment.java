@@ -67,7 +67,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
     @BindView(R.id.tv_header_hint)
     TextView tvHeaderHint;
 
-
     private List<Long> packetsList = new ArrayList<>();
     private List<Long> labelsList = new ArrayList<>();
     private Realm realm;

@@ -31,6 +31,7 @@ import io.realm.RealmList;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import ru.startandroid.retrofit.AppJobManager;
+import ru.startandroid.retrofit.Application;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoice;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoiceWithout;
 import ru.startandroid.retrofit.Model.CreateResponse;
@@ -302,6 +303,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         sendInvoice.setWhere(toName);
         sendInvoice.setBodyForCreateInvoice(bodyRealm);
         realm.executeTransaction(realm -> realm.insert(sendInvoice));
+
     }
 
 
@@ -373,7 +375,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public  void onAcceptEmptyEvent(AcceptEmptyEvent emptyEvent){
-//        showEmptyToast(emptyEvent.getEmptyMessage());
+        showEmptyToast(emptyEvent.getEmptyMessage());
         showRoutesEmptyData();
         hideProgress();
     }
@@ -443,13 +445,15 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         progressInvoice.setVisibility(View.GONE);
     }
 
+    InvoiceRVAdapter invoiceRVAdapter;
+
     @Override
     public void showGeneralInvoice(InvoiceMain invoiceMain) {
         final List<GeneralInvoice> generalInvoiceList = new ArrayList<>();
 
         generalInvoiceList.addAll(invoiceMain.getGeneralInvoices());
 
-        InvoiceRVAdapter invoiceRVAdapter = new InvoiceRVAdapter(getActivity(), generalInvoiceList, (childView, childAdapterPosition) -> {
+        invoiceRVAdapter = new InvoiceRVAdapter(getActivity(), generalInvoiceList, (childView, childAdapterPosition) -> {
 
             Long generalInvoiceId = generalInvoiceList.get(childAdapterPosition).getId();
             presenter.retrofitAcceptGeneralInvoice(generalInvoiceId);
@@ -458,6 +462,8 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 //            jobManager.addJobInBackground(new AcceptGeneralInvoiceJob(generalInvoiceId));
 
             createEmptyInvoice();
+            generalInvoiceList.remove(childAdapterPosition);
+            invoiceRVAdapter.notifyDataSetChanged();
 /*
             if (currentRoutePosition == 0) {
 
