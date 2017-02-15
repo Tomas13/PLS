@@ -73,6 +73,7 @@ public class KeycloakHelper extends HttpDigestAuthenticationConfiguration{
         if (!authzModule.isAuthorized()){
             Log.i(TAG, "is Authorized " + authzModule.isAuthorized());
 
+
             authzModule.requestAccess(activity, new Callback<String>() {
                 @Override
                 public void onSuccess(String data) {

@@ -31,6 +31,7 @@ import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.RoutesRVAdapter;
 import ru.startandroid.retrofit.events.LoadRoutesEvent;
+import ru.startandroid.retrofit.events.RoutesEventError;
 import ru.startandroid.retrofit.jobs.LoadRoutesJob;
 import ru.startandroid.retrofit.view.RoutesView;
 
@@ -108,9 +109,9 @@ public class RoutesFragment extends Fragment implements RoutesView {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onRoutesErrorEvent(Throwable throwable) {
+    public void onRoutesErrorEvent(RoutesEventError eventError) {
         hideProgress();
-        showRoutesError(throwable);
+        showRoutesError(eventError.error);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

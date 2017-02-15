@@ -66,10 +66,16 @@ public interface GitHubService {
 
     );
 
-    @GET("api/mobile/flights")
+
+    @GET("api/mobile/flights-v2")
     Call<Routes> getRoutesInfoCall(
 
     );
+
+  /*  @GET("api/mobile/flights")
+    Call<Routes> getRoutesInfoCall(
+
+    );*/
 
     //Принятие общей накладной
     @GET("api/mobile/general-invoices")

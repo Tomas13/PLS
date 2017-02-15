@@ -2,6 +2,7 @@ package ru.startandroid.retrofit.jobs;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.birbit.android.jobqueue.Job;
 import com.birbit.android.jobqueue.Params;
@@ -13,6 +14,7 @@ import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.events.LoadRoutesEvent;
 import ru.startandroid.retrofit.events.RoutesEmptyEvent;
 import ru.startandroid.retrofit.events.RoutesEventError;
+import ru.startandroid.retrofit.models.ErrorRequestException;
 import ru.startandroid.retrofit.models.NetworkService;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -33,7 +35,7 @@ public class LoadRoutesJob extends Job {
 
     @Override
     public void onAdded() {
-
+        Log.d("LoadRo", " added");
     }
 
     @Override
@@ -54,7 +56,7 @@ public class LoadRoutesJob extends Job {
                             }
                         },
                         throwable -> {
-                            EventBus.getDefault().post(new RoutesEventError(throwable));
+                            EventBus.getDefault().postSticky(new RoutesEventError(throwable));
                         });
     }
 
@@ -65,7 +67,16 @@ public class LoadRoutesJob extends Job {
 
     @Override
     protected RetryConstraint shouldReRunOnThrowable(@NonNull Throwable throwable, int runCount, int maxRunCount) {
-        return RetryConstraint.createExponentialBackoff(runCount, 1000);
+//        return RetryConstraint.createExponentialBackoff(runCount, 1000);
 
+        if (throwable instanceof ErrorRequestException) {
+            ErrorRequestException error = (ErrorRequestException) throwable;
+            int statusCode = error.getResponse().raw().code();
+            if (statusCode >= 400 && statusCode < 500) {
+                return RetryConstraint.CANCEL;
+            }
+        }
+
+        return RetryConstraint.RETRY;
     }
 }
