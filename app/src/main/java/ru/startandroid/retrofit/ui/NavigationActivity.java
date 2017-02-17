@@ -274,8 +274,12 @@ public class NavigationActivity extends AppCompatActivity
             SharedPreferences pref = getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
             SharedPreferences.Editor editor = pref.edit();
             editor.putInt(FLIGHT_POS, position);
-            editor.putLong(FLIGHT_ID, flightArrayList.get(position).getId()); // ;.getItineraryDTO().getEntries().get(0).getDept().getName());
-            editor.putLong(TRANSPONST_LIST_ID, flightArrayList.get(position).getFlight().getId());
+
+            editor.putLong(FLIGHT_ID, flightArrayList.get(position).getFlight().getId());
+            editor.putLong(TRANSPONST_LIST_ID, flightArrayList.get(position).getId());
+
+//            editor.putLong(FLIGHT_ID, flightArrayList.get(position).getId()); // ;.getItineraryDTO().getEntries().get(0).getDept().getName());
+//            editor.putLong(TRANSPONST_LIST_ID, flightArrayList.get(position).getFlight().getId());
             editor.putInt(NUMBER_OF_CITIES, flightArrayList.get(position).getFlight().getItineraryDTO().getEntries().size());
             editor.putInt(CURRENT_ROUTE_POSITION, 0);
 
@@ -516,13 +520,18 @@ public class NavigationActivity extends AppCompatActivity
             //if one route then go to history fragment
             if (routes.getFlights().size() == 1) {
 
+                flightArrayList = routes.getFlights();
+
+                Log.d("NavFligh", flightArrayList.toString());
+
                 //Save Flight Id to shared preferences
                 SharedPreferences pref = getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
                 SharedPreferences.Editor editor = pref.edit();
-                editor.putLong(FLIGHT_ID, routes.getFlights().get(0).getId());
-                editor.putLong(TRANSPONST_LIST_ID, flightArrayList.get(0).getFlight().getId());
+                editor.putLong(FLIGHT_ID, routes.getFlights().get(0).getFlight().getId());
+                editor.putLong(TRANSPONST_LIST_ID, flightArrayList.get(0).getId());
                 editor.putInt(NUMBER_OF_CITIES, routes.getFlights().get(0).getFlight().getItineraryDTO().getEntries().size());
                 editor.putInt(CURRENT_ROUTE_POSITION, 0);
+
 
                 editor.apply();
 
