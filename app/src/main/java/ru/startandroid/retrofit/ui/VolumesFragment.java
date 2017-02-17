@@ -107,7 +107,17 @@ public class VolumesFragment extends Fragment implements VolumesView {
             }
         }
 
-        btnSendInvoice.setOnClickListener(v -> showDialog());
+        btnSendInvoice.setOnClickListener(v -> {
+
+            if (querySendInvoice.findAll().size() > 0 && querySendInvoice.findAll().last().getBodyForCreateInvoice() != null) {
+                flightName.add(querySendInvoice.findAll().last().getBodyForCreateInvoice().getToDepIndex());
+                showDialog();
+
+            }else{
+                Toast.makeText(getContext(), R.string.no_send_invoice, Toast.LENGTH_SHORT).show();
+            }
+
+        });
         chosen = new ArrayList<>();
 
     }
@@ -131,16 +141,16 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
 
         for (int i = 0; i < queryLabel.findAll().size(); i++) {
-            if (queryLabel.findAll().size() > 0 && queryLabel.findAll().get(i).getIsCollated() != null
-                    && queryLabel.findAll().get(i).getAddedToInvoice() == null) {
+            if (queryLabel.findAll().size() > 0 && queryLabel.findAll().get(i).getIsCollated()
+                    && !queryLabel.findAll().get(i).getAddedToInvoice()) {
                 label.add(queryLabel.findAll().get(i));
             }
         }
 
 
         for (int j = 0; j < queryPacket.findAll().size(); j++) {
-            if (queryPacket.findAll().size() > 0 && queryPacket.findAll().get(j).getIsCollated() != null
-                    && queryPacket.findAll().get(j).getAddedToInvoice() == null) {
+            if (queryPacket.findAll().size() > 0 && queryPacket.findAll().get(j).getIsCollated()
+                    && !queryPacket.findAll().get(j).getAddedToInvoice()) {
                 packet.add(queryPacket.findAll().get(j));
             }
         }
@@ -156,6 +166,8 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
     }
 
+    RealmList<RealmLong> labelLongList = new RealmList<>();
+    RealmList<RealmLong> packetLongList = new RealmList<>();
 
     private void showDialog() {
         final Dialog pointDialog = new Dialog(getContext());
@@ -165,9 +177,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
         ListView listView = (ListView) pointDialog.findViewById(R.id.list_view_flight);
 
 
-        if (!querySendInvoice.findAll().isEmpty()) {
-            flightName.add(querySendInvoice.findAll().last().getBodyForCreateInvoice().getToDepIndex());
-        }
 
         adapter = new ArrayAdapter<>(getContext(), R.layout.list_view_item, flightName);
 //        adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_activated_1, flightName);
@@ -192,8 +201,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
                 String toDeptIndex = entries.get(currentRoutePosition + 1).getDept().getName();
                 String fromDeptIndex = entries.get(currentRoutePosition).getDept().getName();
 
-                RealmList<RealmLong> labelLongList = new RealmList<>();
-                RealmList<RealmLong> packetLongList = new RealmList<>();
 
                 for (int i = 0; i < labelsList.size(); i++) {
                     RealmLong realmLong = new RealmLong(labelsList.get(i));
@@ -224,11 +231,37 @@ public class VolumesFragment extends Fragment implements VolumesView {
                     RealmResults<BodyForCreateInvoice> queryBody = realm.where(BodyForCreateInvoice.class).findAll();
                     realm.executeTransaction(
                             realm -> {
-                                realm.insertOrUpdate(body);
+                                realm.copyToRealm(body);
 //                                queryBody.deleteAllFromRealm();
+
+                            ///16.02.17
+                                for (int i = 0; i < queryLabel.findAll().size(); i++) {
+
+                                    for (int j = 0; j < labelLongList.size(); j++) {
+                                        if (queryLabel.findAll().get(i).getId().equals(labelLongList.get(j).getaLong())){
+                                            queryLabel.findAll().get(i).setAddedToInvoice(true);
+                                        }
+
+                                    }
+                                }
+                                ///16.02.17
+                                for (int i = 0; i < queryPacket.findAll().size(); i++) {
+
+                                    for (int j = 0; j < packetLongList.size(); j++) {
+                                        if (queryPacket.findAll().get(i).getId().equals(packetLongList.get(j).getaLong())){
+                                            queryPacket.findAll().get(i).setAddedToInvoice(true);
+                                        }
+
+                                    }
+                                }
+                                ///17.02.17
+
+
+
                             }
 
                     );
+
 
                     updateItemsRV();
 
@@ -240,7 +273,34 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
 
         Button btnCancel = (Button) pointDialog.findViewById(R.id.btn_cancel_flight);
-        btnCancel.setOnClickListener(v -> pointDialog.dismiss());
+        btnCancel.setOnClickListener(v -> {
+
+            realm.executeTransaction(realm -> {
+                ///17.02.17
+                for (int i = 0; i < queryLabel.findAll().size(); i++) {
+
+                    for (int j = 0; j < labelLongList.size(); j++) {
+                        if (queryLabel.findAll().get(i).getId().equals(labelLongList.get(j).getaLong())){
+                            queryLabel.findAll().get(i).setAddedToInvoice(false);
+                        }
+
+                    }
+                }
+
+                for (int i = 0; i < queryPacket.findAll().size(); i++) {
+
+                    for (int j = 0; j < packetLongList.size(); j++) {
+                        if (queryPacket.findAll().get(i).getId().equals(packetLongList.get(j).getaLong())){
+                            queryPacket.findAll().get(i).setAddedToInvoice(false);
+                        }
+
+                    }
+                }
+                ///17.02.17
+
+            });
+            pointDialog.dismiss();
+        });
 
     }
 
@@ -267,14 +327,14 @@ public class VolumesFragment extends Fragment implements VolumesView {
                     packetsList.add(((PacketList) objects.get(childPosition)).getId());
                     realm.executeTransaction(realm1 -> {
 
-                        ((PacketList) objects.get(childPosition)).setAddedToInvoice(true);
+//                        ((PacketList) objects.get(childPosition)).setAddedToInvoice(true);
                     });
                 }
 
                 if (objects.get(childPosition) instanceof LabelList) {
                     labelsList.add(((LabelList) objects.get(childPosition)).getId());
                     realm.executeTransaction(realm1 -> {
-                        ((LabelList) objects.get(childPosition)).setAddedToInvoice(true);
+//                        ((LabelList) objects.get(childPosition)).setAddedToInvoice(true);
                     });
                 }
 
@@ -288,12 +348,12 @@ public class VolumesFragment extends Fragment implements VolumesView {
                 if (objects.get(childPosition) instanceof PacketList) {
                     packetsList.remove(((PacketList) objects.get(childPosition)).getId());
                     realm.executeTransaction(realm1 -> {
-                        ((PacketList) objects.get(childPosition)).setAddedToInvoice(false);
+//                        ((PacketList) objects.get(childPosition)).setAddedToInvoice(false);
                     });
                 } else {
                     labelsList.remove(((LabelList) objects.get(childPosition)).getId());
                     realm.executeTransaction(realm1 -> {
-                        ((LabelList) objects.get(childPosition)).setAddedToInvoice(false);
+//                        ((LabelList) objects.get(childPosition)).setAddedToInvoice(false);
                     });
                 }
 

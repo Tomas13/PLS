@@ -38,6 +38,7 @@ import io.realm.RealmQuery;
 import ru.startandroid.retrofit.AppJobManager;
 import ru.startandroid.retrofit.Model.IdsCollate;
 import ru.startandroid.retrofit.Model.acceptgen.Destination;
+import ru.startandroid.retrofit.Model.acceptgen.Example;
 import ru.startandroid.retrofit.Model.acceptgen.LabelList;
 import ru.startandroid.retrofit.Model.acceptgen.PacketList;
 import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
@@ -191,7 +192,7 @@ public class CollateFragment extends Fragment implements CollateView {
 
         listViewAcceptGen.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
-        ArrayList<String> pickedNames = new ArrayList<>();
+//        ArrayList<String> pickedNames = new ArrayList<>();
 
         listViewAcceptGen.setOnItemClickListener((parent, view1, position, id1) -> {
 
@@ -200,12 +201,12 @@ public class CollateFragment extends Fragment implements CollateView {
 //                if (pickedNames.contains(generalInvoiceIdsList.get(j)) && !listViewAcceptGen.isItemChecked(position)) {
                 if (!listViewAcceptGen.isItemChecked(position)) {
                     listViewAcceptGen.getChildAt(j).setBackgroundColor(Color.TRANSPARENT);
-                    pickedNames.remove(generalInvoiceIdsList.get(j));
+//                    pickedNames.remove(generalInvoiceIdsList.get(j));
                     listViewAcceptGen.setItemChecked(j, false);
 
                     chosenIds.remove(ids.get(position));
                 } else if (listViewAcceptGen.isItemChecked(position)) {
-                    pickedNames.add(generalInvoiceIdsList.get(j));
+//                    pickedNames.add(generalInvoiceIdsList.get(j));
 
                     listViewAcceptGen.setItemChecked(j, true);
                     listViewAcceptGen.getChildAt(j).setBackgroundColor(Color.GREEN);
@@ -244,7 +245,7 @@ public class CollateFragment extends Fragment implements CollateView {
                                 for (int l = 0; l < queryDestination.findAll().get(k).getLabelList().size(); l++) {
                                     queryDestination.findAll().get(k).getLabelList().get(l).setIsCollated(true);
                                 }
-                                realm.insert(queryDestination.findAll().get(k).getLabelList());
+                                realm.copyToRealm(queryDestination.findAll().get(k).getLabelList());
                             }
 
                             if (!queryDestination.findAll().get(k).getPacketList().isEmpty()) {
@@ -252,13 +253,16 @@ public class CollateFragment extends Fragment implements CollateView {
                                     queryDestination.findAll().get(k).getPacketList().get(l).setIsCollated(true);
                                 }
 
-                                realm.insert(queryDestination.findAll().get(k).getPacketList());
+                                realm.copyToRealm(queryDestination.findAll().get(k).getPacketList());
                             }
                         });
 
                         generalInvoiceIdsList.remove(queryDestination.findAll().get(i).getDestinationListId());
                         listAdapter.notifyDataSetChanged();
-                        realm.executeTransaction(realm -> queryDestination.findAll().get(k).deleteFromRealm());
+                        realm.executeTransaction(realm -> {
+                            queryDestination.findAll().get(k).deleteFromRealm();
+                            realm.where(Example.class).findAll().get(k).deleteFromRealm();  //17.02.17
+                        });
                     }
                 }
             }
@@ -271,7 +275,7 @@ public class CollateFragment extends Fragment implements CollateView {
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
-    public void onCollateEvent(CollateEvent collateEvent){
+    public void onCollateEvent(CollateEvent collateEvent) {
         showCollateResponse(collateEvent.getCollateResponse());
         //probably no need for that, to show results
     }
@@ -344,14 +348,13 @@ public class CollateFragment extends Fragment implements CollateView {
     }
 
 
-
     @Override
     public void showCollateResponse(CollateResponse collateResponse) {
 
-        collateDtoObject = new Dto();
+      /*  collateDtoObject = new Dto();
         collateDtoObject = collateResponse.getDto();
 
-        ArrayList<LabelList> labels = new ArrayList<LabelList>();
+        ArrayList<LabelList> labels = new ArrayList<>();
         labels.addAll(collateDtoObject.getLabels());
 
         ArrayList<PacketList> packets = new ArrayList<>();
@@ -360,12 +363,12 @@ public class CollateFragment extends Fragment implements CollateView {
         realm.executeTransaction(realm -> {
             realm.insert(packets);
             realm.insert(labels);
-        });
+        });*/
 
         ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
     }
 
-    @Override
+/*    @Override
     public void showVolumesData(CollateResponse collateResponse) {
 
         ArrayList<PacketList> packetsArrayList = new ArrayList<>();
@@ -384,7 +387,7 @@ public class CollateFragment extends Fragment implements CollateView {
         });
 
         ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
-    }
+    }*/
 
 
     @Override

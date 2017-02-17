@@ -44,5 +44,6 @@
     <string name="title_volumes_fragment">Для создания Общей накладной выберите емкости из списка</string>
     <string name="form_general_invoice">Сформировать общую накладную</string>
     <string name="no_data_get">Нет накладных для принятия</string>
+    <string name="no_send_invoice">нет накладной для добавления</string>
 
 </resources>

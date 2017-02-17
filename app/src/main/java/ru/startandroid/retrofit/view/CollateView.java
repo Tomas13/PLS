@@ -14,7 +14,7 @@ public interface CollateView {
 
     void hideProgress();
 
-    void showVolumesData(CollateResponse volumes);
+//    void showVolumesData(CollateResponse volumes);
 
     void showCollateResponse(CollateResponse collateResponse);
 

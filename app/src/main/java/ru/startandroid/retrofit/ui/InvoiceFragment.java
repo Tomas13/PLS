@@ -31,7 +31,6 @@ import io.realm.RealmList;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import ru.startandroid.retrofit.AppJobManager;
-import ru.startandroid.retrofit.Application;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoice;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoiceWithout;
 import ru.startandroid.retrofit.Model.CreateResponse;
@@ -39,6 +38,7 @@ import ru.startandroid.retrofit.Model.RealmLong;
 import ru.startandroid.retrofit.Model.SendInvoice;
 import ru.startandroid.retrofit.Model.acceptgen.Example;
 import ru.startandroid.retrofit.Model.acceptgen.LabelList;
+import ru.startandroid.retrofit.Model.acceptgen.PacketList;
 import ru.startandroid.retrofit.Model.geninvoice.GeneralInvoice;
 import ru.startandroid.retrofit.Model.geninvoice.InvoiceMain;
 import ru.startandroid.retrofit.Model.routes.Entry;
@@ -49,8 +49,6 @@ import ru.startandroid.retrofit.events.AcceptEmptyEvent;
 import ru.startandroid.retrofit.events.AcceptGenInvoiceEvent;
 import ru.startandroid.retrofit.events.InvoiceEvent;
 import ru.startandroid.retrofit.events.ShowGeneralInvoiceEvent;
-import ru.startandroid.retrofit.jobs.AcceptGeneralInvoiceJob;
-import ru.startandroid.retrofit.jobs.LoadGeneralInvoiceJob;
 import ru.startandroid.retrofit.jobs.PostCreateInvoiceJob;
 import ru.startandroid.retrofit.models.NetworkService;
 import ru.startandroid.retrofit.presenter.InvoicePresenter;
@@ -101,9 +99,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
     private JobManager jobManager;
 
-    //    InvoiceRVAdapter adapterGet;
     InvoiceRVAdapterSend adapterSend;
-
 
     public InvoiceFragment() {
         // Required empty public constructor
@@ -179,9 +175,70 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
                 showProgress();
                 jobManager.addJobInBackground(new PostCreateInvoiceJob(body));
+
+                ///16.02.17 remove  labels that were sent
+                List<Long> listLongs = new ArrayList<>();
+
+
+                for (int k = 0; k < realm.where(BodyForCreateInvoice.class).findAll().size(); k++) {
+
+                    RealmList<RealmLong> realmLongs = realm.where(BodyForCreateInvoice.class).findAll().get(k).getLabelIds();
+                    for (int i = 0; i < realmLongs.size(); i++) {
+                        listLongs.add(realmLongs.get(i).getaLong());
+                    }
+
+
+                }
+
+                for (int i = 0; i < listLongs.size(); i++) {
+
+                    if (realm.where(LabelList.class).findAll().last().getId().equals(listLongs.get(i))) {
+                        realm.executeTransaction(realm1 -> realm.where(LabelList.class).findAll().last().deleteFromRealm());
+                    }
+                }
+
+
+
+
+
+
+
+
+
+
+
+                List<Long> listLongsPacket = new ArrayList<>();
+
+                for (int k = 0; k < realm.where(BodyForCreateInvoice.class).findAll().size(); k++) {
+
+                    RealmList<RealmLong> realmLongsPacket = realm.where(BodyForCreateInvoice.class).findAll().get(k).getPacketIds();
+
+                    for (int i = 0; i < realmLongsPacket.size(); i++) {
+                        listLongsPacket.add(realmLongsPacket.get(i).getaLong());
+                    }
+
+
+                }
+
+
+                for (int i = 0; i < listLongsPacket.size(); i++) {
+
+                    if (realm.where(PacketList.class).findAll().last().getId().equals(listLongsPacket.get(i))) {
+                        realm.executeTransaction(realm1 -> realm.where(PacketList.class).findAll().last().deleteFromRealm());
+                    }
+                }
+                ///16.02.17
+                realm.executeTransaction(realm -> realm.where(RealmLong.class).findAll().deleteAllFromRealm());
+
+
+                realm.executeTransaction(realm1 -> {
+                    realm.where(SendInvoice.class).findAll().deleteAllFromRealm();
+                    realm.where(BodyForCreateInvoice.class).findAll().deleteAllFromRealm();
+//                    queryBody.findAll().deleteAllFromRealm();
+                });
+
+
 //                presenter.postCreateInvoice(body);
-
-
 
 
             }));
@@ -200,7 +257,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
-    public void onLoadGeneralInvoice(ShowGeneralInvoiceEvent event){
+    public void onLoadGeneralInvoice(ShowGeneralInvoiceEvent event) {
 
     }
 
@@ -282,7 +339,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             bodyRealm = new BodyForCreateInvoice(flightId, tlid, true, toDeptIndex, fromDeptIndex, labelLongList, packetLongList);
             //end for saving body in realm
 
-            realm.executeTransaction(realm -> realm.insert(bodyRealm));
+            realm.executeTransaction(realm -> realm.copyToRealm(bodyRealm));
 
         } else {
             Toast.makeText(getContext(), "Ошибка. Нет flightID", Toast.LENGTH_SHORT).show();
@@ -309,7 +366,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onPostCreateInvoiceJob(InvoiceEvent invoiceEvent) {
-        if (invoiceEvent.getCreateResponse() != null){
+        if (invoiceEvent.getCreateResponse() != null) {
             if (invoiceEvent.getCreateResponse().getStatus().equals("success")) {
 
                 Toast.makeText(getContext(), "Общая накладная успешно создана", Toast.LENGTH_SHORT).show();
@@ -329,16 +386,16 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onInvoiceErrorEvent(Throwable message){
+    public void onInvoiceErrorEvent(Throwable message) {
         showEmptyToast(message.getMessage());
         hideProgress();
     }
 
-     private void removeRealm() {
+    private void removeRealm() {
         realm.executeTransaction(realm1 -> {
             queryBody.findAll().deleteAllFromRealm();
-            RealmResults<SendInvoice> qure = realm.where(SendInvoice.class).findAll();
-            qure.deleteAllFromRealm();
+            RealmResults<SendInvoice> sendInvoiceRealm = realm.where(SendInvoice.class).findAll();
+            sendInvoiceRealm.deleteAllFromRealm();
 
         });
     }
@@ -349,32 +406,24 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     }
 
     private void startCollateFragment() {
-
-//            Bundle bundle = new Bundle();
-//            bundle.putLong("generalInvoiceId", generalInvoiceList.get(childAdapterPosition).getId());
         Fragment fragment = new CollateFragment();
-//            fragment.setArguments(bundle);
         ((NavigationActivity) getActivity()).startFragment(fragment);
-
     }
-
-    private List<String> generalInvoiceIdsList = new ArrayList<>();
-    private List<Long> ids = new ArrayList<>();
 
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
-    public void onAcceptGenInvoiceResponce(AcceptGenInvoiceEvent acceptGenInvoiceEvent){
+    public void onAcceptGenInvoiceResponce(AcceptGenInvoiceEvent acceptGenInvoiceEvent) {
 
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
-    public  void onAcceptErrorEvent(Throwable throwable){
+    public void onAcceptErrorEvent(Throwable throwable) {
         showEmptyToast(throwable.getMessage());
         hideProgress();
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
-    public  void onAcceptEmptyEvent(AcceptEmptyEvent emptyEvent){
+    public void onAcceptEmptyEvent(AcceptEmptyEvent emptyEvent) {
         showEmptyToast(emptyEvent.getEmptyMessage());
         showRoutesEmptyData();
         hideProgress();
@@ -412,7 +461,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
     @Override
     public void getPostResponse(CreateResponse createResponse) {
-        if (createResponse != null){
+        if (createResponse != null) {
             if (createResponse.getStatus().equals("success")) {
 
                 Toast.makeText(getContext(), "Общая накладная успешно создана", Toast.LENGTH_SHORT).show();
@@ -435,16 +484,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         alertDialog.dismiss();
     }
 
-    @Override
-    public void showProgress() {
-        progressInvoice.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void hideProgress() {
-        progressInvoice.setVisibility(View.GONE);
-    }
-
     InvoiceRVAdapter invoiceRVAdapter;
 
     @Override
@@ -462,16 +501,9 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 //            jobManager.addJobInBackground(new AcceptGeneralInvoiceJob(generalInvoiceId));
 
             createEmptyInvoice();
+
             generalInvoiceList.remove(childAdapterPosition);
             invoiceRVAdapter.notifyDataSetChanged();
-/*
-            if (currentRoutePosition == 0) {
-
-                createEmptyInvoice();
-            } else if (currentRoutePosition == maxRouteNumber) {
-
-            }
-*/
 
             //startCollateFragment();
 
@@ -484,10 +516,10 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
     @Override
     public void showGeneralInvoiceId(Example example) {
-        for (int i = 0; i < example.getDestinations().size(); i++) {
-            generalInvoiceIdsList.add(example.getDestinations().get(i).getDestinationListId());
-            ids.add(example.getDestinations().get(i).getId());
-        }
+//        for (int i = 0; i < example.getDestinations().size(); i++) {
+//            generalInvoiceIdsList.add(example.getDestinations().get(i).getDestinationListId());
+//            ids.add(example.getDestinations().get(i).getId());
+//        }
 
         hideProgress();
         realm.executeTransaction(realm -> {
@@ -508,6 +540,18 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         EventBus.getDefault().unregister(this);
         super.onStop();
     }
+
+
+    @Override
+    public void showProgress() {
+        progressInvoice.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideProgress() {
+        progressInvoice.setVisibility(View.GONE);
+    }
+
 
     @Override
     public void onDestroyView() {
