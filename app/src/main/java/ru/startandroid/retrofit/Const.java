@@ -28,6 +28,8 @@ public class Const {
 
     public static final String NAV_SHARED_PREF = "NAV_PREF";
     public static final String TOKEN_SHARED_PREF = "TOKEN_PREF";
+    public static final String INVOICE_PREF = "INVOICE_PREF";
+    public static final String INVOICE_NAME = "INVOICE_NAME";
     public static final String TOKEN = "TOKEN";
     public static final String FLIGHT_SHARED_PREF = "FLIGHT_PREF";
     public static final String FLIGHT_NAME = "FLIGHT_NAME";

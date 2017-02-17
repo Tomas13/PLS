@@ -1,5 +1,6 @@
 package ru.startandroid.retrofit.ui;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -21,8 +22,11 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -58,6 +62,8 @@ import ru.startandroid.retrofit.view.InvoiceView;
 import static ru.startandroid.retrofit.Const.CURRENT_ROUTE_POSITION;
 import static ru.startandroid.retrofit.Const.FLIGHT_ID;
 import static ru.startandroid.retrofit.Const.FLIGHT_SHARED_PREF;
+import static ru.startandroid.retrofit.Const.INVOICE_NAME;
+import static ru.startandroid.retrofit.Const.INVOICE_PREF;
 import static ru.startandroid.retrofit.Const.NUMBER_OF_CITIES;
 import static ru.startandroid.retrofit.Const.TRANSPONST_LIST_ID;
 
@@ -135,6 +141,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         init();
 
 
+
         //FOR SENDING
         queryData = realm.where(Entry.class);
         if (!queryData.findAll().isEmpty()) {
@@ -144,6 +151,10 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         }
         for (int i = 1; i < entries.size(); i++) {
             flightName.add(entries.get(i).getDept().getNameRu());
+//            flightName.add(timeOfEvent);
+
+
+
         }
 
 
@@ -355,6 +366,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             pref.edit().putInt(NUMBER_OF_CITIES, currentRoutePosition).apply();
         }
 
+
         String toName = flightName.get(currentRoutePosition);
         SendInvoice sendInvoice = new SendInvoice();
         sendInvoice.setWhere(toName);
@@ -504,6 +516,18 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
             generalInvoiceList.remove(childAdapterPosition);
             invoiceRVAdapter.notifyDataSetChanged();
+
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS", Locale.FRANCE);
+            Date now = new Date();
+            String timeOfEvent = simpleDateFormat.format(now);
+
+
+            SharedPreferences ref = getActivity().getSharedPreferences(INVOICE_PREF, Context.MODE_PRIVATE);
+
+            SharedPreferences.Editor editor = ref.edit();
+            editor.putString(INVOICE_NAME, timeOfEvent);
+            editor.apply();
+
 
             //startCollateFragment();
 

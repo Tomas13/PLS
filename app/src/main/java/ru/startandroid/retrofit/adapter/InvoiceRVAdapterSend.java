@@ -3,6 +3,7 @@ package ru.startandroid.retrofit.adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -14,12 +15,18 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import ru.startandroid.retrofit.Model.SendInvoice;
 import ru.startandroid.retrofit.Model.geninvoice.GeneralInvoice;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.ui.NavigationActivity;
+
+import static ru.startandroid.retrofit.Const.INVOICE_NAME;
+import static ru.startandroid.retrofit.Const.INVOICE_PREF;
 
 
 public class InvoiceRVAdapterSend extends RecyclerView.Adapter<InvoiceRVAdapterSend.InvoiceHolder> implements RecyclerView.OnItemTouchListener  {
@@ -88,8 +95,13 @@ public class InvoiceRVAdapterSend extends RecyclerView.Adapter<InvoiceRVAdapterS
     public void onBindViewHolder(InvoiceHolder holder, final int position) {
         SendInvoice generalInvoice = sendInvoice.get(position);
 
+
+        SharedPreferences ref = activity.getSharedPreferences(INVOICE_PREF, Context.MODE_PRIVATE);
+
+        String timeOfEvent = "O" + ref.getString(INVOICE_NAME, "default");
+
 //        Log.d("Main", "onBIND " + route..getStatus() + " ");
-        holder.tvGeneralInvoiceID.setText("O20170130110809123");
+        holder.tvGeneralInvoiceID.setText(timeOfEvent);
         holder.tvFromDeptName.setText(generalInvoice.getWhere());
 //        holder.tvFromDeptNameRu.setText(generalInvoice.getFromDep().getNameRu());
 

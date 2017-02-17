@@ -2,6 +2,7 @@ package ru.startandroid.retrofit.ui;
 
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -42,6 +43,8 @@ import ru.startandroid.retrofit.view.VolumesView;
 import static ru.startandroid.retrofit.Const.CURRENT_ROUTE_POSITION;
 import static ru.startandroid.retrofit.Const.FLIGHT_ID;
 import static ru.startandroid.retrofit.Const.FLIGHT_SHARED_PREF;
+import static ru.startandroid.retrofit.Const.INVOICE_NAME;
+import static ru.startandroid.retrofit.Const.INVOICE_PREF;
 import static ru.startandroid.retrofit.Const.TRANSPONST_LIST_ID;
 
 /**
@@ -107,10 +110,17 @@ public class VolumesFragment extends Fragment implements VolumesView {
             }
         }
 
+        SharedPreferences ref = getActivity().getSharedPreferences(INVOICE_PREF, Context.MODE_PRIVATE);
+
+        flightName.add("O" + ref.getString(INVOICE_NAME, "default_name"));
+
+
         btnSendInvoice.setOnClickListener(v -> {
 
             if (querySendInvoice.findAll().size() > 0 && querySendInvoice.findAll().last().getBodyForCreateInvoice() != null) {
-                flightName.add(querySendInvoice.findAll().last().getBodyForCreateInvoice().getToDepIndex());
+//                flightName.add(querySendInvoice.findAll().last().getBodyForCreateInvoice().getToDepIndex());
+
+
                 showDialog();
 
             }else{
