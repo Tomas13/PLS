@@ -261,7 +261,7 @@ public class CollateFragment extends Fragment implements CollateView {
                         listAdapter.notifyDataSetChanged();
                         realm.executeTransaction(realm -> {
                             queryDestination.findAll().get(k).deleteFromRealm();
-                            realm.where(Example.class).findAll().get(k).deleteFromRealm();  //17.02.17
+                            realm.where(Example.class).findAll().last().deleteFromRealm();  //17.02.17
                         });
                     }
                 }

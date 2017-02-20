@@ -335,17 +335,10 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
                 if (objects.get(childPosition) instanceof PacketList) {
                     packetsList.add(((PacketList) objects.get(childPosition)).getId());
-                    realm.executeTransaction(realm1 -> {
-
-//                        ((PacketList) objects.get(childPosition)).setAddedToInvoice(true);
-                    });
                 }
 
                 if (objects.get(childPosition) instanceof LabelList) {
                     labelsList.add(((LabelList) objects.get(childPosition)).getId());
-                    realm.executeTransaction(realm1 -> {
-//                        ((LabelList) objects.get(childPosition)).setAddedToInvoice(true);
-                    });
                 }
 
                 checkLabelPacketListEmpty();
@@ -357,14 +350,8 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
                 if (objects.get(childPosition) instanceof PacketList) {
                     packetsList.remove(((PacketList) objects.get(childPosition)).getId());
-                    realm.executeTransaction(realm1 -> {
-//                        ((PacketList) objects.get(childPosition)).setAddedToInvoice(false);
-                    });
                 } else {
                     labelsList.remove(((LabelList) objects.get(childPosition)).getId());
-                    realm.executeTransaction(realm1 -> {
-//                        ((LabelList) objects.get(childPosition)).setAddedToInvoice(false);
-                    });
                 }
 
                 checkLabelPacketListEmpty();

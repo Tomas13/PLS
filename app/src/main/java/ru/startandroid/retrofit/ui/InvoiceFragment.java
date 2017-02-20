@@ -8,6 +8,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -141,7 +142,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         init();
 
 
-
         //FOR SENDING
         queryData = realm.where(Entry.class);
         if (!queryData.findAll().isEmpty()) {
@@ -152,7 +152,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         for (int i = 1; i < entries.size(); i++) {
             flightName.add(entries.get(i).getDept().getNameRu());
 //            flightName.add(timeOfEvent);
-
 
 
         }
@@ -189,64 +188,50 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
                 ///16.02.17 remove  labels that were sent
                 List<Long> listLongs = new ArrayList<>();
-
-
                 for (int k = 0; k < realm.where(BodyForCreateInvoice.class).findAll().size(); k++) {
-
                     RealmList<RealmLong> realmLongs = realm.where(BodyForCreateInvoice.class).findAll().get(k).getLabelIds();
                     for (int i = 0; i < realmLongs.size(); i++) {
                         listLongs.add(realmLongs.get(i).getaLong());
                     }
-
-
                 }
 
-                for (int i = 0; i < listLongs.size(); i++) {
 
-                    if (realm.where(LabelList.class).findAll().last().getId().equals(listLongs.get(i))) {
-                        realm.executeTransaction(realm1 -> realm.where(LabelList.class).findAll().last().deleteFromRealm());
+                //remove label from realm after send
+                for (int j = 0; j < realm.where(LabelList.class).findAll().size(); j++) {
+                    for (int i = 0; i < listLongs.size(); i++) {
+                        if (realm.where(LabelList.class).findAll().get(j).getId().equals(listLongs.get(i))) {
+                            int k = j;
+                            realm.executeTransaction(realm -> realm.where(LabelList.class).findAll().get(k).deleteFromRealm());
+                        }
                     }
                 }
-
-
-
-
-
-
-
-
-
 
 
                 List<Long> listLongsPacket = new ArrayList<>();
-
                 for (int k = 0; k < realm.where(BodyForCreateInvoice.class).findAll().size(); k++) {
-
                     RealmList<RealmLong> realmLongsPacket = realm.where(BodyForCreateInvoice.class).findAll().get(k).getPacketIds();
-
                     for (int i = 0; i < realmLongsPacket.size(); i++) {
                         listLongsPacket.add(realmLongsPacket.get(i).getaLong());
                     }
-
-
                 }
 
+                for (int j = 0; j < realm.where(PacketList.class).findAll().size(); j++) {
 
-                for (int i = 0; i < listLongsPacket.size(); i++) {
+                    for (int i = 0; i < listLongsPacket.size(); i++) {
 
-                    if (realm.where(PacketList.class).findAll().last().getId().equals(listLongsPacket.get(i))) {
-                        realm.executeTransaction(realm1 -> realm.where(PacketList.class).findAll().last().deleteFromRealm());
+                        if (realm.where(PacketList.class).findAll().get(j).getId().equals(listLongsPacket.get(i))) {
+                            int k = i;
+                            realm.executeTransaction(realm -> realm.where(PacketList.class).findAll().get(k).deleteFromRealm());
+                        }
                     }
                 }
+
                 ///16.02.17
+
                 realm.executeTransaction(realm -> realm.where(RealmLong.class).findAll().deleteAllFromRealm());
 
 
-                realm.executeTransaction(realm1 -> {
-                    realm.where(SendInvoice.class).findAll().deleteAllFromRealm();
-                    realm.where(BodyForCreateInvoice.class).findAll().deleteAllFromRealm();
-//                    queryBody.findAll().deleteAllFromRealm();
-                });
+
 
 
 //                presenter.postCreateInvoice(body);
@@ -257,6 +242,12 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
             rvSendInvoice.setLayoutManager(mLayoutManager);
             rvSendInvoice.setAdapter(adapterSend);
+        }else{
+            realm.executeTransaction(realm -> {
+                realm.where(SendInvoice.class).findAll().deleteAllFromRealm();
+                realm.where(BodyForCreateInvoice.class).findAll().deleteAllFromRealm();
+//                    queryBody.findAll().deleteAllFromRealm();
+            });
         }
 
         presenter.loadGeneralInvoice();
@@ -371,7 +362,10 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         SendInvoice sendInvoice = new SendInvoice();
         sendInvoice.setWhere(toName);
         sendInvoice.setBodyForCreateInvoice(bodyRealm);
-        realm.executeTransaction(realm -> realm.insert(sendInvoice));
+        if (realm.where(SendInvoice.class).isValid()){
+
+            realm.executeTransaction(realm -> realm.copyToRealm(sendInvoice));
+        }
 
     }
 
@@ -404,7 +398,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     }
 
     private void removeRealm() {
-        realm.executeTransaction(realm1 -> {
+        realm.executeTransaction(realm -> {
             queryBody.findAll().deleteAllFromRealm();
             RealmResults<SendInvoice> sendInvoiceRealm = realm.where(SendInvoice.class).findAll();
             sendInvoiceRealm.deleteAllFromRealm();
