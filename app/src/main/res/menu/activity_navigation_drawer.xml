@@ -7,17 +7,17 @@
             android:icon="@drawable/ic_history_black_24dp"
             android:title="Последние действия" />
         <item
-            android:id="@+id/nav_volumes"
-            android:icon="@drawable/flask_empty"
-            android:title="Емкости" />
-        <item
             android:id="@+id/nav_note"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="Накладные" />
+            android:title="Общие накладные" />
         <item
             android:id="@+id/nav_dest_list"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="Список S" />
+            android:title="Отдельные накладные" />
+        <item
+            android:id="@+id/nav_volumes"
+            android:icon="@drawable/flask_empty"
+            android:title="Емкости" />
         <item
             android:id="@+id/nav_routes"
             android:icon="@drawable/ic_map_black_24dp"
