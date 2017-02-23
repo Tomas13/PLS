@@ -4,17 +4,15 @@ import android.app.Activity;
 import android.util.Log;
 import android.util.Pair;
 
-import org.jboss.aerogear.android.authentication.AuthenticationManager;
-import org.jboss.aerogear.android.authentication.AuthenticationModule;
 import org.jboss.aerogear.android.authentication.digest.HttpDigestAuthenticationConfiguration;
 import org.jboss.aerogear.android.authorization.AuthorizationManager;
 import org.jboss.aerogear.android.authorization.AuthzModule;
 import org.jboss.aerogear.android.authorization.oauth2.OAuth2AuthorizationConfiguration;
 import org.jboss.aerogear.android.core.Callback;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -56,6 +54,7 @@ public class KeycloakHelper extends HttpDigestAuthenticationConfiguration{
                     .setClientId(AUTHZ_CLIENT_ID)
                     .setClientSecret(CLIENT_SECRET)
                     .addAdditionalAuthorizationParam((Pair.create("access_type", "offline")))
+                    .addAdditionalAuthorizationParam((Pair.create("grant_type", "refresh_token")))
                     .setScopes(scopes)
                     .setRedirectURL(AUTHZ_REDIRECT_URL)
                     .asModule();
@@ -79,6 +78,8 @@ public class KeycloakHelper extends HttpDigestAuthenticationConfiguration{
                 public void onSuccess(String data) {
                     Log.i(TAG, "loging data " + data);
                     callback.onSuccess(data);
+
+                    refresh();
                 }
 
                 @Override

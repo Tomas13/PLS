@@ -14,7 +14,7 @@ public class PacketList extends RealmObject{
     @SerializedName("id")
     @Expose
     private Long id;
-    @SerializedName("packetListid")
+    @SerializedName("packetListId")
     @Expose
     private String packetListid;
     @SerializedName("fromDep")
