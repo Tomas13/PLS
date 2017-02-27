@@ -94,7 +94,7 @@ public class CollatePresenterImpl implements CollatePresenter {
                         response -> {
                             if (response.getStatus().equals("success")) {
                                 view.hideProgress();
-                                view.showCollateResponse(response);
+//                                view.showCollateResponse(response);
                             } else {
 
                                 loadGetListForVpn();

@@ -84,7 +84,7 @@ public class InvoicePresenterImpl implements InvoicePresenter {
 
 
 
-    @Override
+  /*  @Override
     public void postCreateInvoice(BodyForCreateInvoiceWithout bodyForCreateInvoiceWithout) {
         view.showProgress();
 
@@ -105,7 +105,7 @@ public class InvoicePresenterImpl implements InvoicePresenter {
                         });
 
     }
-
+*/
 
 
     @Override

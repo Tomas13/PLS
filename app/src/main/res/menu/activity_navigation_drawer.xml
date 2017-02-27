@@ -22,6 +22,7 @@
             android:id="@+id/nav_routes"
             android:icon="@drawable/ic_map_black_24dp"
             android:title="Маршруты" />
+
     </group>
 
     <item android:title="">

@@ -16,7 +16,7 @@ public interface CollateView {
 
 //    void showVolumesData(CollateResponse volumes);
 
-    void showCollateResponse(CollateResponse collateResponse);
+//    void showCollateResponse(CollateResponse collateResponse);
 
     void showDestinationList(ResponseDestinationList destinationList);
 

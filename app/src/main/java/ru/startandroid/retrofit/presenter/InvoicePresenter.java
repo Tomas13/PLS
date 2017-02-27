@@ -14,7 +14,7 @@ public interface InvoicePresenter {
 
     void retrofitAcceptGeneralInvoice(Long generalInvoiceId);
 
-    void postCreateInvoice(BodyForCreateInvoiceWithout bodyForCreateInvoiceWithout);
+//    void postCreateInvoice(BodyForCreateInvoiceWithout bodyForCreateInvoiceWithout);
 
     void unSubscribe();
 

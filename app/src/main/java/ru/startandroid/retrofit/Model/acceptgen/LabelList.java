@@ -9,7 +9,7 @@ public class LabelList extends RealmObject{
 
     @SerializedName("id")
     @Expose
-    private Long id;
+    public Long id;
     @SerializedName("labelListid")
     @Expose
     private String labelListid;

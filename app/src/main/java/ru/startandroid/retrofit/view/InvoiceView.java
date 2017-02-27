@@ -24,6 +24,6 @@ public interface InvoiceView {
 
     void showEmptyToast(String message);
 
-    void getPostResponse(CreateResponse createResponse);
+//    void getPostResponse(CreateResponse createResponse);
 
 }
