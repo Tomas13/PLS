@@ -11,6 +11,7 @@ import io.realm.RealmObject;
 
 public class SendInvoice extends RealmObject{
     private String where;
+    private String to;
     private BodyForCreateInvoice bodyForCreateInvoice;
 
     public SendInvoice() {
@@ -22,6 +23,14 @@ public class SendInvoice extends RealmObject{
 
     public void setBodyForCreateInvoice(BodyForCreateInvoice bodyForCreateInvoice) {
         this.bodyForCreateInvoice = bodyForCreateInvoice;
+    }
+
+    public String getTo() {
+        return to;
+    }
+
+    public void setTo(String to) {
+        this.to = to;
     }
 
     public String getWhere() {

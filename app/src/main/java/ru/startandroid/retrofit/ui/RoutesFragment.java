@@ -35,6 +35,7 @@ import ru.startandroid.retrofit.events.RoutesEventError;
 import ru.startandroid.retrofit.jobs.LoadRoutesJob;
 import ru.startandroid.retrofit.view.RoutesView;
 
+import static ru.startandroid.retrofit.Const.FLIGHT_ID;
 import static ru.startandroid.retrofit.Const.FLIGHT_POS;
 import static ru.startandroid.retrofit.Const.FLIGHT_SHARED_PREF;
 
@@ -86,15 +87,27 @@ public class RoutesFragment extends Fragment implements RoutesView {
 
         hideProgress();
 
-        int pos = 0;
+//        int pos = 0;
+        long flightId = 0;
         if (isAdded()) {
             SharedPreferences pref = getActivity().getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
-            pos = pref.getInt(FLIGHT_POS, 0);
+//            pos = pref.getInt(FLIGHT_POS, 0);
+
+            flightId = pref.getLong(FLIGHT_ID, 0);
         }
 
         List<Entry> flights = new ArrayList<>();
 
-        flights.addAll(routesEvent.getRoutes().getFlights().get(pos).getFlight().getItineraryDTO().getEntries());
+        boolean foundOne = false;
+
+        for (int i = 0; i < routesEvent.getRoutes().getFlights().size(); i++) {
+            if (routesEvent.getRoutes().getFlights().get(i).getFlight().getId() == flightId && !foundOne){
+                flights.addAll(routesEvent.getRoutes().getFlights().get(i).getFlight().getItineraryDTO().getEntries());
+                foundOne = true;
+            }
+        }
+
+//        flights.addAll(routesEvent.getRoutes().getFlights().get(pos).getFlight().getItineraryDTO().getEntries());
 
         RoutesRVAdapter routesRVAdapter = new RoutesRVAdapter(flights);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());

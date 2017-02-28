@@ -92,13 +92,7 @@ public class InvoiceRVAdapter extends RecyclerView.Adapter<InvoiceRVAdapter.Invo
         holder.tvFromDeptName.setText(generalInvoice.getFromDep().getName());
         holder.tvFromDeptNameRu.setText(generalInvoice.getFromDep().getNameRu());
 
-        holder.btnRetreive.setOnClickListener(new View.OnClickListener(){
-
-            @Override
-            public void onClick(View v) {
-                listener.onItemClick(v, position);
-            }
-        });
+        holder.btnRetreive.setOnClickListener(v -> listener.onItemClick(v, position));
     }
 
 

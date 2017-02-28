@@ -127,7 +127,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
         pref = getActivity().getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
         maxRouteNumber = pref.getInt(NUMBER_OF_CITIES, 0);
-        currentRoutePosition = pref.getInt(CURRENT_ROUTE_POSITION, 0);
+        currentRoutePosition = pref.getInt(CURRENT_ROUTE_POSITION, 1);
 
         jobManager = AppJobManager.getJobManager();
 
@@ -182,6 +182,8 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
                 jobManager.addJobInBackground(new PostCreateInvoiceJob(body));
 
+                updateCurrentRoutePosition();
+
 
                 RealmResults<BodyForCreateInvoice> bodyResults = realm.where(BodyForCreateInvoice.class).findAll();
 
@@ -201,8 +203,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
                 for (int j = 0; j < realm.where(LabelList.class).findAll().size(); j++) {
                     for (int i = 0; i < listLongs.size(); i++) {
                         if (realm.where(LabelList.class).findAll().get(j).getId().equals(listLongs.get(i))) {
-                            int k = j;
-                            labelIds.add(k);
+                            labelIds.add(j);
                         }
                     }
                 }
@@ -226,13 +227,9 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
 
                 for (int j = 0; j < realm.where(PacketList.class).findAll().size(); j++) {
-
                     for (int i = 0; i < listLongsPacket.size(); i++) {
-
                         if (realm.where(PacketList.class).findAll().get(j).getId().equals(listLongsPacket.get(i))) {
-                            int k = j;
-
-                            packetIds.add(k);
+                            packetIds.add(j);
                         }
                     }
 
@@ -329,7 +326,14 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
             ArrayList<Long> labelsList = new ArrayList<>();
             ArrayList<Long> packetsList = new ArrayList<>();
-            String toDeptIndex = entries.get(currentRoutePosition + 1).getDept().getName();
+
+            String toDeptIndex = "InvoiceFrag 329";
+            if (entries.size() >= currentRoutePosition +1){
+
+              toDeptIndex =  entries.get(currentRoutePosition + 1).getDept().getName();
+            }
+
+
             String fromDeptIndex = entries.get(currentRoutePosition).getDept().getName();
 
             body = new BodyForCreateInvoiceWithout(flightId, tlid, true, toDeptIndex, fromDeptIndex, labelsList, packetsList);
@@ -365,7 +369,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
         if (currentRoutePosition > 0 && currentRoutePosition < maxRouteNumber) {
             currentRoutePosition++;
-            pref.edit().putInt(NUMBER_OF_CITIES, currentRoutePosition).apply();
+            pref.edit().putInt(CURRENT_ROUTE_POSITION, currentRoutePosition).apply();
         }
 
 
@@ -378,6 +382,32 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             realm.executeTransaction(realm -> realm.copyToRealm(sendInvoice));
         }
 
+
+/*
+        String whereName;
+        String toName = "default";
+        if (flightName.size() <= currentRoutePosition + 1){
+            whereName = flightName.get(currentRoutePosition + 1);
+            toName = flightName.get(currentRoutePosition);
+        }else{
+            whereName = flightName.get(currentRoutePosition);
+
+            if (flightName.get(currentRoutePosition -1 ) != null)
+                toName = flightName.get(currentRoutePosition - 1);
+        }
+
+
+
+        SendInvoice sendInvoice = new SendInvoice();
+        sendInvoice.setWhere(whereName);
+        sendInvoice.setTo(toName);
+        sendInvoice.setBodyForCreateInvoice(bodyRealm);
+        if (realm.where(SendInvoice.class).isValid()) {
+
+            realm.executeTransaction(realm -> realm.copyToRealm(sendInvoice));
+        }
+*/
+
     }
 
 
@@ -387,7 +417,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             if (invoiceEvent.getCreateResponse().getStatus().equals("success")) {
 
                 Toast.makeText(getContext(), "Общая накладная успешно создана", Toast.LENGTH_SHORT).show();
-
 
                 hideProgress();
                 removeRealm();
@@ -399,6 +428,12 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             }
 
         }
+    }
+
+    private void updateCurrentRoutePosition() {
+        int current = pref.getInt(CURRENT_ROUTE_POSITION, 0);
+        current++;
+        pref.edit().putInt(CURRENT_ROUTE_POSITION, current).apply();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -511,6 +546,8 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
             showProgress();
 //            jobManager.addJobInBackground(new AcceptGeneralInvoiceJob(generalInvoiceId));
+
+
 
             createEmptyInvoice();
 

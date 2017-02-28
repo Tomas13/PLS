@@ -103,7 +103,7 @@ public class InvoiceRVAdapterSend extends RecyclerView.Adapter<InvoiceRVAdapterS
 //        Log.d("Main", "onBIND " + route..getStatus() + " ");
         holder.tvGeneralInvoiceID.setText(timeOfEvent);
         holder.tvFromDeptName.setText(generalInvoice.getWhere());
-//        holder.tvFromDeptNameRu.setText(generalInvoice.getFromDep().getNameRu());
+//        holder.tvFromDeptNameRu.setText(generalInvoice);
 
         holder.btnRetreive.setText("Отправить");
         holder.btnRetreive.setOnClickListener(v -> listener.onItemClick(v, position));
