@@ -10,15 +10,15 @@ import io.realm.RealmObject;
  */
 
 public class SendInvoice extends RealmObject{
-    private String where;
+    private String from;
     private String to;
     private BodyForCreateInvoice bodyForCreateInvoice;
 
     public SendInvoice() {
     }
 
-    public void setWhere(String where) {
-        this.where = where;
+    public void setFrom(String from) {
+        this.from = from;
     }
 
     public void setBodyForCreateInvoice(BodyForCreateInvoice bodyForCreateInvoice) {
@@ -33,8 +33,8 @@ public class SendInvoice extends RealmObject{
         this.to = to;
     }
 
-    public String getWhere() {
-        return where;
+    public String getFrom() {
+        return from;
     }
 
     public BodyForCreateInvoice getBodyForCreateInvoice() {

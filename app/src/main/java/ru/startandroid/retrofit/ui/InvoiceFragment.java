@@ -96,14 +96,11 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     private ArrayList<String> flightName = new ArrayList<>();
     private AlertDialog alertDialog;
     private RealmQuery<BodyForCreateInvoice> queryBody;
-
     private int currentRoutePosition;
     private int maxRouteNumber;
     private SharedPreferences pref;
-
-    public BodyForCreateInvoiceWithout body;
-    public BodyForCreateInvoice bodyRealm;
-
+    private BodyForCreateInvoiceWithout body;
+    private BodyForCreateInvoice bodyRealm;
     private JobManager jobManager;
 
     InvoiceRVAdapterSend adapterSend;
@@ -119,9 +116,10 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         realm = Realm.getDefaultInstance();
 
         RealmResults<SendInvoice> realmResults = realm.where(SendInvoice.class).findAll();
-        for (int i = 0; i < realmResults.size(); i++) {
-            sendInvoiceList.add(realmResults.get(i));
-        }
+        if (realmResults.size() > 0) sendInvoiceList.add(realmResults.last());
+//        for (int i = 0; i < realmResults.size(); i++) {
+//            sendInvoiceList.add(realmResults.get(i));
+//        }
 
         presenter = new InvoicePresenterImpl(this, new NetworkService());
 
@@ -131,6 +129,23 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
         jobManager = AppJobManager.getJobManager();
 
+        //FOR SENDING
+        queryData = realm.where(Entry.class);
+        if (!queryData.findAll().isEmpty()) {
+            for (int i = 0; i < queryData.findAll().distinct("index").size(); i++) {
+                entries.add(queryData.findAll().get(i));
+            }
+        }
+        for (int i = 0; i < entries.size(); i++) {
+            flightName.add(entries.get(i).getDept().getNameRu());
+//            flightName.add(timeOfEvent);
+        }
+
+
+        queryBody = realm.where(BodyForCreateInvoice.class);
+        for (int i = 0; i < queryBody.findAll().size(); i++) {
+            bodyRealm = queryBody.findAll().last();
+        }
     }
 
     @Override
@@ -141,34 +156,11 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         ButterKnife.bind(this, viewRoot);
         init();
 
-
-        //FOR SENDING
-        queryData = realm.where(Entry.class);
-        if (!queryData.findAll().isEmpty()) {
-            for (int i = 0; i < queryData.findAll().distinct("index").size(); i++) {
-                entries.add(queryData.findAll().get(i));
-            }
-        }
-        for (int i = 1; i < entries.size(); i++) {
-            flightName.add(entries.get(i).getDept().getNameRu());
-//            flightName.add(timeOfEvent);
-
-
-        }
-
-
-        queryBody = realm.where(BodyForCreateInvoice.class);
-        for (int i = 0; i < queryBody.findAll().size(); i++) {
-            bodyRealm = queryBody.findAll().last();
-        }
-
         if (queryBody.findAll().size() == 0) prepareBodyForPost();
 
         if (!sendInvoiceList.isEmpty()) {
 
-
             adapterSend = new InvoiceRVAdapterSend(getActivity(), sendInvoiceList, ((childView, childAdapterPosition) -> {
-
 
                 if (queryBody.findAll().size() > 0) body = realmToBody(bodyRealm);
 
@@ -177,71 +169,15 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
                 adapterSend.notifyDataSetChanged();
                 //TODO
 
-
                 showProgress();
 
                 jobManager.addJobInBackground(new PostCreateInvoiceJob(body));
 
                 updateCurrentRoutePosition();
 
-
-                RealmResults<BodyForCreateInvoice> bodyResults = realm.where(BodyForCreateInvoice.class).findAll();
-
-                ///16.02.17 remove  labels that were sent
-                List<Long> listLongs = new ArrayList<>();
-                for (int k = 0; k < bodyResults.size(); k++) {
-                    RealmList<RealmLong> realmLongs = bodyResults.get(k).getLabelIds();
-                    for (int i = 0; i < realmLongs.size(); i++) {
-                        listLongs.add(realmLongs.get(i).getaLong());
-                    }
-                }
-
-
-                ArrayList<Integer> labelIds = new ArrayList<>();
-
-                //remove label from realm after send
-                for (int j = 0; j < realm.where(LabelList.class).findAll().size(); j++) {
-                    for (int i = 0; i < listLongs.size(); i++) {
-                        if (realm.where(LabelList.class).findAll().get(j).getId().equals(listLongs.get(i))) {
-                            labelIds.add(j);
-                        }
-                    }
-                }
-
-                for (int w = labelIds.size() - 1; w >= 0; w--) {
-                    int j = labelIds.get(w);
-                    realm.executeTransaction(realm -> realm.where(LabelList.class).findAll().get(j).deleteFromRealm());
-
-                }
-
-
-                List<Long> listLongsPacket = new ArrayList<>();
-                for (int k = 0; k < bodyResults.size(); k++) {
-                    RealmList<RealmLong> realmLongsPacket = bodyResults.get(k).getPacketIds();
-                    for (int i = 0; i < realmLongsPacket.size(); i++) {
-                        listLongsPacket.add(realmLongsPacket.get(i).getaLong());
-                    }
-                }
-
-                ArrayList<Integer> packetIds = new ArrayList<>();
-
-
-                for (int j = 0; j < realm.where(PacketList.class).findAll().size(); j++) {
-                    for (int i = 0; i < listLongsPacket.size(); i++) {
-                        if (realm.where(PacketList.class).findAll().get(j).getId().equals(listLongsPacket.get(i))) {
-                            packetIds.add(j);
-                        }
-                    }
-
-                }
-                ///16.02.17
-                for (int w = packetIds.size() - 1; w >= 0; w--) {
-                    int j = packetIds.get(w);
-                    realm.executeTransaction(realm -> realm.where(PacketList.class).findAll().get(j).deleteFromRealm());
-                }
+                removeSentPacketsAndLabels();
 
                 realm.executeTransaction(realm -> realm.where(RealmLong.class).findAll().deleteAllFromRealm());
-
 
 //                presenter.postCreateInvoice(body);
 
@@ -265,10 +201,79 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         return viewRoot;
     }
 
+    private void removeSentPacketsAndLabels() {
+        RealmResults<BodyForCreateInvoice> bodyResults = realm.where(BodyForCreateInvoice.class).findAll();
+
+        ///16.02.17 remove  labels that were sent
+        List<Long> listLongs = new ArrayList<>();
+        for (int k = 0; k < bodyResults.size(); k++) {
+            RealmList<RealmLong> realmLongs = bodyResults.get(k).getLabelIds();
+            for (int i = 0; i < realmLongs.size(); i++) {
+                listLongs.add(realmLongs.get(i).getaLong());
+            }
+        }
+
+
+        ArrayList<Integer> labelIds = new ArrayList<>();
+
+        //remove label from realm after send
+        for (int j = 0; j < realm.where(LabelList.class).findAll().size(); j++) {
+            for (int i = 0; i < listLongs.size(); i++) {
+                if (realm.where(LabelList.class).findAll().get(j).getId().equals(listLongs.get(i))) {
+                    labelIds.add(j);
+                }
+            }
+        }
+
+        for (int w = labelIds.size() - 1; w >= 0; w--) {
+            int j = labelIds.get(w);
+            realm.executeTransaction(realm -> realm.where(LabelList.class).findAll().get(j).deleteFromRealm());
+
+        }
+
+
+        List<Long> listLongsPacket = new ArrayList<>();
+        for (int k = 0; k < bodyResults.size(); k++) {
+            RealmList<RealmLong> realmLongsPacket = bodyResults.get(k).getPacketIds();
+            for (int i = 0; i < realmLongsPacket.size(); i++) {
+                listLongsPacket.add(realmLongsPacket.get(i).getaLong());
+            }
+        }
+
+        ArrayList<Integer> packetIds = new ArrayList<>();
+
+
+        for (int j = 0; j < realm.where(PacketList.class).findAll().size(); j++) {
+            for (int i = 0; i < listLongsPacket.size(); i++) {
+                if (realm.where(PacketList.class).findAll().get(j).getId().equals(listLongsPacket.get(i))) {
+                    packetIds.add(j);
+                }
+            }
+
+        }
+        ///16.02.17
+        for (int w = packetIds.size() - 1; w >= 0; w--) {
+            int j = packetIds.get(w);
+            realm.executeTransaction(realm -> realm.where(PacketList.class).findAll().get(j).deleteFromRealm());
+        }
+    }
+
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
-    public void onLoadGeneralInvoice(ShowGeneralInvoiceEvent event) {
+    public void onPostCreateInvoiceJob(InvoiceEvent invoiceEvent) {
+        if (invoiceEvent.getCreateResponse() != null) {
+            if (invoiceEvent.getCreateResponse().getStatus().equals("success")) {
 
+                Toast.makeText(getContext(), "Общая накладная успешно создана", Toast.LENGTH_SHORT).show();
+
+                hideProgress();
+//                removeRealm();
+
+
+            } else {
+                showEmptyToast(invoiceEvent.getCreateResponse().getStatus());
+            }
+        }
     }
 
     private BodyForCreateInvoiceWithout realmToBody(BodyForCreateInvoice bodyRealm) {
@@ -367,79 +372,29 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
     private void createEmptyInvoice() {
 
+        String toName = flightName.get(currentRoutePosition + 1);
+        String fromName = flightName.get(currentRoutePosition);
+        SendInvoice sendInvoice = new SendInvoice();
+        sendInvoice.setTo(toName);
+        sendInvoice.setFrom(fromName);
+        sendInvoice.setBodyForCreateInvoice(bodyRealm);
+        if (realm.where(SendInvoice.class).findAll().isValid()) {
+            realm.executeTransaction(realm -> realm.copyToRealm(sendInvoice));
+        }
+
         if (currentRoutePosition > 0 && currentRoutePosition < maxRouteNumber) {
             currentRoutePosition++;
             pref.edit().putInt(CURRENT_ROUTE_POSITION, currentRoutePosition).apply();
         }
 
-
-        String toName = flightName.get(currentRoutePosition);
-        SendInvoice sendInvoice = new SendInvoice();
-        sendInvoice.setWhere(toName);
-        sendInvoice.setBodyForCreateInvoice(bodyRealm);
-        if (realm.where(SendInvoice.class).isValid()) {
-
-            realm.executeTransaction(realm -> realm.copyToRealm(sendInvoice));
-        }
-
-
-/*
-        String whereName;
-        String toName = "default";
-        if (flightName.size() <= currentRoutePosition + 1){
-            whereName = flightName.get(currentRoutePosition + 1);
-            toName = flightName.get(currentRoutePosition);
-        }else{
-            whereName = flightName.get(currentRoutePosition);
-
-            if (flightName.get(currentRoutePosition -1 ) != null)
-                toName = flightName.get(currentRoutePosition - 1);
-        }
-
-
-
-        SendInvoice sendInvoice = new SendInvoice();
-        sendInvoice.setWhere(whereName);
-        sendInvoice.setTo(toName);
-        sendInvoice.setBodyForCreateInvoice(bodyRealm);
-        if (realm.where(SendInvoice.class).isValid()) {
-
-            realm.executeTransaction(realm -> realm.copyToRealm(sendInvoice));
-        }
-*/
-
     }
 
-
-    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
-    public void onPostCreateInvoiceJob(InvoiceEvent invoiceEvent) {
-        if (invoiceEvent.getCreateResponse() != null) {
-            if (invoiceEvent.getCreateResponse().getStatus().equals("success")) {
-
-                Toast.makeText(getContext(), "Общая накладная успешно создана", Toast.LENGTH_SHORT).show();
-
-                hideProgress();
-                removeRealm();
-
-
-            } else {
-                showEmptyToast(invoiceEvent.getCreateResponse().getStatus());
-
-            }
-
-        }
-    }
 
     private void updateCurrentRoutePosition() {
         int current = pref.getInt(CURRENT_ROUTE_POSITION, 0);
         current++;
+        currentRoutePosition++;
         pref.edit().putInt(CURRENT_ROUTE_POSITION, current).apply();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onInvoiceErrorEvent(Throwable message) {
-        showEmptyToast(message.getMessage());
-        hideProgress();
     }
 
     private void removeRealm() {
@@ -452,6 +407,16 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onInvoiceErrorEvent(Throwable message) {
+        showEmptyToast(message.getMessage());
+        hideProgress();
+    }
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onLoadGeneralInvoice(ShowGeneralInvoiceEvent event) {
+
+    }
 
     private void startCollateFragment() {
         Fragment fragment = new CollateFragment();
@@ -507,26 +472,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
     }
 
-    /*  @Override
-      public void getPostResponse(CreateResponse createResponse) {
-          if (createResponse != null) {
-              if (createResponse.getStatus().equals("success")) {
-
-                  Toast.makeText(getContext(), "Общая накладная успешно создана", Toast.LENGTH_SHORT).show();
-
-
-                  hideProgress();
-  //                removeRealm();
-
-
-              } else {
-                  showEmptyToast(createResponse.getStatus());
-
-              }
-
-          }
-      }
-  */
     private void dismissDialog() {
         alertDialog.dismiss();
     }
@@ -546,8 +491,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
             showProgress();
 //            jobManager.addJobInBackground(new AcceptGeneralInvoiceJob(generalInvoiceId));
-
-
 
             createEmptyInvoice();
 
@@ -620,4 +563,27 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         presenter.unSubscribe();
         if (!realm.isClosed()) realm.close();
     }
+
+
+
+    /*  @Override
+      public void getPostResponse(CreateResponse createResponse) {
+          if (createResponse != null) {
+              if (createResponse.getStatus().equals("success")) {
+
+                  Toast.makeText(getContext(), "Общая накладная успешно создана", Toast.LENGTH_SHORT).show();
+
+
+                  hideProgress();
+  //                removeRealm();
+
+
+              } else {
+                  showEmptyToast(createResponse.getStatus());
+
+              }
+
+          }
+      }
+  */
 }
