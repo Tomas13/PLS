@@ -3,6 +3,7 @@ package ru.startandroid.retrofit.ui;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -29,6 +30,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.Realm;
@@ -88,6 +90,10 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     @BindView(R.id.rv_send_invoice)
     RecyclerView rvSendInvoice;
 
+    @BindString(R.string.last_point)
+    String lastPoint;
+
+    private InvoiceRVAdapter invoiceRVAdapter;
     private InvoicePresenter presenter;
     private Realm realm;
     private List<SendInvoice> sendInvoiceList;
@@ -276,6 +282,77 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         }
     }
 
+    private void createEmptyInvoice() {
+
+
+        String toName = flightName.get(currentRoutePosition + 1);
+        String fromName = flightName.get(currentRoutePosition);
+        SendInvoice sendInvoice = new SendInvoice();
+        sendInvoice.setTo(toName);
+        sendInvoice.setFrom(fromName);
+        sendInvoice.setBodyForCreateInvoice(bodyRealm);
+        if (realm.where(SendInvoice.class).findAll().isValid()) {
+            realm.executeTransaction(realm -> realm.copyToRealm(sendInvoice));
+        }
+
+        if (currentRoutePosition > 0 && currentRoutePosition < maxRouteNumber) {
+            currentRoutePosition++;
+            pref.edit().putInt(CURRENT_ROUTE_POSITION, currentRoutePosition).apply();
+        }
+
+
+    }
+
+
+    @Override
+    public void showGeneralInvoice(InvoiceMain invoiceMain) {
+
+        List<GeneralInvoice> generalInvoiceList = new ArrayList<>();
+        generalInvoiceList.addAll(invoiceMain.getGeneralInvoices());
+
+        invoiceRVAdapter = new InvoiceRVAdapter(getActivity(), generalInvoiceList, (childView, childAdapterPosition) -> {
+
+            if (currentRoutePosition == flightName.size()) {
+
+                Long generalInvoiceId = generalInvoiceList.get(childAdapterPosition).getId();
+                presenter.retrofitAcceptGeneralInvoice(generalInvoiceId);
+
+                showProgress();
+//            jobManager.addJobInBackground(new AcceptGeneralInvoiceJob(generalInvoiceId));
+
+                createEmptyInvoice();
+
+                generalInvoiceList.remove(childAdapterPosition);
+                invoiceRVAdapter.notifyDataSetChanged();
+
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS", Locale.FRANCE);
+                Date now = new Date();
+                String timeOfEvent = simpleDateFormat.format(now);
+
+
+                SharedPreferences ref = getActivity().getSharedPreferences(INVOICE_PREF, Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = ref.edit();
+                editor.putString(INVOICE_NAME, timeOfEvent);
+                editor.apply();
+            } else {
+                Snackbar snackbar = Snackbar.make(rvInvoice, lastPoint, Snackbar.LENGTH_LONG);
+
+                View snackbarView = snackbar.getView();
+                TextView textView = (TextView) snackbarView.findViewById(android.support.design.R.id.snackbar_text);
+                textView.setMaxLines(2);  // show multiple line
+                snackbar.show();
+            }
+            //startCollateFragment();
+        });
+
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+        rvInvoice.setLayoutManager(mLayoutManager);
+        rvInvoice.setAdapter(invoiceRVAdapter);
+
+
+    }
+
+
     private BodyForCreateInvoiceWithout realmToBody(BodyForCreateInvoice bodyRealm) {
 
         BodyForCreateInvoiceWithout bodyForCreateInvoiceWithout = new BodyForCreateInvoiceWithout();
@@ -333,9 +410,9 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             ArrayList<Long> packetsList = new ArrayList<>();
 
             String toDeptIndex = "InvoiceFrag 329";
-            if (entries.size() >= currentRoutePosition +1){
+            if (entries.size() >= currentRoutePosition + 1) {
 
-              toDeptIndex =  entries.get(currentRoutePosition + 1).getDept().getName();
+                toDeptIndex = entries.get(currentRoutePosition + 1).getDept().getName();
             }
 
 
@@ -369,26 +446,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         }
         //FOR SENDING
     }
-
-    private void createEmptyInvoice() {
-
-        String toName = flightName.get(currentRoutePosition + 1);
-        String fromName = flightName.get(currentRoutePosition);
-        SendInvoice sendInvoice = new SendInvoice();
-        sendInvoice.setTo(toName);
-        sendInvoice.setFrom(fromName);
-        sendInvoice.setBodyForCreateInvoice(bodyRealm);
-        if (realm.where(SendInvoice.class).findAll().isValid()) {
-            realm.executeTransaction(realm -> realm.copyToRealm(sendInvoice));
-        }
-
-        if (currentRoutePosition > 0 && currentRoutePosition < maxRouteNumber) {
-            currentRoutePosition++;
-            pref.edit().putInt(CURRENT_ROUTE_POSITION, currentRoutePosition).apply();
-        }
-
-    }
-
 
     private void updateCurrentRoutePosition() {
         int current = pref.getInt(CURRENT_ROUTE_POSITION, 0);
@@ -476,47 +533,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         alertDialog.dismiss();
     }
 
-    InvoiceRVAdapter invoiceRVAdapter;
-
-    @Override
-    public void showGeneralInvoice(InvoiceMain invoiceMain) {
-        final List<GeneralInvoice> generalInvoiceList = new ArrayList<>();
-
-        generalInvoiceList.addAll(invoiceMain.getGeneralInvoices());
-
-        invoiceRVAdapter = new InvoiceRVAdapter(getActivity(), generalInvoiceList, (childView, childAdapterPosition) -> {
-
-            Long generalInvoiceId = generalInvoiceList.get(childAdapterPosition).getId();
-            presenter.retrofitAcceptGeneralInvoice(generalInvoiceId);
-
-            showProgress();
-//            jobManager.addJobInBackground(new AcceptGeneralInvoiceJob(generalInvoiceId));
-
-            createEmptyInvoice();
-
-            generalInvoiceList.remove(childAdapterPosition);
-            invoiceRVAdapter.notifyDataSetChanged();
-
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS", Locale.FRANCE);
-            Date now = new Date();
-            String timeOfEvent = simpleDateFormat.format(now);
-
-
-            SharedPreferences ref = getActivity().getSharedPreferences(INVOICE_PREF, Context.MODE_PRIVATE);
-
-            SharedPreferences.Editor editor = ref.edit();
-            editor.putString(INVOICE_NAME, timeOfEvent);
-            editor.apply();
-
-
-            //startCollateFragment();
-
-        });
-
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-        rvInvoice.setLayoutManager(mLayoutManager);
-        rvInvoice.setAdapter(invoiceRVAdapter);
-    }
 
     @Override
     public void showGeneralInvoiceId(Example example) {
