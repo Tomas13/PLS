@@ -117,7 +117,8 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
         btnSendInvoice.setOnClickListener(v -> {
 
-            if (querySendInvoice.findAll().size() > 0 && querySendInvoice.findAll().last().getBodyForCreateInvoice() != null) {
+//            if (querySendInvoice.findAll().size() > 0 && querySendInvoice.findAll().last().getBodyForCreateInvoice() != null) {
+            if (querySendInvoice.findAll().size() > 0 ) {
 //                flightName.add(querySendInvoice.findAll().last().getBodyForCreateInvoice().getToDepIndex());
 
 
@@ -186,8 +187,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
         ListView listView = (ListView) pointDialog.findViewById(R.id.list_view_flight);
 
-
-
         adapter = new ArrayAdapter<>(getContext(), R.layout.list_view_item, flightName);
 //        adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_activated_1, flightName);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
@@ -196,7 +195,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
         pointDialog.show();
 
         listView.setOnItemClickListener((parent, view, position, id) -> {
-
             pointDialog.setTitle(flightName.get(position));
             listView.setItemChecked(position, true);
 
@@ -210,7 +208,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
                 String toDeptIndex = entries.get(currentRoutePosition + 1).getDept().getName();
                 String fromDeptIndex = entries.get(currentRoutePosition).getDept().getName();
-
 
                 for (int i = 0; i < labelsList.size(); i++) {
                     RealmLong realmLong = new RealmLong(labelsList.get(i));
@@ -238,13 +235,12 @@ public class VolumesFragment extends Fragment implements VolumesView {
         Button btnOk = (Button) pointDialog.findViewById(R.id.btn_ok_flight);
         btnOk.setOnClickListener(v -> {
 
-                    RealmResults<BodyForCreateInvoice> queryBody = realm.where(BodyForCreateInvoice.class).findAll();
+//                    RealmResults<BodyForCreateInvoice> queryBody = realm.where(BodyForCreateInvoice.class).findAll();
                     realm.executeTransaction(
                             realm -> {
                                 realm.copyToRealm(body);
 //                                queryBody.deleteAllFromRealm();
 
-                            ///16.02.17
                                 for (int i = 0; i < queryLabel.findAll().size(); i++) {
 
                                     for (int j = 0; j < labelLongList.size(); j++) {
@@ -254,7 +250,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
                                     }
                                 }
-                                ///16.02.17
+
                                 for (int i = 0; i < queryPacket.findAll().size(); i++) {
 
                                     for (int j = 0; j < packetLongList.size(); j++) {
@@ -264,21 +260,12 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
                                     }
                                 }
-                                ///17.02.17
-
-
-
                             }
-
                     );
 
-
                     updateItemsRV();
-
                     pointDialog.dismiss();
-
                 }
-
         );
 
 

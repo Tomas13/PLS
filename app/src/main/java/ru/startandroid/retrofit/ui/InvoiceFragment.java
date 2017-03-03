@@ -120,6 +120,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
         sendInvoiceList = new ArrayList<>();
         realm = Realm.getDefaultInstance();
+        realm.setAutoRefresh(true);
 
         RealmResults<SendInvoice> realmResults = realm.where(SendInvoice.class).findAll();
         if (realmResults.size() > 0) sendInvoiceList.add(realmResults.last());
@@ -182,6 +183,8 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
                 updateCurrentRoutePosition();
 
                 removeSentPacketsAndLabels();
+
+//                removeRealm();
 
                 realm.executeTransaction(realm -> realm.where(RealmLong.class).findAll().deleteAllFromRealm());
 
@@ -273,7 +276,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
                 Toast.makeText(getContext(), "Общая накладная успешно создана", Toast.LENGTH_SHORT).show();
 
                 hideProgress();
-//                removeRealm();
+                removeRealm();
 
 
             } else {
@@ -285,19 +288,24 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     private void createEmptyInvoice() {
 
 
-        String toName = flightName.get(currentRoutePosition + 1);
-        String fromName = flightName.get(currentRoutePosition);
-        SendInvoice sendInvoice = new SendInvoice();
-        sendInvoice.setTo(toName);
-        sendInvoice.setFrom(fromName);
-        sendInvoice.setBodyForCreateInvoice(bodyRealm);
-        if (realm.where(SendInvoice.class).findAll().isValid()) {
-            realm.executeTransaction(realm -> realm.copyToRealm(sendInvoice));
-        }
+        if (flightName.size() > currentRoutePosition + 1) {
+            String toName = flightName.get(currentRoutePosition + 1);
+            String fromName = flightName.get(currentRoutePosition);
+            SendInvoice sendInvoice = new SendInvoice();
+            sendInvoice.setTo(toName);
+            sendInvoice.setFrom(fromName);
+//            sendInvoice.setBodyForCreateInvoice(bodyRealm);
 
-        if (currentRoutePosition > 0 && currentRoutePosition < maxRouteNumber) {
-            currentRoutePosition++;
-            pref.edit().putInt(CURRENT_ROUTE_POSITION, currentRoutePosition).apply();
+
+            realm.executeTransaction(realm -> realm.insert(sendInvoice));
+
+            if (currentRoutePosition > 0 && currentRoutePosition < maxRouteNumber) {
+                currentRoutePosition++;
+                pref.edit().putInt(CURRENT_ROUTE_POSITION, currentRoutePosition).apply();
+            }
+
+        } else {
+            Toast.makeText(getContext(), "END OF ROUTE", Toast.LENGTH_SHORT).show();
         }
 
 
@@ -312,7 +320,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
         invoiceRVAdapter = new InvoiceRVAdapter(getActivity(), generalInvoiceList, (childView, childAdapterPosition) -> {
 
-            if (currentRoutePosition == flightName.size()) {
+            if (currentRoutePosition < flightName.size()) {    //if all current route points are passed, we can't accept new O-invoice
 
                 Long generalInvoiceId = generalInvoiceList.get(childAdapterPosition).getId();
                 presenter.retrofitAcceptGeneralInvoice(generalInvoiceId);
@@ -410,7 +418,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             ArrayList<Long> packetsList = new ArrayList<>();
 
             String toDeptIndex = "InvoiceFrag 329";
-            if (entries.size() >= currentRoutePosition + 1) {
+            if (entries.size() > currentRoutePosition + 1) {
 
                 toDeptIndex = entries.get(currentRoutePosition + 1).getDept().getName();
             }
@@ -438,7 +446,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             bodyRealm = new BodyForCreateInvoice(flightId, tlid, true, toDeptIndex, fromDeptIndex, labelLongList, packetLongList);
             //end for saving body in realm
 
-            realm.executeTransaction(realm -> realm.copyToRealm(bodyRealm));
+            realm.executeTransaction(realm -> realm.insert(bodyRealm));
 
         } else {
             Toast.makeText(getContext(), "Ошибка. Нет flightID", Toast.LENGTH_SHORT).show();
