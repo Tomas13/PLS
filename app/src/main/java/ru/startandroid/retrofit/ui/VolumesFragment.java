@@ -64,8 +64,8 @@ public class VolumesFragment extends Fragment implements VolumesView {
     @BindView(R.id.rv_fragment_volumes)
     RecyclerView recyclerViewVolumes;
 
-    @BindView(R.id.btn_send_invoice)
-    Button btnSendInvoice;
+    @BindView(R.id.btn_attach_to_invoice)
+    Button btnAttachToInvoice;
 
     @BindView(R.id.tv_header_hint)
     TextView tvHeaderHint;
@@ -73,11 +73,9 @@ public class VolumesFragment extends Fragment implements VolumesView {
     private List<Long> packetsList = new ArrayList<>();
     private List<Long> labelsList = new ArrayList<>();
     private Realm realm;
-    private RealmQuery<Entry> queryData;
     private RealmQuery<PacketList> queryPacket;
     private RealmQuery<LabelList> queryLabel;
     private RealmQuery<SendInvoice> querySendInvoice;
-    private ArrayAdapter<String> adapter;
     private List<Entry> entries;
     private ArrayList<String> flightName;
     private BodyForCreateInvoice body;
@@ -95,7 +93,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
         flightName = new ArrayList<>();
         entries = new ArrayList<>();
         realm = Realm.getDefaultInstance();
-        queryData = realm.where(Entry.class);
+        RealmQuery<Entry> queryData = realm.where(Entry.class);
         queryLabel = realm.where(LabelList.class);
         queryPacket = realm.where(PacketList.class);
         querySendInvoice = realm.where(SendInvoice.class);
@@ -115,7 +113,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
         flightName.add("O" + ref.getString(INVOICE_NAME, "default_name"));
 
 
-        btnSendInvoice.setOnClickListener(v -> {
+        btnAttachToInvoice.setOnClickListener(v -> {
 
 //            if (querySendInvoice.findAll().size() > 0 && querySendInvoice.findAll().last().getBodyForCreateInvoice() != null) {
             if (querySendInvoice.findAll().size() > 0 ) {
@@ -187,7 +185,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
         ListView listView = (ListView) pointDialog.findViewById(R.id.list_view_flight);
 
-        adapter = new ArrayAdapter<>(getContext(), R.layout.list_view_item, flightName);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), R.layout.list_view_item, flightName);
 //        adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_activated_1, flightName);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         listView.setAdapter(adapter);
@@ -357,10 +355,10 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
     private void hideButtonShowText(boolean b) {
         if (b) {
-            btnSendInvoice.setVisibility(View.GONE);
+            btnAttachToInvoice.setVisibility(View.GONE);
             tvHeaderHint.setVisibility(View.VISIBLE);
         } else {
-            btnSendInvoice.setVisibility(View.VISIBLE);
+            btnAttachToInvoice.setVisibility(View.VISIBLE);
             tvHeaderHint.setVisibility(View.GONE);
         }
     }

@@ -21,7 +21,7 @@
             android:textAlignment="center" />
 
         <Button
-            android:id="@+id/btn_send_invoice"
+            android:id="@+id/btn_attach_to_invoice"
             android:layout_marginBottom="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
