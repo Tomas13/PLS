@@ -288,14 +288,28 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     private void createEmptyInvoice() {
 
 
-        if (flightName.size() > currentRoutePosition + 1) {
-            String toName = flightName.get(currentRoutePosition + 1);
-            String fromName = flightName.get(currentRoutePosition);
-            SendInvoice sendInvoice = new SendInvoice();
-            sendInvoice.setTo(toName);
-            sendInvoice.setFrom(fromName);
+        if (flightName.size() >= currentRoutePosition + 1) {
+
+            SendInvoice sendInvoice;
+
+            if (flightName.size() == currentRoutePosition + 1) {
+                String toName = flightName.get(currentRoutePosition);
+                String fromName = flightName.get(currentRoutePosition - 1);
+                sendInvoice = new SendInvoice();
+                sendInvoice.setTo(toName);
+                sendInvoice.setFrom(fromName);
 //            sendInvoice.setBodyForCreateInvoice(bodyRealm);
 
+            } else {
+
+
+                String toName = flightName.get(currentRoutePosition + 1);
+                String fromName = flightName.get(currentRoutePosition);
+                sendInvoice = new SendInvoice();
+                sendInvoice.setTo(toName);
+                sendInvoice.setFrom(fromName);
+//            sendInvoice.setBodyForCreateInvoice(bodyRealm);
+            }
 
             realm.executeTransaction(realm -> realm.insert(sendInvoice));
 
@@ -417,14 +431,33 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             ArrayList<Long> labelsList = new ArrayList<>();
             ArrayList<Long> packetsList = new ArrayList<>();
 
-            String toDeptIndex = "InvoiceFrag 329";
+            String toDeptIndex = "InvoiceFrag 434";
+            String fromDeptIndex = "FromDep 435";
+
+            if (entries.size() == currentRoutePosition + 1){
+                if ( entries.size() == currentRoutePosition + 1 ) {
+                    toDeptIndex = entries.get(currentRoutePosition).getDept().getName();
+                    fromDeptIndex = entries.get(currentRoutePosition - 1).getDept().getName();
+                }
+
+            }
+
             if (entries.size() > currentRoutePosition + 1) {
 
-                toDeptIndex = entries.get(currentRoutePosition + 1).getDept().getName();
+
+                if (currentRoutePosition == 0) {
+                    toDeptIndex = entries.get(currentRoutePosition + 1).getDept().getName();
+                    fromDeptIndex = entries.get(currentRoutePosition).getDept().getName();
+
+                } else  {
+                    fromDeptIndex = entries.get(currentRoutePosition - 1).getDept().getName();
+
+                    toDeptIndex = entries.get(currentRoutePosition).getDept().getName();
+                }
+
             }
 
 
-            String fromDeptIndex = entries.get(currentRoutePosition).getDept().getName();
 
             body = new BodyForCreateInvoiceWithout(flightId, tlid, true, toDeptIndex, fromDeptIndex, labelsList, packetsList);
 
