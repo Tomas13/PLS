@@ -434,15 +434,11 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             String toDeptIndex = "InvoiceFrag 434";
             String fromDeptIndex = "FromDep 435";
 
-            if (entries.size() == currentRoutePosition + 1){
-                if ( entries.size() == currentRoutePosition + 1 ) {
-                    toDeptIndex = entries.get(currentRoutePosition).getDept().getName();
-                    fromDeptIndex = entries.get(currentRoutePosition - 1).getDept().getName();
-                }
+            if (entries.size() == currentRoutePosition){
+                    toDeptIndex = entries.get(currentRoutePosition - 1).getDept().getName();
+                    fromDeptIndex = entries.get(currentRoutePosition - 2).getDept().getName();
 
-            }
-
-            if (entries.size() > currentRoutePosition + 1) {
+            } else if (entries.size() > currentRoutePosition + 1) {
 
 
                 if (currentRoutePosition == 0) {
@@ -450,9 +446,8 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
                     fromDeptIndex = entries.get(currentRoutePosition).getDept().getName();
 
                 } else  {
-                    fromDeptIndex = entries.get(currentRoutePosition - 1).getDept().getName();
-
                     toDeptIndex = entries.get(currentRoutePosition).getDept().getName();
+                    fromDeptIndex = entries.get(currentRoutePosition - 1).getDept().getName();
                 }
 
             }

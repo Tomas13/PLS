@@ -57,7 +57,6 @@ public class KeycloakHelper extends HttpDigestAuthenticationConfiguration{
                     .setClientId(AUTHZ_CLIENT_ID)
                     .setClientSecret(CLIENT_SECRET)
 //                    .addAdditionalAuthorizationParam((Pair.create("access_type", "offline")))
-                    .addAdditionalAuthorizationParam((Pair.create("scope", "offline")))
 //                    .addAdditionalAuthorizationParam((Pair.create("grant_type", "refresh_token")))
                     .setScopes(scopes)
                     .setRedirectURL(AUTHZ_REDIRECT_URL)
