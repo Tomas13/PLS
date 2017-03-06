@@ -21,30 +21,33 @@
 
         <TextView
             android:id="@+id/tv_role_name"
-            android:textColor="@android:color/black"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/vpn_title"
-            android:textSize="17sp" />
+            android:textColor="@android:color/black"
+            android:textSize="17sp"
+            android:textStyle="bold" />
 
 
         <TextView
             android:id="@+id/tv_lname"
-            android:textColor="@android:color/black"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:text="Фамилия"
-            android:textSize="17sp" />
+            android:textColor="@android:color/black"
+            android:textSize="17sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tv_fname"
-            android:textColor="@android:color/black"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="3dp"
             android:text="Имя"
-            android:textSize="17sp" />
+            android:textColor="@android:color/black"
+            android:textSize="17sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 
@@ -56,9 +59,10 @@
 
         <TextView
             android:layout_width="wrap_content"
-            android:textColor="@android:color/black"
             android:layout_height="wrap_content"
             android:text="Текущий маршрут:"
+            android:textStyle="italic"
+            android:textColor="@android:color/black"
             android:textSize="15sp" />
 
         <LinearLayout
@@ -69,10 +73,10 @@
 
             <TextView
                 android:id="@+id/tv_route_header"
-                android:textColor="@android:color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Петропавловск "
+                android:textColor="@android:color/black"
                 android:textSize="15sp" />
 
             <!--<TextView-->
