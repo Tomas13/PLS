@@ -474,7 +474,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             bodyRealm = new BodyForCreateInvoice(flightId, tlid, true, toDeptIndex, fromDeptIndex, labelLongList, packetLongList);
             //end for saving body in realm
 
-            realm.executeTransaction(realm -> realm.insert(bodyRealm));
+            realm.executeTransaction(realm -> realm.copyToRealm(bodyRealm));
 
         } else {
             Toast.makeText(getContext(), "Ошибка. Нет flightID", Toast.LENGTH_SHORT).show();

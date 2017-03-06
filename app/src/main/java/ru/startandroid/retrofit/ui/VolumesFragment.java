@@ -116,13 +116,13 @@ public class VolumesFragment extends Fragment implements VolumesView {
         btnAttachToInvoice.setOnClickListener(v -> {
 
 //            if (querySendInvoice.findAll().size() > 0 && querySendInvoice.findAll().last().getBodyForCreateInvoice() != null) {
-            if (querySendInvoice.findAll().size() > 0 ) {
+            if (querySendInvoice.findAll().size() > 0) {
 //                flightName.add(querySendInvoice.findAll().last().getBodyForCreateInvoice().getToDepIndex());
 
 
                 showDialog();
 
-            }else{
+            } else {
                 Toast.makeText(getContext(), R.string.no_send_invoice, Toast.LENGTH_SHORT).show();
             }
 
@@ -204,8 +204,28 @@ public class VolumesFragment extends Fragment implements VolumesView {
                 Long flightId = pref1.getLong(FLIGHT_ID, 0);
                 Long tlid = pref1.getLong(TRANSPONST_LIST_ID, 0);
 
-                String toDeptIndex = entries.get(currentRoutePosition + 1).getDept().getName();
-                String fromDeptIndex = entries.get(currentRoutePosition).getDept().getName();
+
+                String toDeptIndex = "toDepIndex"; //entries.get(currentRoutePosition + 1).getDept().getName();
+                String fromDeptIndex = "fromDepIndex"; //entries.get(currentRoutePosition).getDept().getName();
+
+                if (entries.size() == currentRoutePosition) {
+                    toDeptIndex = entries.get(currentRoutePosition - 1).getDept().getName();
+                    fromDeptIndex = entries.get(currentRoutePosition - 2).getDept().getName();
+
+                } else if (entries.size() > currentRoutePosition + 1) {
+
+
+                    if (currentRoutePosition == 0) {
+                        toDeptIndex = entries.get(currentRoutePosition + 1).getDept().getName();
+                        fromDeptIndex = entries.get(currentRoutePosition).getDept().getName();
+
+                    } else {
+                        toDeptIndex = entries.get(currentRoutePosition).getDept().getName();
+                        fromDeptIndex = entries.get(currentRoutePosition - 1).getDept().getName();
+                    }
+
+                }
+
 
                 for (int i = 0; i < labelsList.size(); i++) {
                     RealmLong realmLong = new RealmLong(labelsList.get(i));
@@ -242,7 +262,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
                                 for (int i = 0; i < queryLabel.findAll().size(); i++) {
 
                                     for (int j = 0; j < labelLongList.size(); j++) {
-                                        if (queryLabel.findAll().get(i).getId().equals(labelLongList.get(j).getaLong())){
+                                        if (queryLabel.findAll().get(i).getId().equals(labelLongList.get(j).getaLong())) {
                                             queryLabel.findAll().get(i).setAddedToInvoice(true);
                                         }
 
@@ -252,7 +272,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
                                 for (int i = 0; i < queryPacket.findAll().size(); i++) {
 
                                     for (int j = 0; j < packetLongList.size(); j++) {
-                                        if (queryPacket.findAll().get(i).getId().equals(packetLongList.get(j).getaLong())){
+                                        if (queryPacket.findAll().get(i).getId().equals(packetLongList.get(j).getaLong())) {
                                             queryPacket.findAll().get(i).setAddedToInvoice(true);
                                         }
 
@@ -275,7 +295,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
                 for (int i = 0; i < queryLabel.findAll().size(); i++) {
 
                     for (int j = 0; j < labelLongList.size(); j++) {
-                        if (queryLabel.findAll().get(i).getId().equals(labelLongList.get(j).getaLong())){
+                        if (queryLabel.findAll().get(i).getId().equals(labelLongList.get(j).getaLong())) {
                             queryLabel.findAll().get(i).setAddedToInvoice(false);
                         }
 
@@ -285,7 +305,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
                 for (int i = 0; i < queryPacket.findAll().size(); i++) {
 
                     for (int j = 0; j < packetLongList.size(); j++) {
-                        if (queryPacket.findAll().get(i).getId().equals(packetLongList.get(j).getaLong())){
+                        if (queryPacket.findAll().get(i).getId().equals(packetLongList.get(j).getaLong())) {
                             queryPacket.findAll().get(i).setAddedToInvoice(false);
                         }
 
@@ -399,10 +419,11 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
     public void showErrorDialog(String error) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setMessage(error)
-                .setPositiveButton(R.string.ok, (dialog, id) -> dialog.dismiss());
         builder
-                .create().show();
+                .setMessage(error)
+                .setPositiveButton(R.string.ok, (dialog, id) -> dialog.dismiss())
+                .create()
+                .show();
     }
 
 }
