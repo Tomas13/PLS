@@ -39,7 +39,7 @@ public class KeycloakHelper extends HttpDigestAuthenticationConfiguration{
     private static final String TAG = KeycloakHelper.class.getSimpleName();
 
     private static final String ACCESS_TOKEN_ENDPOINT = "/realms/toolpar/protocol/openid-connect/token";
-    private static final String REFRESH_TOKEN_ENDPOINT = "/realms/toolpar/protocol/openid-connect/token";
+    private static final String REFRESH_TOKEN_ENDPOINT = "/realms/toolpar/protocol/openid-connect/refresh-token";
 
     public static final String LOGOUT = "/realms/toolpar/protocol/openid-connect/logout";
 
@@ -83,7 +83,7 @@ public class KeycloakHelper extends HttpDigestAuthenticationConfiguration{
                     callback.onSuccess(data);
 
 
-                    refresh();
+//                    refresh();
                 }
 
                 @Override
