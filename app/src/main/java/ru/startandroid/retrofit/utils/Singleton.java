@@ -35,4 +35,27 @@ public class Singleton {
     }
 
 
+    public static OkHttpClient getUserClient(){
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addNetworkInterceptor(new StethoInterceptor()); //подключаю Stetho
+        httpClient.readTimeout(60, TimeUnit.SECONDS);
+        httpClient.connectTimeout(60, TimeUnit.SECONDS);
+        httpClient.addInterceptor(chain -> {
+            Request original = chain.request();
+
+            Request request = original.newBuilder()
+//                    .header("Authorization", credentials) //добавляю хедер
+//                    .header("grant_type", "password")
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .method(original.method(), original.body())
+                    .build();
+
+            return chain.proceed(request);
+        });
+
+        return httpClient.build();
+    }
+
+
+
 }

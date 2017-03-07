@@ -17,15 +17,6 @@
         />
 
 
-    <android.support.v7.widget.RecyclerView
-        android:layout_below="@id/tv"
-        android:layout_above="@id/btn"
-        android:id="@+id/rv_test"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-    </android.support.v7.widget.RecyclerView>
-
     <Button
         android:id="@+id/btn"
         android:layout_alignParentBottom="true"
@@ -41,4 +32,16 @@
         android:layout_alignParentBottom="true"
         android:text="rxBinding"
         android:layout_height="wrap_content" />
+
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_below="@id/tv"
+        android:layout_above="@id/btn"
+        android:id="@+id/rv_test"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </android.support.v7.widget.RecyclerView>
+
 </RelativeLayout>
+

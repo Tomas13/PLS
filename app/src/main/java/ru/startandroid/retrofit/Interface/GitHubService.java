@@ -23,6 +23,8 @@ import ru.startandroid.retrofit.Model.acceptgen.Example;
 import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
 import ru.startandroid.retrofit.Model.geninvoice.InvoiceMain;
+import ru.startandroid.retrofit.Model.login.BodyLogin;
+import ru.startandroid.retrofit.Model.login.LoginResponse;
 import ru.startandroid.retrofit.Model.routes.Routes;
 import rx.Observable;
 
@@ -130,5 +132,13 @@ public interface GitHubService {
 
     @GET(LOGOUT)
     Call<ResponseBody> getLogout();
+
+
+    @POST("/auth/realms/toolpar/protocol/openid-connect/token")
+    @Headers("Content-Type:application/x-www-form-urlencoded")
+    Observable<LoginResponse> postLogin(
+            @Body BodyLogin bodyLogin
+    );
+
 
 }

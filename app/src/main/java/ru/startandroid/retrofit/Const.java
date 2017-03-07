@@ -31,6 +31,7 @@ public class Const {
     public static final String INVOICE_PREF = "INVOICE_PREF";
     public static final String INVOICE_NAME = "INVOICE_NAME";
     public static final String TOKEN = "TOKEN";
+    public static final String REFRESH_TOKEN = "REFRESH_TOKEN";
     public static final String FLIGHT_SHARED_PREF = "FLIGHT_PREF";
     public static final String FLIGHT_NAME = "FLIGHT_NAME";
     public static final String FLIGHT_ID = "FLIGHT_ID";
