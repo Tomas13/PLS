@@ -40,7 +40,6 @@ import io.realm.RealmResults;
 import ru.startandroid.retrofit.AppJobManager;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoice;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoiceWithout;
-import ru.startandroid.retrofit.Model.CreateResponse;
 import ru.startandroid.retrofit.Model.RealmLong;
 import ru.startandroid.retrofit.Model.SendInvoice;
 import ru.startandroid.retrofit.Model.acceptgen.Example;
@@ -54,14 +53,18 @@ import ru.startandroid.retrofit.adapter.InvoiceRVAdapter;
 import ru.startandroid.retrofit.adapter.InvoiceRVAdapterSend;
 import ru.startandroid.retrofit.events.AcceptEmptyEvent;
 import ru.startandroid.retrofit.events.AcceptGenInvoiceEvent;
+import ru.startandroid.retrofit.events.AccessTokenEvent;
 import ru.startandroid.retrofit.events.InvoiceEvent;
 import ru.startandroid.retrofit.events.ShowGeneralInvoiceEvent;
+import ru.startandroid.retrofit.jobs.GetAccessTokenJob;
+import ru.startandroid.retrofit.jobs.LoadGeneralInvoiceJob;
 import ru.startandroid.retrofit.jobs.PostCreateInvoiceJob;
 import ru.startandroid.retrofit.models.NetworkService;
 import ru.startandroid.retrofit.presenter.InvoicePresenter;
 import ru.startandroid.retrofit.presenter.InvoicePresenterImpl;
 import ru.startandroid.retrofit.view.InvoiceView;
 
+import static ru.startandroid.retrofit.Const.AccessTokenConst;
 import static ru.startandroid.retrofit.Const.CURRENT_ROUTE_POSITION;
 import static ru.startandroid.retrofit.Const.FLIGHT_ID;
 import static ru.startandroid.retrofit.Const.FLIGHT_SHARED_PREF;
@@ -108,8 +111,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     private BodyForCreateInvoiceWithout body;
     private BodyForCreateInvoice bodyRealm;
     private JobManager jobManager;
-
-    InvoiceRVAdapterSend adapterSend;
+    private InvoiceRVAdapterSend adapterSend;
 
     public InvoiceFragment() {
         // Required empty public constructor
@@ -178,6 +180,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
                 showProgress();
 
+
                 jobManager.addJobInBackground(new PostCreateInvoiceJob(body));
 
                 updateCurrentRoutePosition();
@@ -203,12 +206,23 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             });
         }
 
-        presenter.loadGeneralInvoice();
 
-//        jobManager.addJobInBackground(new LoadGeneralInvoiceJob());
+//        presenter.loadGeneralInvoice();
+
+        jobManager.addJobInBackground(new GetAccessTokenJob());
+
 
         return viewRoot;
     }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onAccessTokenEvent(AccessTokenEvent accessTokenEvent){
+        AccessTokenConst = accessTokenEvent.getLoginResponse().getAccessToken();
+        Log.d("Access2", AccessTokenConst);
+        jobManager.addJobInBackground(new LoadGeneralInvoiceJob());
+    }
+
+
 
     private void removeSentPacketsAndLabels() {
         RealmResults<BodyForCreateInvoice> bodyResults = realm.where(BodyForCreateInvoice.class).findAll();
@@ -329,6 +343,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     @Override
     public void showGeneralInvoice(InvoiceMain invoiceMain) {
 
+        Log.d("Access2Inoice", "got to showGen");
         List<GeneralInvoice> generalInvoiceList = new ArrayList<>();
         generalInvoiceList.addAll(invoiceMain.getGeneralInvoices());
 
@@ -440,7 +455,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
             } else if (entries.size() > currentRoutePosition + 1) {
 
-
                 if (currentRoutePosition == 0) {
                     toDeptIndex = entries.get(currentRoutePosition + 1).getDept().getName();
                     fromDeptIndex = entries.get(currentRoutePosition).getDept().getName();
@@ -449,13 +463,9 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
                     toDeptIndex = entries.get(currentRoutePosition).getDept().getName();
                     fromDeptIndex = entries.get(currentRoutePosition - 1).getDept().getName();
                 }
-
             }
 
-
-
             body = new BodyForCreateInvoiceWithout(flightId, tlid, true, toDeptIndex, fromDeptIndex, labelsList, packetsList);
-
 
             //for saving body in realm
             RealmList<RealmLong> labelLongList = new RealmList<>();
@@ -530,7 +540,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onAcceptEmptyEvent(AcceptEmptyEvent emptyEvent) {
-        showEmptyToast(emptyEvent.getEmptyMessage());
+//        showEmptyToast(emptyEvent.getEmptyMessage());
         showRoutesEmptyData();
         hideProgress();
     }

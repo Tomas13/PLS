@@ -9,6 +9,10 @@ import com.birbit.android.jobqueue.RetryConstraint;
 
 import org.greenrobot.eventbus.EventBus;
 
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.geninvoice.InvoiceMain;
 import ru.startandroid.retrofit.events.AcceptEmptyEvent;
 import ru.startandroid.retrofit.events.LoadGeneralErrorEvent;
@@ -18,8 +22,11 @@ import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
+import static ru.startandroid.retrofit.Const.AccessTokenConst;
+import static ru.startandroid.retrofit.Const.BASE_URL;
 import static ru.startandroid.retrofit.Const.CREATE_INVOICE_PRIORITY;
 import static ru.startandroid.retrofit.Const.LOAD_INVOICE_PRIORITY;
+import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
 /**
  * Created by root on 2/9/17.
@@ -38,8 +45,20 @@ public class LoadGeneralInvoiceJob extends Job {
 
     @Override
     public void onRun() throws Throwable {
+
+
+        Retrofit retrofitRoutes = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(getUserClient("Bearer " + AccessTokenConst))
+                .build();
+
+        GitHubService gitHubServ = retrofitRoutes.create(GitHubService.class);
+
+
         Observable<InvoiceMain> callEdges =
-                NetworkService.getApiService().getGeneralInvoice();
+                gitHubServ.getGeneralInvoice();
 
         callEdges
                 .subscribeOn(Schedulers.io())
@@ -51,7 +70,7 @@ public class LoadGeneralInvoiceJob extends Job {
                                 EventBus.getDefault().post(new ShowGeneralInvoiceEvent(response));
                             } else {
 
-                                EventBus.getDefault().post(new AcceptEmptyEvent(""));
+                                EventBus.getDefault().post(new AcceptEmptyEvent("Нет накладных для принятия или отправки"));
 
 //                                view.showRoutesEmptyData();
                             }
