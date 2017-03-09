@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,13 +31,15 @@ import ru.startandroid.retrofit.Model.routes.Entry;
 import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.RoutesRVAdapter;
+import ru.startandroid.retrofit.events.AccessTokenEvent;
 import ru.startandroid.retrofit.events.LoadRoutesEvent;
 import ru.startandroid.retrofit.events.RoutesEventError;
+import ru.startandroid.retrofit.jobs.GetAccessTokenJob;
 import ru.startandroid.retrofit.jobs.LoadRoutesJob;
 import ru.startandroid.retrofit.view.RoutesView;
 
+import static ru.startandroid.retrofit.Const.AccessTokenConst;
 import static ru.startandroid.retrofit.Const.FLIGHT_ID;
-import static ru.startandroid.retrofit.Const.FLIGHT_POS;
 import static ru.startandroid.retrofit.Const.FLIGHT_SHARED_PREF;
 
 /**
@@ -57,12 +60,16 @@ public class RoutesFragment extends Fragment implements RoutesView {
     LinearLayout linearLayoutHeader;
 
 
+    private JobManager jobManager;
+
     public RoutesFragment() {
         // Required empty public constructor
     }
 
     private void init() {
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Маршруты");
+
+        jobManager = AppJobManager.getJobManager();
     }
 
     @Override
@@ -74,12 +81,17 @@ public class RoutesFragment extends Fragment implements RoutesView {
 
         init();
 
-
-        JobManager jobManager = AppJobManager.getJobManager();
         showProgress();
-        jobManager.addJobInBackground(new LoadRoutesJob());
+        jobManager.addJobInBackground(new GetAccessTokenJob());
 
         return viewRoot;
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onAccessTokenEvent(AccessTokenEvent accessTokenEvent){
+        AccessTokenConst = accessTokenEvent.getLoginResponse().getAccessToken();
+        Log.d("Access2Routes", AccessTokenConst);
+        jobManager.addJobInBackground(new LoadRoutesJob());
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)

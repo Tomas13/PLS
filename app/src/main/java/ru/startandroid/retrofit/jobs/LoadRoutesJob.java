@@ -10,17 +10,23 @@ import com.birbit.android.jobqueue.RetryConstraint;
 
 import org.greenrobot.eventbus.EventBus;
 
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.events.LoadRoutesEvent;
 import ru.startandroid.retrofit.events.RoutesEmptyEvent;
 import ru.startandroid.retrofit.events.RoutesEventError;
 import ru.startandroid.retrofit.models.ErrorRequestException;
-import ru.startandroid.retrofit.models.NetworkService;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
+import static ru.startandroid.retrofit.Const.AccessTokenConst;
+import static ru.startandroid.retrofit.Const.BASE_URL;
 import static ru.startandroid.retrofit.Const.LOAD_ROUTES_PRIORITY;
+import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
 /**
  * Created by root on 2/9/17.
@@ -30,7 +36,6 @@ public class LoadRoutesJob extends Job {
 
     public LoadRoutesJob() {
         super(new Params(LOAD_ROUTES_PRIORITY).requireNetwork().persist());
-
     }
 
     @Override
@@ -40,8 +45,17 @@ public class LoadRoutesJob extends Job {
 
     @Override
     public void onRun() throws Throwable {
-        Observable<Routes> callEdges =
-                NetworkService.getApiService().getRoutesInfo();
+
+        Retrofit retrofitRoutes = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(getUserClient("Bearer " + AccessTokenConst))
+                .build();
+
+        GitHubService gitHubServ = retrofitRoutes.create(GitHubService.class);
+
+        Observable<Routes> callEdges = gitHubServ.getRoutesInfo();
 
         callEdges
                 .subscribeOn(Schedulers.io())
