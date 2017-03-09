@@ -1,5 +1,7 @@
 package ru.startandroid.retrofit.view;
 
+import android.content.Context;
+
 import ru.startandroid.retrofit.Model.login.LoginResponse;
 
 /**
@@ -7,10 +9,6 @@ import ru.startandroid.retrofit.Model.login.LoginResponse;
  */
 
 public interface LoginView {
-
-    void showProgress();
-
-    void hideProgress();
 
     void showLoginData(LoginResponse loginResponse);
 

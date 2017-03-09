@@ -15,7 +15,7 @@ import okhttp3.Request;
 
 public class Singleton {
 
-    public static OkHttpClient getUserClient(final String credentials){
+    public static OkHttpClient getUserClient(String credentials){
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient.addNetworkInterceptor(new StethoInterceptor()); //подключаю Stetho
         httpClient.readTimeout(60, TimeUnit.SECONDS);
@@ -46,7 +46,7 @@ public class Singleton {
             Request request = original.newBuilder()
 //                    .header("Authorization", credentials) //добавляю хедер
 //                    .header("grant_type", "password")
-                    .header("Content-Type", "application/x-www-form-urlencoded")
+//                    .header("Content-Type", "application/x-www-form-urlencoded")
                     .method(original.method(), original.body())
                     .build();
 

@@ -31,6 +31,19 @@ public class LoginResponse {
     @Expose
     private String sessionState;
 
+    @SerializedName("error")
+    private String error;
+    @SerializedName("error_description")
+    private String error_description;
+
+    public String getError() {
+        return error;
+    }
+
+    public String getError_description() {
+        return error_description;
+    }
+
     public String getAccessToken() {
         return accessToken;
     }

@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,11 +28,16 @@ import butterknife.ButterKnife;
 import ru.startandroid.retrofit.AppJobManager;
 import ru.startandroid.retrofit.Model.History;
 import ru.startandroid.retrofit.Model.LastActions;
+import ru.startandroid.retrofit.Model.login.LoginResponse;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.HistoryRVAdapter;
+import ru.startandroid.retrofit.events.AccessTokenEvent;
 import ru.startandroid.retrofit.events.HistoryEvent;
+import ru.startandroid.retrofit.jobs.GetAccessTokenJob;
 import ru.startandroid.retrofit.jobs.GetHistoryJob;
 import ru.startandroid.retrofit.view.HistoryView;
+
+import static ru.startandroid.retrofit.Const.AccessTokenConst;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -73,14 +79,23 @@ public class HistoryFragment extends Fragment implements HistoryView {
         init();
 
         showProgress();
-        jobManager.addJobInBackground(new GetHistoryJob());
+        jobManager.addJobInBackground(new GetAccessTokenJob());
+
         return viewRoot;
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onAccessTokenEvent(AccessTokenEvent accessTokenEvent){
+        AccessTokenConst = accessTokenEvent.getLoginResponse().getAccessToken();
+        Log.d("Access2", AccessTokenConst);
+        jobManager.addJobInBackground(new GetHistoryJob());
     }
 
     // This method will be called when a MessageEvent is posted (in the UI thread for Toast)
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onHistoryEvent(HistoryEvent event) {
 
+        Log.d("Access2", "Got to History Event");
         showHistoryData(event.getHistory());
 
         hideProgress();

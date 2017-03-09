@@ -1,5 +1,9 @@
 package ru.startandroid.retrofit.presenter;
 
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.Member;
 import ru.startandroid.retrofit.models.NetworkService;
 import ru.startandroid.retrofit.view.NavigationActView;
@@ -8,6 +12,9 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
+import static ru.startandroid.retrofit.Const.BASE_URL;
+import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
+
 /**
  * Created by root on 1/19/17.
  */
@@ -15,12 +22,9 @@ import rx.schedulers.Schedulers;
 public class NavigationPresenterImpl implements NavitationPresenter {
     private Subscription subscription;
     private NavigationActView view;
-    private NetworkService service;
 
-
-    public NavigationPresenterImpl(NavigationActView view, NetworkService networkService) {
+    public NavigationPresenterImpl(NavigationActView view) {
         this.view = view;
-        this.service = networkService;
     }
 
     @Override
@@ -29,11 +33,21 @@ public class NavigationPresenterImpl implements NavitationPresenter {
     }
 
     @Override
-    public void loadMembershipInfo() {
+    public void loadMembershipInfo(String accessToken) {
         view.showProgress();
 
+        Retrofit retrofitRoutes = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(getUserClient("Bearer " + accessToken))
+                .build();
+
+        GitHubService gitHubServ = retrofitRoutes.create(GitHubService.class);
+
+
         Observable<Member> callEdges =
-                service.getApiService().getMembershipInfo();
+                gitHubServ.getMembershipInfo();
 
         subscription = callEdges
                 .subscribeOn(Schedulers.io())

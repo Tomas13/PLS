@@ -1,37 +1,27 @@
 package ru.startandroid.retrofit.ui;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.StrictMode;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import org.jboss.aerogear.android.core.Callback;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.startandroid.retrofit.Const;
-import ru.startandroid.retrofit.Model.login.BodyLogin;
 import ru.startandroid.retrofit.Model.login.LoginResponse;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.presenter.LoginPresenter;
 import ru.startandroid.retrofit.presenter.LoginPresenterImpl;
-import ru.startandroid.retrofit.utils.KeycloakHelper;
 import ru.startandroid.retrofit.view.LoginView;
 
-import static ru.startandroid.retrofit.Const.LOGIN_BOOL;
-import static ru.startandroid.retrofit.Const.LOGIN_PREF;
-import static ru.startandroid.retrofit.Const.REFRESH_TOKEN;
-import static ru.startandroid.retrofit.Const.TOKEN;
+import static ru.startandroid.retrofit.Const.PASSWORD;
+import static ru.startandroid.retrofit.Const.ACCESS_TOKEN;
 import static ru.startandroid.retrofit.Const.TOKEN_SHARED_PREF;
-import static ru.startandroid.retrofit.Const.Token;
+import static ru.startandroid.retrofit.Const.USERNAME;
 
 public class LoginActivity extends AppCompatActivity implements LoginView {
 
@@ -51,48 +41,37 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
     TextInputLayout passwordWrapper;
 
     private SharedPreferences pref1;
-
     private LoginPresenter loginPresenter;
+    private String mLogin;
+    private String mPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_login);
-
         ButterKnife.bind(this);
 
-
         loginPresenter = new LoginPresenterImpl(this);
-
         pref1 = getApplicationContext().getSharedPreferences(TOKEN_SHARED_PREF, 0); // 0 - for private mode
-
         btnLogin.setOnClickListener(v -> Login());
 
-        if (!pref1.contains(REFRESH_TOKEN)) {
-
-
-        } else {
+        if (pref1.contains(ACCESS_TOKEN)) {
             Intent intent = new Intent(LoginActivity.this, NavigationActivity.class);
-            Const.Token = "Bearer " + pref1.getString(REFRESH_TOKEN, "empty");
+            Const.Token = "Bearer " + pref1.getString(ACCESS_TOKEN, "empty");
             startActivity(intent);
             finish();
-
         }
     }
 
     private void startAuth(String mLogin, String mPassword) {
-
-        BodyLogin bodyLogin = new BodyLogin(mLogin, mPassword);
-        loginPresenter.setBody(bodyLogin);
-        loginPresenter.postLogin();
-
+        loginPresenter.postLogin(mLogin, mPassword);
     }
 
     public void Login() {
 
-        String mLogin = userNameET.getText().toString();
-        String mPassword = passwordET.getText().toString();
+        mLogin = userNameET.getText().toString().trim();
+        mPassword = passwordET.getText().toString().trim();
 
         if (mLogin.isEmpty()) {
             usernameWrapper.setError("Пустое поле логин");
@@ -106,6 +85,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
             passwordET.setText("");
 
         } else {
+
 
             startAuth(mLogin, mPassword);
 
@@ -126,26 +106,19 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
 */
     }
 
-    @Override
-    public void showProgress() {
-
-    }
-
-    @Override
-    public void hideProgress() {
-
-    }
 
     @Override
     public void showLoginData(LoginResponse loginResponse) {
 
+        pref1.edit().putString(USERNAME, mLogin).apply();
+        pref1.edit().putString(PASSWORD, mPassword).apply();
+
         String refreshToken = loginResponse.getRefreshToken();
 
-        pref1.edit().putString(REFRESH_TOKEN, refreshToken).apply();
+        pref1.edit().putString(ACCESS_TOKEN, refreshToken).apply();
 
         startActivity(new Intent(this, NavigationActivity.class));
         this.finish();
-
 
 
     }
@@ -157,7 +130,9 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
 
     @Override
     public void showLoginError(Throwable throwable) {
-        Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
-        
+
+        Toast.makeText(this, "Неверный пароль или логин", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+
     }
 }

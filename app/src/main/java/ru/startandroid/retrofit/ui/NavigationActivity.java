@@ -5,8 +5,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
-import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -31,34 +29,32 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.pwittchen.reactivenetwork.library.ReactiveNetwork;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.Model.Datum;
 import ru.startandroid.retrofit.Model.Member;
+import ru.startandroid.retrofit.Model.login.LoginResponse;
 import ru.startandroid.retrofit.Model.routes.Entry;
 import ru.startandroid.retrofit.Model.routes.Flight;
 import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.models.NetworkService;
+import ru.startandroid.retrofit.presenter.LoginPresenter;
+import ru.startandroid.retrofit.presenter.LoginPresenterImpl;
 import ru.startandroid.retrofit.presenter.NavigationPresenterImpl;
 import ru.startandroid.retrofit.presenter.NavitationPresenter;
 import ru.startandroid.retrofit.presenter.RoutesPresenter;
 import ru.startandroid.retrofit.presenter.RoutesPresenterImpl;
 import ru.startandroid.retrofit.utils.KeycloakHelper;
+import ru.startandroid.retrofit.view.LoginView;
 import ru.startandroid.retrofit.view.NavigationActView;
 import ru.startandroid.retrofit.view.RoutesView;
-import rx.Observable;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
+import static ru.startandroid.retrofit.Const.AccessTokenConst;
 import static ru.startandroid.retrofit.Const.CURRENT_ROUTE_POSITION;
 import static ru.startandroid.retrofit.Const.FLIGHT_ID;
 import static ru.startandroid.retrofit.Const.FLIGHT_NAME;
@@ -67,14 +63,18 @@ import static ru.startandroid.retrofit.Const.FLIGHT_SHARED_PREF;
 import static ru.startandroid.retrofit.Const.LOGIN_PREF;
 import static ru.startandroid.retrofit.Const.NAV_SHARED_PREF;
 import static ru.startandroid.retrofit.Const.NUMBER_OF_CITIES;
-import static ru.startandroid.retrofit.Const.TOKEN;
+import static ru.startandroid.retrofit.Const.PASSWORD;
+import static ru.startandroid.retrofit.Const.ACCESS_TOKEN;
 import static ru.startandroid.retrofit.Const.TOKEN_SHARED_PREF;
 import static ru.startandroid.retrofit.Const.TRANSPONST_LIST_ID;
-import static ru.startandroid.retrofit.Const.Token;
-import static ru.startandroid.retrofit.Const.isConnected;
+import static ru.startandroid.retrofit.Const.USERNAME;
+import static ru.startandroid.retrofit.Const.passwordConst;
+import static ru.startandroid.retrofit.Const.usernameConst;
 
 public class NavigationActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, RoutesView, NavigationActView {
+        implements NavigationView.OnNavigationItemSelectedListener, RoutesView, NavigationActView, LoginView {
+
+    private String accessToken;
 
     private ProgressBar navProgressBar;
     private TextView tvFirstName;
@@ -88,76 +88,21 @@ public class NavigationActivity extends AppCompatActivity
     private RoutesPresenter routesPresenter;
     private NavitationPresenter navPresenter;
     private Realm realm;
-    private Subscription subscription;
+    private LoginPresenter loginPresenter;
 
-    private void runRefreshToken() {
-        subscription = Observable.interval(45, TimeUnit.SECONDS)
-                .map(aLong -> "HeyRx " + aLong)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        this::connect,
-                        error -> Log.d("MainNavObser", error.getMessage()),
-                        () -> Log.d("MainNavObser", "OnCompleted"));
-    }
+    SharedPreferences pref1;
+    Toolbar toolbar;
 
-    private void connect(Object object) {
-
-        if (!KeycloakHelper.isConnected()) {
-            KeycloakHelper.connect(NavigationActivity.this, new org.jboss.aerogear.android.core.Callback<String>() {
-                @Override
-                public void onSuccess(String data) {
-                    Const.Token = "Bearer " + data;
-
-                    SharedPreferences pref1 = getApplicationContext().getSharedPreferences(TOKEN_SHARED_PREF, 0); // 0 - for private mode
-
-                    //Save Token to shared preferences
-                    SharedPreferences.Editor editor1 = pref1.edit();
-                    editor1.putString(TOKEN, data);
-                    editor1.apply();
-
-                    Log.d("MainNavTimerRX", Const.Token);
-                }
-
-                @Override
-                public void onFailure(Exception e) {
-                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-                }
-            });
-        }
-
-        Log.d("MainApplication", object.toString() + Token); //.getExpires_on());
-
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_navigation);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    private void init() {
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setTitle("PLS");
 
-//        runRefreshToken();
+        pref1 = getApplicationContext().getSharedPreferences(TOKEN_SHARED_PREF, 0);
 
-        subscription = ReactiveNetwork.observeNetworkConnectivity(getApplicationContext())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(connectivity -> {
-                    if (connectivity.getState() == NetworkInfo.State.DISCONNECTED) {
-                        Log.d("NavReac", "dis");
-                        isConnected = false;
-                    } else {
-                        Log.d("NavReac", "connects");
-                        isConnected = true;
-
-                    }
-                });
-
-
+        loginPresenter = new LoginPresenterImpl(this);
         routesPresenter = new RoutesPresenterImpl(this, new NetworkService());
-        navPresenter = new NavigationPresenterImpl(this, new NetworkService());
+        navPresenter = new NavigationPresenterImpl(this);
         navProgressBar = (ProgressBar) findViewById(R.id.activity_navigation_progressbar);
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -169,19 +114,47 @@ public class NavigationActivity extends AppCompatActivity
         tvRoleName = (TextView) navHeaderView.findViewById(R.id.tv_role_name);
         tvRouteHeader = (TextView) navHeaderView.findViewById(R.id.tv_route_header);
 
-        // Create the Realm instance
         realm = Realm.getDefaultInstance();
-        // Build the query looking at all users:
-        RealmQuery<Datum> queryData = realm.where(Datum.class);
 
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_navigation);
+
+        init();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        String username = pref1.getString(USERNAME, "mLogin");
+        String password = pref1.getString(PASSWORD, "mPassword");
+        usernameConst = username;
+        passwordConst = password;
+
+        showProgress();
+        loginPresenter.postLogin(username, password);   //get access token
+    }
+
+    private void init2() {
+        RealmQuery<Datum> queryData = realm.where(Datum.class);
         Datum memberData;
 
         //if we don't have data of user
         if (queryData.findAll().size() == 0) {
             Log.d("Main", "fetching membership info");
-            navProgressBar.setVisibility(View.VISIBLE);
 
-            navPresenter.loadMembershipInfo();
+            showProgress();
+
+            navPresenter.loadMembershipInfo(accessToken);
 
         } else {
 
@@ -208,7 +181,7 @@ public class NavigationActivity extends AppCompatActivity
 
         if (!pref.contains(FLIGHT_POS)) {
 //            navProgressBar.setVisibility(View.VISIBLE);
-            routesPresenter.loadRoutes();
+            routesPresenter.loadRoutes(accessToken);
 
         } else {
 
@@ -217,15 +190,7 @@ public class NavigationActivity extends AppCompatActivity
 
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-
     }
-
 
     @Override
     public void getMembershipData(Member member) {
@@ -270,30 +235,9 @@ public class NavigationActivity extends AppCompatActivity
             flightDialog.setTitle(flights.get(position));
             listView.setItemChecked(position, true);
 
-//                Toast.makeText(getApplicationContext(), "Сохраняем " + flights.get(position), Toast.LENGTH_SHORT).show();
-            //Save Flight Id to shared preferences
-            SharedPreferences pref = getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
-            SharedPreferences.Editor editor = pref.edit();
-            editor.putInt(FLIGHT_POS, position);
-
-            editor.putLong(FLIGHT_ID, flightArrayList.get(position).getFlight().getId());
-            editor.putLong(TRANSPONST_LIST_ID, flightArrayList.get(position).getId());
-
-//            editor.putLong(FLIGHT_ID, flightArrayList.get(position).getId()); // ;.getItineraryDTO().getEntries().get(0).getDept().getName());
-//            editor.putLong(TRANSPONST_LIST_ID, flightArrayList.get(position).getFlight().getId());
-            editor.putInt(NUMBER_OF_CITIES, flightArrayList.get(position).getFlight().getItineraryDTO().getEntries().size());
-            editor.putInt(CURRENT_ROUTE_POSITION, 0);
-
-            editor.apply();
-
-            //Save Flight Id to shared preferences
-            SharedPreferences pref1 = getApplicationContext().getSharedPreferences(NAV_SHARED_PREF, 0); // 0 - for private mode
-            SharedPreferences.Editor editor1 = pref1.edit();
-            editor1.putString(FLIGHT_NAME, flights.get(position));
-            editor1.apply();
+            saveFlightIdToSharedPrefs(position);
 
             tvRouteHeader.setText(pref1.getString(FLIGHT_NAME, "Путь"));
-
             posReturn = position;
 
             Toast.makeText(NavigationActivity.this, "Готово, можете нажать кнопку ОК для закрытия диалога", Toast.LENGTH_SHORT).show();
@@ -320,6 +264,26 @@ public class NavigationActivity extends AppCompatActivity
             }
         });
 
+    }
+
+
+    private void saveFlightIdToSharedPrefs(int position) {
+        //Save Flight Id to shared preferences
+        SharedPreferences pref = getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putInt(FLIGHT_POS, position);
+        editor.putLong(FLIGHT_ID, flightArrayList.get(position).getFlight().getId());
+        editor.putLong(TRANSPONST_LIST_ID, flightArrayList.get(position).getId());
+        editor.putInt(NUMBER_OF_CITIES, flightArrayList.get(position).getFlight().getItineraryDTO().getEntries().size());
+        editor.putInt(CURRENT_ROUTE_POSITION, 0);
+
+        editor.apply();
+
+        //Save Flight Id to shared preferences
+        SharedPreferences pref1 = getApplicationContext().getSharedPreferences(NAV_SHARED_PREF, 0); // 0 - for private mode
+        SharedPreferences.Editor editor1 = pref1.edit();
+        editor1.putString(FLIGHT_NAME, flights.get(position));
+        editor1.apply();
     }
 
     @Override
@@ -425,7 +389,6 @@ public class NavigationActivity extends AppCompatActivity
 
             // use old hacky way, which can be removed
             // once minSdkVersion goes above 19 in a few years.
-            stopSubscription();
             clearCookies(getApplicationContext());
             clearSharedPrefs();
             KeycloakHelper.remove();
@@ -451,13 +414,6 @@ public class NavigationActivity extends AppCompatActivity
             cookieManager.removeSessionCookie();
             cookieSyncMngr.stopSync();
             cookieSyncMngr.sync();
-        }
-    }
-
-    void stopSubscription() {
-        if (subscription != null && !subscription.isUnsubscribed()) {
-            Log.d("MainNav", " Observable stopped");
-            subscription.unsubscribe();
         }
     }
 
@@ -488,7 +444,6 @@ public class NavigationActivity extends AppCompatActivity
         super.onDestroy();
         if (realm != null && !realm.isClosed()) realm.close();
 
-        stopSubscription();
         routesPresenter.unSubscribe();
         routesPresenter.onDestroy();
     }
@@ -588,5 +543,30 @@ public class NavigationActivity extends AppCompatActivity
         builder.setMessage(error)
                 .setPositiveButton(R.string.ok, (dialog, id) -> dialog.dismiss());
         builder.create().show();
+    }
+
+
+    @Override
+    public void showLoginData(LoginResponse loginResponse) {
+
+        hideProgress();
+
+        accessToken = loginResponse.getAccessToken();
+        AccessTokenConst = accessToken;
+
+        pref1.edit().putString(ACCESS_TOKEN, accessToken).apply();
+
+        init2();
+
+    }
+
+    @Override
+    public void showLoginEmptyData() {
+
+    }
+
+    @Override
+    public void showLoginError(Throwable throwable) {
+        Toast.makeText(this, "Неверный логин", Toast.LENGTH_SHORT).show();
     }
 }

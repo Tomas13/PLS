@@ -1,43 +1,38 @@
-package ru.startandroid.retrofit.presenter;
-
-import android.content.SharedPreferences;
-import android.util.Log;
+package ru.startandroid.retrofit.utils;
 
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.Interface.GitHubService;
-import ru.startandroid.retrofit.Model.login.BodyLogin;
 import ru.startandroid.retrofit.Model.login.LoginResponse;
-import ru.startandroid.retrofit.models.NetworkService;
-import ru.startandroid.retrofit.view.LoginView;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 import static ru.startandroid.retrofit.Const.BASE_URL;
-import static ru.startandroid.retrofit.Const.PASSWORD;
-import static ru.startandroid.retrofit.Const.TOKEN_SHARED_PREF;
-import static ru.startandroid.retrofit.Const.USERNAME;
 import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
 /**
- * Created by root on 3/7/17.
+ * Created by root on 3/9/17.
  */
 
-public class LoginPresenterImpl implements LoginPresenter {
+public class AccessToken {
 
-    private LoginView loginView;
+    String mAccessToken;
+    String username;
+    String password;
 
-    public LoginPresenterImpl(LoginView view) {
-        loginView = view;
+    public AccessToken(String username1, String password1) {
+        username = username1;
+        password = password1;
     }
 
 
-    @Override
-    public void postLogin(String username, String password) {
+    public String getmAccessToken() {
+        return mAccessToken;
+    }
 
+    public void postLogin(){
         Retrofit retrofitRoutes = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
@@ -61,31 +56,16 @@ public class LoginPresenterImpl implements LoginPresenter {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        response -> {
-
-                            loginView.showLoginData(response);
-
-                        },
+                        response -> mAccessToken = response.getAccessToken(),
                         throwable -> {
 
                             if (throwable.getMessage().equals("HTTP 401 Unauthorized")){
-
-                                loginView.showLoginError(throwable);
+                                mAccessToken = "Неверный пароль или логин";
                             }
 
                         });
 
     }
 
-    @Override
-    public void unSubscribe() {
-
-    }
-
-    @Override
-    public void onDestroy() {
-
-    }
 
 }
-

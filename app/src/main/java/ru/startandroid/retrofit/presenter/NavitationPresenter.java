@@ -7,7 +7,7 @@ package ru.startandroid.retrofit.presenter;
 public interface NavitationPresenter {
     void onDestroy();
 
-    void loadMembershipInfo();
+    void loadMembershipInfo(String accessToken);
 
     void unSubscribe();
 }

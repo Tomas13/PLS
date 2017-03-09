@@ -8,7 +8,7 @@ public interface RoutesPresenter {
 
     void onDestroy();
 
-    void loadRoutes();
+    void loadRoutes(String token);
 
     void unSubscribe();
 

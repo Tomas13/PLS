@@ -20,12 +20,12 @@ public class BodyLogin implements Serializable {
     String grant_type = "password";
 
     @Expose
-    @SerializedName("scope")
-    String scope = "offline_access";
-
-    @Expose
     @SerializedName("client_id")
     String client_id = "toolpar-mobile";
+
+    @Expose
+    @SerializedName("scope")
+    String scope = "offline_access";
 
     @Expose
     @SerializedName("username")
@@ -40,5 +40,11 @@ public class BodyLogin implements Serializable {
         this.password = password1;
     }
 
+    public String getUsername() {
+        return username;
+    }
 
+    public String getPassword() {
+        return password;
+    }
 }

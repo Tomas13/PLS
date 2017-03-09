@@ -31,7 +31,9 @@ public class Const {
     public static final String INVOICE_PREF = "INVOICE_PREF";
     public static final String INVOICE_NAME = "INVOICE_NAME";
     public static final String TOKEN = "TOKEN";
-    public static final String REFRESH_TOKEN = "REFRESH_TOKEN";
+    public static final String ACCESS_TOKEN = "ACCESS_TOKEN";
+    public static final String USERNAME = "USERNAME";
+    public static final String PASSWORD = "PASSWORD";
     public static final String FLIGHT_SHARED_PREF = "FLIGHT_PREF";
     public static final String FLIGHT_NAME = "FLIGHT_NAME";
     public static final String FLIGHT_ID = "FLIGHT_ID";
@@ -43,6 +45,12 @@ public class Const {
     public static final String LOGIN_BOOL = "LOGIN_BOOL";
 
 
+    public static String usernameConst;
+    public static String passwordConst;
+    public static String AccessTokenConst;
+
+
+
 
     public static final int COLLATE_PRIORITY = 5;
     public static final int CREATE_INVOICE_PRIORITY = 5;
@@ -52,5 +60,6 @@ public class Const {
 
 
     public static final int HISTORY_PRIORITY = 5;
+    public static final int ACCESS_TOKEN_PRIORITY = 100;
 
 }

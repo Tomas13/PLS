@@ -1,43 +1,48 @@
-package ru.startandroid.retrofit.presenter;
+package ru.startandroid.retrofit.jobs;
 
-import android.content.SharedPreferences;
-import android.util.Log;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import com.birbit.android.jobqueue.Job;
+import com.birbit.android.jobqueue.Params;
+import com.birbit.android.jobqueue.RetryConstraint;
+
+import org.greenrobot.eventbus.EventBus;
 
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.Interface.GitHubService;
-import ru.startandroid.retrofit.Model.login.BodyLogin;
 import ru.startandroid.retrofit.Model.login.LoginResponse;
-import ru.startandroid.retrofit.models.NetworkService;
-import ru.startandroid.retrofit.view.LoginView;
+import ru.startandroid.retrofit.events.AccessTokenErrorEvent;
+import ru.startandroid.retrofit.events.AccessTokenEvent;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
+import static ru.startandroid.retrofit.Const.ACCESS_TOKEN_PRIORITY;
 import static ru.startandroid.retrofit.Const.BASE_URL;
-import static ru.startandroid.retrofit.Const.PASSWORD;
-import static ru.startandroid.retrofit.Const.TOKEN_SHARED_PREF;
-import static ru.startandroid.retrofit.Const.USERNAME;
+import static ru.startandroid.retrofit.Const.passwordConst;
+import static ru.startandroid.retrofit.Const.usernameConst;
 import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
 /**
- * Created by root on 3/7/17.
+ * Created by root on 3/9/17.
  */
 
-public class LoginPresenterImpl implements LoginPresenter {
+public class GetAccessTokenJob extends Job {
 
-    private LoginView loginView;
-
-    public LoginPresenterImpl(LoginView view) {
-        loginView = view;
+    public GetAccessTokenJob() {
+        super(new Params(ACCESS_TOKEN_PRIORITY).requireNetwork().persist());
     }
 
+    @Override
+    public void onAdded() {
+
+    }
 
     @Override
-    public void postLogin(String username, String password) {
-
+    public void onRun() throws Throwable {
         Retrofit retrofitRoutes = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
@@ -54,8 +59,8 @@ public class LoginPresenterImpl implements LoginPresenter {
                         "password",
                         "toolpar-mobile",
                         "offline-access",
-                        username,
-                        password);
+                        usernameConst,
+                        passwordConst);
 
         callCreate
                 .subscribeOn(Schedulers.io())
@@ -63,29 +68,29 @@ public class LoginPresenterImpl implements LoginPresenter {
                 .subscribe(
                         response -> {
 
-                            loginView.showLoginData(response);
+                            EventBus.getDefault().postSticky(new AccessTokenEvent(response));
+
 
                         },
                         throwable -> {
 
                             if (throwable.getMessage().equals("HTTP 401 Unauthorized")){
 
-                                loginView.showLoginError(throwable);
+                                EventBus.getDefault().postSticky(new AccessTokenErrorEvent(throwable.getMessage()));
+
                             }
 
                         });
+    }
+
+    @Override
+    protected void onCancel(int cancelReason, @Nullable Throwable throwable) {
 
     }
 
     @Override
-    public void unSubscribe() {
+    protected RetryConstraint shouldReRunOnThrowable(@NonNull Throwable throwable, int runCount, int maxRunCount) {
+        return RetryConstraint.createExponentialBackoff(runCount, 1000);
 
     }
-
-    @Override
-    public void onDestroy() {
-
-    }
-
 }
-

@@ -9,6 +9,10 @@ import com.birbit.android.jobqueue.RetryConstraint;
 
 import org.greenrobot.eventbus.EventBus;
 
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.LastActions;
 import ru.startandroid.retrofit.events.HistoryErrorEvent;
 import ru.startandroid.retrofit.events.HistoryEvent;
@@ -17,7 +21,10 @@ import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
+import static ru.startandroid.retrofit.Const.AccessTokenConst;
+import static ru.startandroid.retrofit.Const.BASE_URL;
 import static ru.startandroid.retrofit.Const.HISTORY_PRIORITY;
+import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
 
 /**
  * Created by root on 1/25/17.
@@ -53,7 +60,16 @@ public class GetHistoryJob extends Job {
         // onRun() finishes.
 
 
-        Observable<LastActions> observable = NetworkService.getApiService().getLastActions();
+        Retrofit retrofitRoutes = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(getUserClient("Bearer " + AccessTokenConst))
+                .build();
+
+        GitHubService gitHubServ = retrofitRoutes.create(GitHubService.class);
+
+        Observable<LastActions> observable = gitHubServ.getLastActions();
 
         history = new LastActions();
         observable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())

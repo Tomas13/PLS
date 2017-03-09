@@ -7,8 +7,11 @@ import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
@@ -86,12 +89,10 @@ public interface GitHubService {
     );
 
 
-
     @GET("/api/mobile/accept-general-invoice-two")
     Observable<Example> acceptGeneralInvoiceNew(
             @Query("id") Long genInvoiceID
     );
-
 
 
     //    Получение списка s накладных, которые уже извлекли из О
@@ -104,9 +105,7 @@ public interface GitHubService {
     @Headers("Content-Type: text/plain")
     Observable<CollateResponse> postCollateDestinationLists(
             @Body IdsCollate idsCollate
-            );
-
-
+    );
 
 
     @POST("/api/mobile/create-general-invoice")
@@ -129,15 +128,34 @@ public interface GitHubService {
     );
 
 
-
     @GET(LOGOUT)
     Call<ResponseBody> getLogout();
 
 
+    @FormUrlEncoded
     @POST("/auth/realms/toolpar/protocol/openid-connect/token")
     @Headers("Content-Type:application/x-www-form-urlencoded")
     Observable<LoginResponse> postLogin(
-            @Body BodyLogin bodyLogin
+            @Field("Cache-Control") String cache,
+            @Field("grant_type") String grant,
+            @Field("client_id") String clientid,
+            @Field("scope") String scope,
+            @Field("username") String username,
+            @Field("password") String password
+//            @Body BodyLogin bodyLogin
+    );
+
+    @FormUrlEncoded
+    @POST("/auth/realms/toolpar/protocol/openid-connect/token")
+    @Headers("Content-Type:application/x-www-form-urlencoded")
+    Observable<LoginResponse> postLogin1(
+            @Field("Cache-Control") String cache,
+            @Field("grant_type") String grant,
+            @Field("client_id") String clientid,
+            @Field("scope") String scope,
+            @Field("username") String username,
+            @Field("password") String password
+//            @Body BodyLogin bodyLogin
     );
 
 

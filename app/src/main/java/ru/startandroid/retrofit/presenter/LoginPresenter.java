@@ -10,9 +10,7 @@ public interface LoginPresenter {
 
     void onDestroy();
 
-    void postLogin();
-
-    void setBody(BodyLogin bodyLogin);
+    void postLogin(String username, String password);
 
     void unSubscribe();
 }
