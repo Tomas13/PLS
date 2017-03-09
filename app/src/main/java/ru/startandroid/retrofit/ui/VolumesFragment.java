@@ -406,17 +406,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
     }
 
-    @Override
-    public void showProgress() {
-
-    }
-
-    @Override
-    public void hideProgress() {
-
-    }
-
-
     public void showErrorDialog(String error) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder

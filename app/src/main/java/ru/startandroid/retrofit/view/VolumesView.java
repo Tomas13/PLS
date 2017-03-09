@@ -9,10 +9,6 @@ import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 
 public interface VolumesView {
 
-    void showProgress();
-
-    void hideProgress();
-
 //    void showVolumesData(CollateResponse volumes);
     
     void showRoutesEmptyData();

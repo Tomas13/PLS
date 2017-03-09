@@ -25,7 +25,7 @@ public class VolumesPresenterImpl implements VolumesPresenter {
 
     @Override
     public void loadGetListForVpn() {
-        view.showProgress();
+//        view.showProgress();
 
         Observable<CollateResponse> callEdges =
                 service.getApiService().getListForVpn();
@@ -37,15 +37,15 @@ public class VolumesPresenterImpl implements VolumesPresenter {
                         response -> {
                             if (response.getStatus().equals("success")) {
 //                                view.showVolumesData(response);
-                                view.hideProgress();
+//                                view.hideProgress();
                             } else {
                                 view.showRoutesEmptyData();
-                                view.hideProgress();
+//                                view.hideProgress();
                             }
                         },
                         throwable -> {
                             view.showRoutesError(throwable);
-                            view.hideProgress();
+//                            view.hideProgress();
                         });
 
     }
