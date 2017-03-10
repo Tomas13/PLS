@@ -66,13 +66,12 @@ public class RoutesPresenterImpl implements RoutesPresenter {
                                 view.showRoutesEmptyData();
                                 view.hideProgress();
                             }
-                        },
-                        throwable -> {
-
-                            Log.d("routesPresent", throwable.toString());
-                            view.showRoutesError(throwable);
-                            view.hideProgress();
-                        }
+                        }//,
+//                        throwable -> {
+//
+//                            view.showRoutesError(throwable);
+//                            view.hideProgress();
+//                        }
 
                         );
 

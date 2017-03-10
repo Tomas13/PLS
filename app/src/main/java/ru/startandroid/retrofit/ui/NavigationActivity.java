@@ -509,16 +509,12 @@ public class NavigationActivity extends AppCompatActivity
                     flights.add(i, routes.getFlights().get(i).getFlight().getName());
                 }
 
-//                Bundle bundle = new Bundle();
-//                bundle.putStringArrayList("flightsList", flights);
-
                 flightArrayList = routes.getFlights();
 
                 createDialog();
             }
 
         }
-        Log.d("Main", Const.Token);
     }
 
     @Override

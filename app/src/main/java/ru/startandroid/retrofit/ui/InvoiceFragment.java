@@ -218,7 +218,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onAccessTokenEvent(AccessTokenEvent accessTokenEvent){
         AccessTokenConst = accessTokenEvent.getLoginResponse().getAccessToken();
-        Log.d("Access2", AccessTokenConst);
+            Log.d("Access2", AccessTokenConst);
                 presenter.loadGeneralInvoice(AccessTokenConst);
 
 //        jobManager.addJobInBackground(new LoadGeneralInvoiceJob());
