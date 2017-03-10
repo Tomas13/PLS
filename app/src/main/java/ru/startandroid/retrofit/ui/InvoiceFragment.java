@@ -130,7 +130,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 //            sendInvoiceList.add(realmResults.get(i));
 //        }
 
-        presenter = new InvoicePresenterImpl(this, new NetworkService());
+        presenter = new InvoicePresenterImpl(this);
 
         pref = getActivity().getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
         maxRouteNumber = pref.getInt(NUMBER_OF_CITIES, 0);
@@ -219,7 +219,9 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     public void onAccessTokenEvent(AccessTokenEvent accessTokenEvent){
         AccessTokenConst = accessTokenEvent.getLoginResponse().getAccessToken();
         Log.d("Access2", AccessTokenConst);
-        jobManager.addJobInBackground(new LoadGeneralInvoiceJob());
+                presenter.loadGeneralInvoice(AccessTokenConst);
+
+//        jobManager.addJobInBackground(new LoadGeneralInvoiceJob());
     }
 
 
@@ -352,7 +354,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             if (currentRoutePosition < flightName.size()) {    //if all current route points are passed, we can't accept new O-invoice
 
                 Long generalInvoiceId = generalInvoiceList.get(childAdapterPosition).getId();
-                presenter.retrofitAcceptGeneralInvoice(generalInvoiceId);
+                presenter.retrofitAcceptGeneralInvoice(generalInvoiceId, AccessTokenConst);
 
                 showProgress();
 //            jobManager.addJobInBackground(new AcceptGeneralInvoiceJob(generalInvoiceId));

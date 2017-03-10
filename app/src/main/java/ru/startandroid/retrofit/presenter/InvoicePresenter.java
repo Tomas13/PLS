@@ -10,9 +10,9 @@ public interface InvoicePresenter {
 
     void onDestroy();
 
-    void loadGeneralInvoice();
+    void loadGeneralInvoice(String accessToken);
 
-    void retrofitAcceptGeneralInvoice(Long generalInvoiceId);
+    void retrofitAcceptGeneralInvoice(Long generalInvoiceId, String accessToken);
 
 //    void postCreateInvoice(BodyForCreateInvoiceWithout bodyForCreateInvoiceWithout);
 

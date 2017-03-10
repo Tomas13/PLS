@@ -253,9 +253,25 @@ public class CollateFragment extends Fragment implements CollateView {
         jobManager.addJobInBackground(new CollateJob(idsCol));
     }
 
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onCollateEvent(CollateEvent collateEvent) {
+
+//        showCollateResponse(collateEvent.getCollateResponse());
+        //probably no need for that, to show results
+
+        realm.executeTransaction(realm -> {
+            queryDestination.findAll().deleteAllFromRealm();
+            if (!realm.where(Example.class).findAll().isEmpty()) {
+                realm.where(Example.class).findAll().deleteAllFromRealm();  //17.02.17
+            }
+        });
+
+        ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
+    }
+
+
 
     private void setLabelsAndPacketsCollated(int k) {
-
         Destination destination = queryDestination.findAll().get(k);
 
         realm.executeTransaction(realm -> {
@@ -275,22 +291,6 @@ public class CollateFragment extends Fragment implements CollateView {
             }
         });
     }
-
-    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
-    public void onCollateEvent(CollateEvent collateEvent) {
-
-        ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
-
-//        showCollateResponse(collateEvent.getCollateResponse());
-        //probably no need for that, to show results
-
-        realm.executeTransaction(realm -> {
-            queryDestination.findAll().deleteAllFromRealm();
-            if (!realm.where(Example.class).findAll().isEmpty())
-                realm.where(Example.class).findAll().deleteAllFromRealm();  //17.02.17
-        });
-    }
-
 
     private void loadSRealm() {
 

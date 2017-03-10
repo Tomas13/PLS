@@ -48,5 +48,6 @@
     <string name="last_point">Вы достигли конечной точки маршрута, пожалуйста авторизуйтесь заново и выберите другой маршрут</string>
     <string name="login">Логин</string>
     <string name="pswd">Пароль</string>
+    <string name="loginbtn">Войти</string>
 
 </resources>

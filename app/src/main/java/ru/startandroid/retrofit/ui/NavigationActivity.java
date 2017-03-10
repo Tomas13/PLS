@@ -154,7 +154,7 @@ public class NavigationActivity extends AppCompatActivity
 
             showProgress();
 
-            navPresenter.loadMembershipInfo(accessToken);
+            navPresenter.loadMembershipInfo(AccessTokenConst);
 
         } else {
 
@@ -174,20 +174,22 @@ public class NavigationActivity extends AppCompatActivity
         //If VPN didn't choose flight then getRoutesInfo
         SharedPreferences pref = getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
 
-        SharedPreferences pref1 = getApplicationContext().getSharedPreferences(NAV_SHARED_PREF, 0); // 0 - for private mode
-        if (pref1.contains(FLIGHT_NAME)) {
-            tvRouteHeader.setText(pref1.getString(FLIGHT_NAME, "Путь"));
-        }
-
         if (!pref.contains(FLIGHT_POS)) {
 //            navProgressBar.setVisibility(View.VISIBLE);
-            routesPresenter.loadRoutes(accessToken);
+            routesPresenter.loadRoutes(AccessTokenConst);
 
         } else {
 
             Log.d("MainNav", "no request getroutesinfo");
             startFragment(new HistoryFragment());
 
+        }
+
+
+
+        SharedPreferences pref1 = getApplicationContext().getSharedPreferences(NAV_SHARED_PREF, 0); // 0 - for private mode
+        if (pref1.contains(FLIGHT_NAME)) {
+            tvRouteHeader.setText(pref1.getString(FLIGHT_NAME, "Путь"));
         }
 
     }

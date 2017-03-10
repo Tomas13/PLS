@@ -1,5 +1,9 @@
 package ru.startandroid.retrofit.presenter;
 
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoiceWithout;
 import ru.startandroid.retrofit.Model.CreateResponse;
 import ru.startandroid.retrofit.Model.acceptgen.Example;
@@ -12,6 +16,9 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
+import static ru.startandroid.retrofit.Const.BASE_URL;
+import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
+
 /**
  * Created by root on 1/17/17.
  */
@@ -21,17 +28,28 @@ public class InvoicePresenterImpl implements InvoicePresenter {
     private Subscription subscription;
     private InvoiceView view;
 
-    public InvoicePresenterImpl(InvoiceView view, NetworkService service) {
+    public InvoicePresenterImpl(InvoiceView view) {
         this.view = view;
     }
 
     @Override
-    public void loadGeneralInvoice() {
+    public void loadGeneralInvoice(String accessToken) {
 
         view.showProgress();
 
+        Retrofit retrofitRoutes = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(getUserClient("Bearer " + accessToken))
+                .build();
+
+        GitHubService gitHubServ = retrofitRoutes.create(GitHubService.class);
+
+
+
         Observable<InvoiceMain> callEdges =
-                NetworkService.getApiService().getGeneralInvoice();
+                gitHubServ.getGeneralInvoice();
 
         subscription = callEdges
                 .subscribeOn(Schedulers.io())
@@ -54,11 +72,21 @@ public class InvoicePresenterImpl implements InvoicePresenter {
     }
 
     @Override
-    public void retrofitAcceptGeneralInvoice(Long generalInvoiceId) {
+    public void retrofitAcceptGeneralInvoice(Long generalInvoiceId, String accessToken) {
         view.showProgress();
 
+        Retrofit retrofitRoutes = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(getUserClient("Bearer " + accessToken))
+                .build();
+
+        GitHubService gitHubServ = retrofitRoutes.create(GitHubService.class);
+
+
         Observable<Example> acceptGeneralInvoice =
-                NetworkService.getApiService().acceptGeneralInvoiceNew(generalInvoiceId);
+                gitHubServ.acceptGeneralInvoiceNew(generalInvoiceId);
 
         subscription = acceptGeneralInvoice.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
