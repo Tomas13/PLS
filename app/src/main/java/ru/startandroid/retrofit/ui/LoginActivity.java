@@ -18,6 +18,7 @@ import ru.startandroid.retrofit.presenter.LoginPresenter;
 import ru.startandroid.retrofit.presenter.LoginPresenterImpl;
 import ru.startandroid.retrofit.view.LoginView;
 
+import static ru.startandroid.retrofit.Const.AccessTokenConst;
 import static ru.startandroid.retrofit.Const.PASSWORD;
 import static ru.startandroid.retrofit.Const.ACCESS_TOKEN;
 import static ru.startandroid.retrofit.Const.TOKEN_SHARED_PREF;
@@ -116,6 +117,8 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         String refreshToken = loginResponse.getRefreshToken();
 
         pref1.edit().putString(ACCESS_TOKEN, refreshToken).apply();
+
+        AccessTokenConst = loginResponse.getAccessToken();
 
         startActivity(new Intent(this, NavigationActivity.class));
         this.finish();

@@ -105,7 +105,7 @@ dependencies {
 
 //    compile 'com.github.maning0303:ZXingCodeDemo:V1.0.3'
 
-    compile 'com.github.pwittchen:reactivenetwork:0.5.0'
+//    compile 'com.github.pwittchen:reactivenetwork:0.5.0'
 
 
     compile 'com.birbit:android-priority-jobqueue:2.0.1'

@@ -1,12 +1,11 @@
 package ru.startandroid.retrofit.presenter;
 
-import android.support.v4.util.LruCache;
+import android.util.Log;
 
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import ru.startandroid.retrofit.Interface.GitHubService;
-import ru.startandroid.retrofit.Model.Member;
 import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.models.NetworkService;
 import ru.startandroid.retrofit.view.RoutesView;
@@ -26,11 +25,9 @@ public class RoutesPresenterImpl implements RoutesPresenter {
 
     private Subscription subscription;
     private RoutesView view;
-    private NetworkService service;
 
-    public RoutesPresenterImpl(RoutesView view, NetworkService service) {
+    public RoutesPresenterImpl(RoutesView view) {
         this.view = view;
-        this.service = service;
     }
 
     @Override
@@ -71,9 +68,13 @@ public class RoutesPresenterImpl implements RoutesPresenter {
                             }
                         },
                         throwable -> {
+
+                            Log.d("routesPresent", throwable.toString());
                             view.showRoutesError(throwable);
                             view.hideProgress();
-                        });
+                        }
+
+                        );
 
     }
 

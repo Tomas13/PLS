@@ -7,8 +7,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -42,7 +42,6 @@ import ru.startandroid.retrofit.Model.routes.Entry;
 import ru.startandroid.retrofit.Model.routes.Flight;
 import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.R;
-import ru.startandroid.retrofit.models.NetworkService;
 import ru.startandroid.retrofit.presenter.LoginPresenter;
 import ru.startandroid.retrofit.presenter.LoginPresenterImpl;
 import ru.startandroid.retrofit.presenter.NavigationPresenterImpl;
@@ -54,6 +53,7 @@ import ru.startandroid.retrofit.view.LoginView;
 import ru.startandroid.retrofit.view.NavigationActView;
 import ru.startandroid.retrofit.view.RoutesView;
 
+import static ru.startandroid.retrofit.Const.ACCESS_TOKEN;
 import static ru.startandroid.retrofit.Const.AccessTokenConst;
 import static ru.startandroid.retrofit.Const.CURRENT_ROUTE_POSITION;
 import static ru.startandroid.retrofit.Const.FLIGHT_ID;
@@ -64,7 +64,6 @@ import static ru.startandroid.retrofit.Const.LOGIN_PREF;
 import static ru.startandroid.retrofit.Const.NAV_SHARED_PREF;
 import static ru.startandroid.retrofit.Const.NUMBER_OF_CITIES;
 import static ru.startandroid.retrofit.Const.PASSWORD;
-import static ru.startandroid.retrofit.Const.ACCESS_TOKEN;
 import static ru.startandroid.retrofit.Const.TOKEN_SHARED_PREF;
 import static ru.startandroid.retrofit.Const.TRANSPONST_LIST_ID;
 import static ru.startandroid.retrofit.Const.USERNAME;
@@ -73,8 +72,6 @@ import static ru.startandroid.retrofit.Const.usernameConst;
 
 public class NavigationActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, RoutesView, NavigationActView, LoginView {
-
-    private String accessToken;
 
     private ProgressBar navProgressBar;
     private TextView tvFirstName;
@@ -88,20 +85,24 @@ public class NavigationActivity extends AppCompatActivity
     private RoutesPresenter routesPresenter;
     private NavitationPresenter navPresenter;
     private Realm realm;
-    private LoginPresenter loginPresenter;
-
     SharedPreferences pref1;
-    Toolbar toolbar;
+    private LoginPresenter loginPresenter;
+    private String accessToken;
 
-    private void init() {
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        setTitle("PLS");
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_navigation);
 
         pref1 = getApplicationContext().getSharedPreferences(TOKEN_SHARED_PREF, 0);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        setTitle("PLS");
+
         loginPresenter = new LoginPresenterImpl(this);
-        routesPresenter = new RoutesPresenterImpl(this, new NetworkService());
+
+        routesPresenter = new RoutesPresenterImpl(this);
         navPresenter = new NavigationPresenterImpl(this);
         navProgressBar = (ProgressBar) findViewById(R.id.activity_navigation_progressbar);
 
@@ -114,45 +115,17 @@ public class NavigationActivity extends AppCompatActivity
         tvRoleName = (TextView) navHeaderView.findViewById(R.id.tv_role_name);
         tvRouteHeader = (TextView) navHeaderView.findViewById(R.id.tv_route_header);
 
+        // Create the Realm instance
         realm = Realm.getDefaultInstance();
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_navigation);
-
-        init();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        String username = pref1.getString(USERNAME, "mLogin");
-        String password = pref1.getString(PASSWORD, "mPassword");
-        usernameConst = username;
-        passwordConst = password;
-
-        showProgress();
-        loginPresenter.postLogin(username, password);   //get access token
-    }
-
-    private void init2() {
+        // Build the query looking at all users:
         RealmQuery<Datum> queryData = realm.where(Datum.class);
+
         Datum memberData;
 
         //if we don't have data of user
         if (queryData.findAll().size() == 0) {
             Log.d("Main", "fetching membership info");
-
-            showProgress();
+            navProgressBar.setVisibility(View.VISIBLE);
 
             navPresenter.loadMembershipInfo(AccessTokenConst);
 
@@ -174,6 +147,11 @@ public class NavigationActivity extends AppCompatActivity
         //If VPN didn't choose flight then getRoutesInfo
         SharedPreferences pref = getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
 
+       SharedPreferences pref1 = getApplicationContext().getSharedPreferences(NAV_SHARED_PREF, 0); // 0 - for private mode
+        if (pref1.contains(FLIGHT_NAME)) {
+            tvRouteHeader.setText(pref1.getString(FLIGHT_NAME, "Путь"));
+        }
+
         if (!pref.contains(FLIGHT_POS)) {
 //            navProgressBar.setVisibility(View.VISIBLE);
             routesPresenter.loadRoutes(AccessTokenConst);
@@ -185,14 +163,28 @@ public class NavigationActivity extends AppCompatActivity
 
         }
 
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
 
-
-        SharedPreferences pref1 = getApplicationContext().getSharedPreferences(NAV_SHARED_PREF, 0); // 0 - for private mode
-        if (pref1.contains(FLIGHT_NAME)) {
-            tvRouteHeader.setText(pref1.getString(FLIGHT_NAME, "Путь"));
-        }
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        String username = pref1.getString(USERNAME, "mLogin");
+        String password = pref1.getString(PASSWORD, "mPassword");
+        usernameConst = username;
+        passwordConst = password;
+
+        showProgress();
+        loginPresenter.postLogin(username, password);   //get access token
+    }
+
 
     @Override
     public void getMembershipData(Member member) {
@@ -237,9 +229,30 @@ public class NavigationActivity extends AppCompatActivity
             flightDialog.setTitle(flights.get(position));
             listView.setItemChecked(position, true);
 
-            saveFlightIdToSharedPrefs(position);
+//                Toast.makeText(getApplicationContext(), "Сохраняем " + flights.get(position), Toast.LENGTH_SHORT).show();
+            //Save Flight Id to shared preferences
+            SharedPreferences pref = getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
+            SharedPreferences.Editor editor = pref.edit();
+            editor.putInt(FLIGHT_POS, position);
+
+            editor.putLong(FLIGHT_ID, flightArrayList.get(position).getFlight().getId());
+            editor.putLong(TRANSPONST_LIST_ID, flightArrayList.get(position).getId());
+
+//            editor.putLong(FLIGHT_ID, flightArrayList.get(position).getId()); // ;.getItineraryDTO().getEntries().get(0).getDept().getName());
+//            editor.putLong(TRANSPONST_LIST_ID, flightArrayList.get(position).getFlight().getId());
+            editor.putInt(NUMBER_OF_CITIES, flightArrayList.get(position).getFlight().getItineraryDTO().getEntries().size());
+            editor.putInt(CURRENT_ROUTE_POSITION, 0);
+
+            editor.apply();
+
+            //Save Flight Id to shared preferences
+            SharedPreferences pref1 = getApplicationContext().getSharedPreferences(NAV_SHARED_PREF, 0); // 0 - for private mode
+            SharedPreferences.Editor editor1 = pref1.edit();
+            editor1.putString(FLIGHT_NAME, flights.get(position));
+            editor1.apply();
 
             tvRouteHeader.setText(pref1.getString(FLIGHT_NAME, "Путь"));
+
             posReturn = position;
 
             Toast.makeText(NavigationActivity.this, "Готово, можете нажать кнопку ОК для закрытия диалога", Toast.LENGTH_SHORT).show();
@@ -266,26 +279,6 @@ public class NavigationActivity extends AppCompatActivity
             }
         });
 
-    }
-
-
-    private void saveFlightIdToSharedPrefs(int position) {
-        //Save Flight Id to shared preferences
-        SharedPreferences pref = getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putInt(FLIGHT_POS, position);
-        editor.putLong(FLIGHT_ID, flightArrayList.get(position).getFlight().getId());
-        editor.putLong(TRANSPONST_LIST_ID, flightArrayList.get(position).getId());
-        editor.putInt(NUMBER_OF_CITIES, flightArrayList.get(position).getFlight().getItineraryDTO().getEntries().size());
-        editor.putInt(CURRENT_ROUTE_POSITION, 0);
-
-        editor.apply();
-
-        //Save Flight Id to shared preferences
-        SharedPreferences pref1 = getApplicationContext().getSharedPreferences(NAV_SHARED_PREF, 0); // 0 - for private mode
-        SharedPreferences.Editor editor1 = pref1.edit();
-        editor1.putString(FLIGHT_NAME, flights.get(position));
-        editor1.apply();
     }
 
     @Override
@@ -419,6 +412,7 @@ public class NavigationActivity extends AppCompatActivity
         }
     }
 
+
     private void clearSharedPrefs() {
         getSharedPreferences(LOGIN_PREF, MODE_PRIVATE).edit().clear().apply();
         getSharedPreferences(NAV_SHARED_PREF, MODE_PRIVATE).edit().clear().apply();
@@ -547,18 +541,14 @@ public class NavigationActivity extends AppCompatActivity
         builder.create().show();
     }
 
-
     @Override
     public void showLoginData(LoginResponse loginResponse) {
-
         hideProgress();
 
         accessToken = loginResponse.getAccessToken();
         AccessTokenConst = accessToken;
 
         pref1.edit().putString(ACCESS_TOKEN, accessToken).apply();
-
-        init2();
 
     }
 
