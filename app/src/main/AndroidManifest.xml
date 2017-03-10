@@ -40,8 +40,6 @@
             android:label="@string/title_activity_navigation"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".ui.TEST"></activity>
-        <activity android:name=".ui.TestScan"></activity>
     </application>
 
 </manifest>
