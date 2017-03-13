@@ -225,11 +225,12 @@ public class CollateFragment extends Fragment implements CollateView {
                         generalInvoiceIdsList.remove(queryDestination.findAll().get(i).getDestinationListId());
                         listAdapter.notifyDataSetChanged();
 
-//                        realm.executeTransaction(realm -> {
-//                            queryDestination.findAll().get(k).deleteFromRealm();
-//                            if (!realm.where(Example.class).findAll().isEmpty())
-//                                realm.where(Example.class).findAll().get(k).deleteFromRealm();  //17.02.17
-//                        });
+                        int k = i;
+                        realm.executeTransaction(realm -> {
+                            queryDestination.findAll().get(k).deleteFromRealm();
+                            if (!realm.where(Example.class).findAll().isEmpty())
+                                realm.where(Example.class).findAll().get(k).deleteFromRealm();  //17.02.17
+                        });
                     }
                 }
             }
@@ -259,16 +260,32 @@ public class CollateFragment extends Fragment implements CollateView {
 //        showCollateResponse(collateEvent.getCollateResponse());
         //probably no need for that, to show results
 
-        realm.executeTransaction(realm -> {
-            queryDestination.findAll().deleteAllFromRealm();
-            if (!realm.where(Example.class).findAll().isEmpty()) {
-                realm.where(Example.class).findAll().deleteAllFromRealm();  //17.02.17
+        Toast.makeText(getContext(), collateEvent.getCollateResponse().getStatus(), Toast.LENGTH_SHORT).show();
+
+       /* for (int i = 0; i < queryDestination.findAll().size(); i++) {
+            for (int j = 0; j < chosenIds.size(); j++) {
+                if (queryDestination.findAll().get(i).getId().equals(chosenIds.get(j))) {
+
+                    int k = i;
+
+                    realm.executeTransaction(realm -> {
+                        queryDestination.findAll().get(k).deleteFromRealm();
+                        if (!realm.where(Example.class).findAll().isEmpty())
+                            realm.where(Example.class).findAll().get(k).deleteFromRealm();  //17.02.17
+                    });
+                }
             }
-        });
+        }*/
+
+//        realm.executeTransaction(realm -> {
+//            queryDestination.findAll().deleteAllFromRealm();
+//            if (!realm.where(Example.class).findAll().isEmpty()) {
+//                realm.where(Example.class).findAll().deleteAllFromRealm();  //17.02.17
+//            }
+//        });
 
         ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
     }
-
 
 
     private void setLabelsAndPacketsCollated(int k) {
