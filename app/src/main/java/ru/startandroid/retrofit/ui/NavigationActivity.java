@@ -34,7 +34,6 @@ import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
-import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.Model.Datum;
 import ru.startandroid.retrofit.Model.Member;
 import ru.startandroid.retrofit.Model.login.LoginResponse;
@@ -48,7 +47,6 @@ import ru.startandroid.retrofit.presenter.NavigationPresenterImpl;
 import ru.startandroid.retrofit.presenter.NavitationPresenter;
 import ru.startandroid.retrofit.presenter.RoutesPresenter;
 import ru.startandroid.retrofit.presenter.RoutesPresenterImpl;
-import ru.startandroid.retrofit.utils.KeycloakHelper;
 import ru.startandroid.retrofit.view.LoginView;
 import ru.startandroid.retrofit.view.NavigationActView;
 import ru.startandroid.retrofit.view.RoutesView;
@@ -362,7 +360,6 @@ public class NavigationActivity extends AppCompatActivity
 //            getSharedPreferences(LOGIN_PREF, MODE_PRIVATE).edit().putBoolean(LOGIN_BOOL, false).apply();
 //            getSharedPreferences(TOKEN_SHARED_PREF, MODE_PRIVATE).edit().remove(TOKEN).apply();
 
-//            KeycloakHelper.deleteAccount();
 //            this.finish();
         }
 
@@ -386,7 +383,6 @@ public class NavigationActivity extends AppCompatActivity
             // once minSdkVersion goes above 19 in a few years.
             clearCookies(getApplicationContext());
             clearSharedPrefs();
-            KeycloakHelper.remove();
             finish();
             System.exit(0);
         }

@@ -2,7 +2,6 @@ package ru.startandroid.retrofit.Interface;
 
 import java.util.List;
 
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -11,7 +10,6 @@ import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
-import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
@@ -26,12 +24,9 @@ import ru.startandroid.retrofit.Model.acceptgen.Example;
 import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
 import ru.startandroid.retrofit.Model.geninvoice.InvoiceMain;
-import ru.startandroid.retrofit.Model.login.BodyLogin;
 import ru.startandroid.retrofit.Model.login.LoginResponse;
 import ru.startandroid.retrofit.Model.routes.Routes;
 import rx.Observable;
-
-import static ru.startandroid.retrofit.utils.KeycloakHelper.LOGOUT;
 
 /**
  * Created by zhangali on 18.12.16.
@@ -127,9 +122,6 @@ public interface GitHubService {
 
     );
 
-
-    @GET(LOGOUT)
-    Call<ResponseBody> getLogout();
 
 
     @FormUrlEncoded

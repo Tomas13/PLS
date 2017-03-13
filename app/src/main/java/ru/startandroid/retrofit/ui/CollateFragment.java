@@ -260,7 +260,7 @@ public class CollateFragment extends Fragment implements CollateView {
 //        showCollateResponse(collateEvent.getCollateResponse());
         //probably no need for that, to show results
 
-        Toast.makeText(getContext(), collateEvent.getCollateResponse().getStatus(), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getContext(), collateEvent.getCollateResponse().getStatus(), Toast.LENGTH_SHORT).show();
 
        /* for (int i = 0; i < queryDestination.findAll().size(); i++) {
             for (int j = 0; j < chosenIds.size(); j++) {
