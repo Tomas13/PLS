@@ -163,7 +163,7 @@ public class CollateFragment extends Fragment implements CollateView {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        // Inflate the login_new for this fragment
         View view = inflater.inflate(R.layout.fragment_collate, container, false);
         ButterKnife.bind(this, view);
         init();

@@ -160,7 +160,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        // Inflate the login_new for this fragment
         View viewRoot = inflater.inflate(R.layout.fragment_invoice, container, false);
         ButterKnife.bind(this, viewRoot);
         init();

@@ -71,7 +71,7 @@ public class HistoryFragment extends Fragment implements HistoryView {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        // Inflate the login_new for this fragment
 
         View viewRoot = inflater.inflate(R.layout.fragment_last_actions, container, false);
         ButterKnife.bind(this, viewRoot);

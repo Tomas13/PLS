@@ -134,7 +134,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        // Inflate the login_new for this fragment
         View rootView = inflater.inflate(R.layout.fragment_volumes, container, false);
         ButterKnife.bind(this, rootView);
 
@@ -186,7 +186,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
         ListView listView = (ListView) pointDialog.findViewById(R.id.list_view_flight);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), R.layout.list_view_item, flightName);
-//        adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_activated_1, flightName);
+//        adapter = new ArrayAdapter<String>(getContext(), android.R.login_new.simple_list_item_activated_1, flightName);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         listView.setAdapter(adapter);
 
