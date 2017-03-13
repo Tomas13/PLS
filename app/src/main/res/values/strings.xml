@@ -46,8 +46,8 @@
     <string name="no_data_get">Нет накладных для принятия</string>
     <string name="no_send_invoice">нет накладной для добавления</string>
     <string name="last_point">Вы достигли конечной точки маршрута, пожалуйста авторизуйтесь заново и выберите другой маршрут</string>
-    <string name="login">Логин</string>
-    <string name="pswd">Пароль</string>
-    <string name="loginbtn">Войти</string>
+    <string name="login">ЛОГИН</string>
+    <string name="pswd">ПАРОЛЬ</string>
+    <string name="loginbtn">ВОЙТИ</string>
 
 </resources>

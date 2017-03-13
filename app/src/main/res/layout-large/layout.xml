@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="#005AAB"
     android:orientation="vertical"
-    android:fitsSystemWindows="true"
     android:paddingBottom="16dp"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
@@ -17,7 +16,6 @@
         android:layout_height="10dp"
         android:layout_weight="0.5"
         android:orientation="vertical"
-        android:padding="25dp"
         android:paddingTop="20dp">
 
         <ImageView
@@ -31,26 +29,25 @@
 
 
     <LinearLayout
-        android:gravity="center_horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.8"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
+        android:layout_weight="0.7"
         android:orientation="vertical">
 
 
         <LinearLayout
             android:id="@+id/ll_username"
-            android:layout_width="250dp"
-            android:layout_height="90dp"
+            android:layout_width="450dp"
+            android:layout_height="100dp"
             android:layout_marginTop="40dp"
             android:background="@drawable/round">
 
 
             <ImageView
-                android:layout_marginTop="20dp"
-                android:padding="5dp"
-                android:layout_width="60dp"
-                android:layout_height="40dp"
+                android:layout_width="80dp"
+                android:layout_height="60dp"
                 android:src="@drawable/user_icon" />
 
             <android.support.design.widget.TextInputLayout
@@ -70,7 +67,7 @@
                     android:inputType="textEmailAddress"
                     android:textColor="@android:color/white"
                     android:textColorHint="@android:color/white"
-                    android:textSize="23sp" />
+                    android:textSize="26sp" />
             </android.support.design.widget.TextInputLayout>
 
         </LinearLayout>
@@ -78,16 +75,15 @@
 
         <LinearLayout
             android:id="@+id/ll_pswd"
-            android:layout_width="250dp"
+            android:layout_width="450dp"
             android:layout_height="100dp"
+            android:layout_marginTop="0dp"
             android:background="@drawable/round">
 
 
             <ImageView
-                android:layout_marginTop="20dp"
-                android:layout_width="60dp"
-                android:padding="5dp"
-                android:layout_height="40dp"
+                android:layout_width="80dp"
+                android:layout_height="60dp"
                 android:src="@drawable/pswd_blue" />
 
 
@@ -109,20 +105,21 @@
                     android:textColor="@android:color/white"
                     android:textColorHighlight="@android:color/white"
                     android:textColorHint="@android:color/white"
-                    android:textSize="23sp" />
+                    android:textSize="26sp" />
             </android.support.design.widget.TextInputLayout>
         </LinearLayout>
 
 
         <Button
+            android:layout_marginLeft="20dp"
             android:id="@+id/btn_login"
-            android:layout_width="250dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="0dp"
+            android:layout_width="450dp"
+            android:layout_height="70dp"
+            android:layout_marginTop="20dp"
             android:background="@drawable/round_blue"
             android:text="@string/loginbtn"
             android:textColor="#4FC3F7"
-            android:textSize="21sp" />
+            android:textSize="24sp" />
 
     </LinearLayout>
 

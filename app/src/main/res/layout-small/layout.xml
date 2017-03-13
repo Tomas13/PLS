@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="#005AAB"
     android:orientation="vertical"
-    android:fitsSystemWindows="true"
     android:paddingBottom="16dp"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
@@ -17,7 +16,6 @@
         android:layout_height="10dp"
         android:layout_weight="0.5"
         android:orientation="vertical"
-        android:padding="25dp"
         android:paddingTop="20dp">
 
         <ImageView
@@ -31,24 +29,24 @@
 
 
     <LinearLayout
-        android:gravity="center_horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.8"
+        android:layout_marginLeft="50dp"
+        android:layout_marginStart="50dp"
+        android:layout_weight="0.5"
         android:orientation="vertical">
 
 
         <LinearLayout
             android:id="@+id/ll_username"
             android:layout_width="250dp"
-            android:layout_height="90dp"
+            android:layout_height="80dp"
             android:layout_marginTop="40dp"
             android:background="@drawable/round">
 
 
             <ImageView
                 android:layout_marginTop="20dp"
-                android:padding="5dp"
                 android:layout_width="60dp"
                 android:layout_height="40dp"
                 android:src="@drawable/user_icon" />
@@ -79,14 +77,14 @@
         <LinearLayout
             android:id="@+id/ll_pswd"
             android:layout_width="250dp"
-            android:layout_height="100dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="0dp"
             android:background="@drawable/round">
 
 
             <ImageView
                 android:layout_marginTop="20dp"
                 android:layout_width="60dp"
-                android:padding="5dp"
                 android:layout_height="40dp"
                 android:src="@drawable/pswd_blue" />
 
@@ -115,14 +113,15 @@
 
 
         <Button
+
             android:id="@+id/btn_login"
             android:layout_width="250dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="0dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
             android:background="@drawable/round_blue"
             android:text="@string/loginbtn"
             android:textColor="#4FC3F7"
-            android:textSize="21sp" />
+            android:textSize="24sp" />
 
     </LinearLayout>
 
