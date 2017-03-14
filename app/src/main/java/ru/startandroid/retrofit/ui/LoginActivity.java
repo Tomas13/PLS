@@ -5,8 +5,10 @@ import android.content.SharedPreferences;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import butterknife.BindView;
@@ -34,6 +36,9 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
 
     @BindView(R.id.btn_login)
     Button btnLogin;
+
+    @BindView(R.id.progress_login)
+    ProgressBar progressBar;
 
     @BindView(R.id.usernameWrapper)
     TextInputLayout usernameWrapper;
@@ -71,6 +76,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
 
     public void Login() {
 
+
         mLogin = userNameET.getText().toString().trim();
         mPassword = passwordET.getText().toString().trim();
 
@@ -88,6 +94,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         } else {
 
 
+            progressBar.setVisibility(View.VISIBLE);
             startAuth(mLogin, mPassword);
 
         }
@@ -120,6 +127,8 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
 
         AccessTokenConst = loginResponse.getAccessToken();
 
+        progressBar.setVisibility(View.INVISIBLE);
+
         startActivity(new Intent(this, NavigationActivity.class));
         this.finish();
 
@@ -134,6 +143,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
     @Override
     public void showLoginError(Throwable throwable) {
 
+        progressBar.setVisibility(View.INVISIBLE);
         Toast.makeText(this, "Неверный пароль или логин", Toast.LENGTH_SHORT).show();
 //        Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
 

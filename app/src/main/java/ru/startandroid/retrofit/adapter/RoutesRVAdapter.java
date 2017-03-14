@@ -90,9 +90,16 @@ public class RoutesRVAdapter extends RecyclerView.Adapter<RoutesRVAdapter.Routes
     public void onBindViewHolder(RoutesHolder holder, int position) {
         Entry flight = mRoutes.get(position);
 
-        SharedPreferences pref = context.getSharedPreferences(FLIGHT_SHARED_PREF, Context.MODE_PRIVATE);
-        int currentPos = pref.getInt(CURRENT_ROUTE_POSITION, 0);
-        if (position == currentPos - 1){
+//        SharedPreferences pref = context.getSharedPreferences(FLIGHT_SHARED_PREF, Context.MODE_PRIVATE);
+//        int currentPos = pref.getInt(CURRENT_ROUTE_POSITION, 0);
+
+        holder.tvNumber.setText(String.valueOf(position + 1));
+        holder.tvIndex.setText(flight.getDept().getName());// getIndex(position) + "");
+        holder.tvArrival.setText(flight.getArrival());
+        holder.tvDeparture.setText(flight.getDeparture());
+        holder.tvName.setText(flight.getDept().getNameRu());
+
+      /*  if (position == currentPos) {
             holder.tvNumber.setTextColor(Color.BLUE);
             holder.tvIndex.setTextColor(Color.BLUE);
             holder.tvArrival.setTextColor(Color.BLUE);
@@ -101,19 +108,14 @@ public class RoutesRVAdapter extends RecyclerView.Adapter<RoutesRVAdapter.Routes
 
 
             holder.tvNumber.setText(String.valueOf(position + 1));
-            holder.tvIndex.setText(flight.getDept().getName()) ;// getIndex(position) + "");
+            holder.tvIndex.setText(flight.getDept().getName());// getIndex(position) + "");
             holder.tvArrival.setText(flight.getArrival());
             holder.tvDeparture.setText(flight.getDeparture());
             holder.tvName.setText(flight.getDept().getNameRu());
 
-        }else{
+        } else {
 
-            holder.tvNumber.setText(String.valueOf(position + 1));
-            holder.tvIndex.setText(flight.getDept().getName()) ;// getIndex(position) + "");
-            holder.tvArrival.setText(flight.getArrival());
-            holder.tvDeparture.setText(flight.getDeparture());
-            holder.tvName.setText(flight.getDept().getNameRu());
-        }
+        }*/
 
 
     }
