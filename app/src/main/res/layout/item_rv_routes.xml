@@ -15,6 +15,7 @@
         <TextView
             android:id="@+id/tv_number_routes"
             android:layout_width="0dp"
+            android:textSize="17sp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
             android:gravity="center"
@@ -23,6 +24,7 @@
         <TextView
             android:id="@+id/tv_index"
             android:layout_width="0dp"
+            android:textSize="17sp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:gravity="center"
@@ -32,6 +34,7 @@
             android:id="@+id/tv_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:textSize="17sp"
             android:layout_weight="3"
             android:gravity="center"
             android:text="@string/of_karagandy" />
@@ -40,6 +43,7 @@
             android:id="@+id/tv_departure_time"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:textSize="17sp"
             android:layout_weight="2"
             android:gravity="center"
             android:text="01:00" />
@@ -47,6 +51,7 @@
         <TextView
             android:id="@+id/tv_arrival_time"
             android:layout_width="0dp"
+            android:textSize="17sp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:gravity="center"

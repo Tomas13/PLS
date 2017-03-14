@@ -121,7 +121,7 @@ public class RoutesFragment extends Fragment implements RoutesView {
 
 //        flights.addAll(routesEvent.getRoutes().getFlights().get(pos).getFlight().getItineraryDTO().getEntries());
 
-        RoutesRVAdapter routesRVAdapter = new RoutesRVAdapter(flights);
+        RoutesRVAdapter routesRVAdapter = new RoutesRVAdapter(flights, getContext());
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         rvRoutes.setLayoutManager(mLayoutManager);
         rvRoutes.setAdapter(routesRVAdapter);

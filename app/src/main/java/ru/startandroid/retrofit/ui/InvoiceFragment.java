@@ -250,10 +250,12 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             }
         }
 
-        for (int w = labelIds.size() - 1; w >= 0; w--) {
-            int j = labelIds.get(w);
-            realm.executeTransaction(realm -> realm.where(LabelList.class).findAll().get(j).deleteFromRealm());
+        if (labelIds.size() >= 1){
+            for (int w = labelIds.size() - 1; w >= 0; w--) {
+                int j = labelIds.get(w);
+                realm.executeTransaction(realm -> realm.where(LabelList.class).findAll().get(j).deleteFromRealm());
 
+            }
         }
 
 
@@ -276,11 +278,14 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             }
 
         }
-        ///16.02.17
-        for (int w = packetIds.size() - 1; w >= 0; w--) {
-            int j = packetIds.get(w);
-            realm.executeTransaction(realm -> realm.where(PacketList.class).findAll().get(j).deleteFromRealm());
+
+        if (packetIds.size() >= 1){
+            for (int w = packetIds.size() - 1; w >= 0; w--) {
+                int j = packetIds.get(w);
+                realm.executeTransaction(realm -> realm.where(PacketList.class).findAll().get(j).deleteFromRealm());
+            }
         }
+
     }
 
 

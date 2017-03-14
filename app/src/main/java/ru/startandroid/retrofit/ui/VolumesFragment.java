@@ -112,7 +112,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
 
         flightName.add("O" + ref.getString(INVOICE_NAME, "default_name"));
 
-
         btnAttachToInvoice.setOnClickListener(v -> {
 
 //            if (querySendInvoice.findAll().size() > 0 && querySendInvoice.findAll().last().getBodyForCreateInvoice() != null) {
@@ -326,7 +325,6 @@ public class VolumesFragment extends Fragment implements VolumesView {
         }
 
         collateRVAdapter.notifyDataSetChanged();
-
     }
 
 

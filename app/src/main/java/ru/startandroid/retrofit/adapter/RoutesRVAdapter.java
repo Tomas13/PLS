@@ -2,6 +2,8 @@ package ru.startandroid.retrofit.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -15,6 +17,9 @@ import java.util.List;
 
 import ru.startandroid.retrofit.Model.routes.Entry;
 import ru.startandroid.retrofit.R;
+
+import static ru.startandroid.retrofit.Const.CURRENT_ROUTE_POSITION;
+import static ru.startandroid.retrofit.Const.FLIGHT_SHARED_PREF;
 
 /**
  * Created by root on 12/27/16.
@@ -53,8 +58,9 @@ public class RoutesRVAdapter extends RecyclerView.Adapter<RoutesRVAdapter.Routes
     }
 
 
-    public RoutesRVAdapter(List<Entry> routes) {
+    public RoutesRVAdapter(List<Entry> routes, Context context) {
         mRoutes = routes;
+        this.context = context;
     }
 
 
@@ -84,11 +90,31 @@ public class RoutesRVAdapter extends RecyclerView.Adapter<RoutesRVAdapter.Routes
     public void onBindViewHolder(RoutesHolder holder, int position) {
         Entry flight = mRoutes.get(position);
 
-        holder.tvNumber.setText(String.valueOf(position + 1));
-        holder.tvIndex.setText(flight.getDept().getName()) ;// getIndex(position) + "");
-        holder.tvArrival.setText(flight.getArrival());
-        holder.tvDeparture.setText(flight.getDeparture());
-        holder.tvName.setText(flight.getDept().getNameRu());
+        SharedPreferences pref = context.getSharedPreferences(FLIGHT_SHARED_PREF, Context.MODE_PRIVATE);
+        int currentPos = pref.getInt(CURRENT_ROUTE_POSITION, 0);
+        if (position == currentPos - 1){
+            holder.tvNumber.setTextColor(Color.BLUE);
+            holder.tvIndex.setTextColor(Color.BLUE);
+            holder.tvArrival.setTextColor(Color.BLUE);
+            holder.tvDeparture.setTextColor(Color.BLUE);
+            holder.tvName.setTextColor(Color.BLUE);
+
+
+            holder.tvNumber.setText(String.valueOf(position + 1));
+            holder.tvIndex.setText(flight.getDept().getName()) ;// getIndex(position) + "");
+            holder.tvArrival.setText(flight.getArrival());
+            holder.tvDeparture.setText(flight.getDeparture());
+            holder.tvName.setText(flight.getDept().getNameRu());
+
+        }else{
+
+            holder.tvNumber.setText(String.valueOf(position + 1));
+            holder.tvIndex.setText(flight.getDept().getName()) ;// getIndex(position) + "");
+            holder.tvArrival.setText(flight.getArrival());
+            holder.tvDeparture.setText(flight.getDeparture());
+            holder.tvName.setText(flight.getDept().getNameRu());
+        }
+
 
     }
 
