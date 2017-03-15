@@ -72,6 +72,7 @@ import static ru.startandroid.retrofit.Const.INVOICE_NAME;
 import static ru.startandroid.retrofit.Const.INVOICE_PREF;
 import static ru.startandroid.retrofit.Const.NUMBER_OF_CITIES;
 import static ru.startandroid.retrofit.Const.TRANSPONST_LIST_ID;
+import static ru.startandroid.retrofit.Const.fake;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -500,11 +501,17 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         //FOR SENDING
     }
 
+
     private void updateCurrentRoutePosition() {
         int current = pref.getInt(CURRENT_ROUTE_POSITION, 0);
+
+        fake++;
+        pref.edit().putInt("FAKE", fake).apply();
+
         current++;
         currentRoutePosition++;
         pref.edit().putInt(CURRENT_ROUTE_POSITION, current).apply();
+
     }
 
     private void removeRealm() {
