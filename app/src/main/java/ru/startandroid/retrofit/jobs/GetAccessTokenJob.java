@@ -1,5 +1,6 @@
 package ru.startandroid.retrofit.jobs;
 
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -21,7 +22,10 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 import static ru.startandroid.retrofit.Const.ACCESS_TOKEN_PRIORITY;
+import static ru.startandroid.retrofit.Const.AccessTokenConst;
 import static ru.startandroid.retrofit.Const.BASE_URL;
+import static ru.startandroid.retrofit.Const.REFRESH_TOKEN;
+import static ru.startandroid.retrofit.Const.TOKEN_SHARED_PREF;
 import static ru.startandroid.retrofit.Const.passwordConst;
 import static ru.startandroid.retrofit.Const.usernameConst;
 import static ru.startandroid.retrofit.utils.Singleton.getUserClient;
@@ -52,15 +56,16 @@ public class GetAccessTokenJob extends Job {
 
         GitHubService gitHubServ = retrofitRoutes.create(GitHubService.class);
 
+        SharedPreferences pref1 = getApplicationContext().getSharedPreferences(TOKEN_SHARED_PREF, 0);
+
+        String accessToken = pref1.getString(REFRESH_TOKEN, "0");
 
         Observable<LoginResponse> callCreate =
-                gitHubServ.postLogin(
+                gitHubServ.postAccess(
                         "no-cache",
-                        "password",
+                        "refresh_token",
                         "toolpar-mobile",
-                        "offline-access",
-                        usernameConst,
-                        passwordConst);
+                        accessToken);
 
         callCreate
                 .subscribeOn(Schedulers.io())
@@ -74,7 +79,7 @@ public class GetAccessTokenJob extends Job {
                         },
                         throwable -> {
 
-                            if (throwable.getMessage().equals("HTTP 401 Unauthorized")){
+                            if (throwable.getMessage().equals("HTTP 401 Unauthorized")) {
 
                                 EventBus.getDefault().postSticky(new AccessTokenErrorEvent(throwable.getMessage()));
 

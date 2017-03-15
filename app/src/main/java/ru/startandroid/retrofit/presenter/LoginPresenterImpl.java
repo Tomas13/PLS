@@ -53,7 +53,7 @@ public class LoginPresenterImpl implements LoginPresenter {
                         "no-cache",
                         "password",
                         "toolpar-mobile",
-                        "offline-access",
+                        "offline_access",
                         username,
                         password);
 

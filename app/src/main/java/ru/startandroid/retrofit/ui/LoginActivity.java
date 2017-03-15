@@ -23,6 +23,7 @@ import ru.startandroid.retrofit.view.LoginView;
 import static ru.startandroid.retrofit.Const.AccessTokenConst;
 import static ru.startandroid.retrofit.Const.PASSWORD;
 import static ru.startandroid.retrofit.Const.ACCESS_TOKEN;
+import static ru.startandroid.retrofit.Const.REFRESH_TOKEN;
 import static ru.startandroid.retrofit.Const.TOKEN_SHARED_PREF;
 import static ru.startandroid.retrofit.Const.USERNAME;
 
@@ -62,7 +63,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         pref1 = getApplicationContext().getSharedPreferences(TOKEN_SHARED_PREF, 0); // 0 - for private mode
         btnLogin.setOnClickListener(v -> Login());
 
-        if (pref1.contains(ACCESS_TOKEN)) {
+        if (pref1.contains(REFRESH_TOKEN)) {
             Intent intent = new Intent(LoginActivity.this, NavigationActivity.class);
             Const.Token = "Bearer " + pref1.getString(ACCESS_TOKEN, "empty");
             startActivity(intent);
@@ -124,6 +125,9 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         String refreshToken = loginResponse.getRefreshToken();
 
         pref1.edit().putString(ACCESS_TOKEN, refreshToken).apply();
+        pref1.edit().putString(REFRESH_TOKEN, refreshToken).apply();
+
+
 
         AccessTokenConst = loginResponse.getAccessToken();
 

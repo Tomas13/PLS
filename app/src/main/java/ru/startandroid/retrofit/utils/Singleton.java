@@ -40,7 +40,7 @@ public class Singleton {
         httpClient.addNetworkInterceptor(new StethoInterceptor()); //подключаю Stetho
         httpClient.readTimeout(60, TimeUnit.SECONDS);
         httpClient.connectTimeout(60, TimeUnit.SECONDS);
-        httpClient.addInterceptor(chain -> {
+       /* httpClient.addInterceptor(chain -> {
             Request original = chain.request();
 
             Request request = original.newBuilder()
@@ -51,7 +51,7 @@ public class Singleton {
                     .build();
 
             return chain.proceed(request);
-        });
+        });*/
 
         return httpClient.build();
     }

@@ -32,6 +32,7 @@ public class Const {
     public static final String INVOICE_NAME = "INVOICE_NAME";
     public static final String TOKEN = "TOKEN";
     public static final String ACCESS_TOKEN = "ACCESS_TOKEN";
+    public static final String REFRESH_TOKEN = "REFRESH_TOKEN";
     public static final String USERNAME = "USERNAME";
     public static final String PASSWORD = "PASSWORD";
     public static final String FLIGHT_SHARED_PREF = "FLIGHT_PREF";

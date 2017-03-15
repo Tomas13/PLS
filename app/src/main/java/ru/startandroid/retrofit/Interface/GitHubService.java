@@ -140,13 +140,11 @@ public interface GitHubService {
     @FormUrlEncoded
     @POST("/auth/realms/toolpar/protocol/openid-connect/token")
     @Headers("Content-Type:application/x-www-form-urlencoded")
-    Observable<LoginResponse> postLogin1(
+    Observable<LoginResponse> postAccess(
             @Field("Cache-Control") String cache,
             @Field("grant_type") String grant,
             @Field("client_id") String clientid,
-            @Field("scope") String scope,
-            @Field("username") String username,
-            @Field("password") String password
+            @Field("refresh_token") String refresh
 //            @Body BodyLogin bodyLogin
     );
 
