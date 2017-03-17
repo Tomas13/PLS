@@ -34,7 +34,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:text="Фамилия"
+            android:layout_marginStart="10dp"
+            android:text="@string/surname"
             android:textColor="@android:color/black"
             android:textSize="17sp"
             android:textStyle="bold" />
@@ -44,7 +45,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="3dp"
-            android:text="Имя"
+            android:layout_marginStart="3dp"
+            android:text="@string/firstname"
             android:textColor="@android:color/black"
             android:textSize="17sp"
             android:textStyle="bold" />

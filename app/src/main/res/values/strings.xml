@@ -49,5 +49,7 @@
     <string name="login">ЛОГИН</string>
     <string name="pswd">ПАРОЛЬ</string>
     <string name="loginbtn">ВОЙТИ</string>
+    <string name="surname">Фамилия</string>
+    <string name="firstname">Имя</string>
 
 </resources>
