@@ -235,6 +235,8 @@ public class CollateFragment extends Fragment implements CollateView {
                 }
             }
 
+            ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
+
 
             jobManager.addJobInBackground(new GetAccessTokenJob());
 

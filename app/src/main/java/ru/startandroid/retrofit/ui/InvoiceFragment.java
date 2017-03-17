@@ -182,6 +182,8 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
                 showProgress();
 
 
+                jobManager.addJobInBackground(new GetAccessTokenJob());
+
                 jobManager.addJobInBackground(new PostCreateInvoiceJob(body));
 
                 updateCurrentRoutePosition();

@@ -62,7 +62,7 @@ public class HistoryFragment extends Fragment implements HistoryView {
         // Required empty public constructor
     }
 
-    private void init(){
+    private void init() {
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Последние действия");
 
         jobManager = AppJobManager.getJobManager();
@@ -85,7 +85,7 @@ public class HistoryFragment extends Fragment implements HistoryView {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onAccessTokenEvent(AccessTokenEvent accessTokenEvent){
+    public void onAccessTokenEvent(AccessTokenEvent accessTokenEvent) {
         AccessTokenConst = accessTokenEvent.getLoginResponse().getAccessToken();
         Log.d("Access2", AccessTokenConst);
         jobManager.addJobInBackground(new GetHistoryJob());
@@ -103,30 +103,8 @@ public class HistoryFragment extends Fragment implements HistoryView {
 
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onHistoryErrorEvent(Throwable message){
+    public void onHistoryErrorEvent(Throwable message) {
         showHistoryError(message);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    public void onStop() {
-        EventBus.getDefault().unregister(this);
-        super.onStop();
-    }
-
-    @Override
-    public void showProgress() {
-        progressHistory.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void hideProgress() {
-        progressHistory.setVisibility(View.GONE);
     }
 
     @Override
@@ -154,6 +132,28 @@ public class HistoryFragment extends Fragment implements HistoryView {
     @Override
     public void showHistoryError(Throwable throwable) {
         Toast.makeText(getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+
+    @Override
+    public void showProgress() {
+        progressHistory.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideProgress() {
+        progressHistory.setVisibility(View.GONE);
     }
 
 }
