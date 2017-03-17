@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -128,7 +129,6 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         pref1.edit().putString(REFRESH_TOKEN, refreshToken).apply();
 
 
-
         AccessTokenConst = loginResponse.getAccessToken();
 
         progressBar.setVisibility(View.INVISIBLE);
@@ -148,7 +148,18 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
     public void showLoginError(Throwable throwable) {
 
         progressBar.setVisibility(View.INVISIBLE);
-        Toast.makeText(this, "Неверный пароль или логин", Toast.LENGTH_SHORT).show();
+
+        Toast toast = Toast.makeText(this, "Неверный пароль или логин", Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.TOP, 0, 80);
+        toast.show();
+
+//        passwordET.setText("");
+//        userNameET.setText("");
+        userNameET.requestFocus();
+
+        usernameWrapper.setErrorEnabled(false);
+        passwordWrapper.setErrorEnabled(false);
+
 //        Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
 
     }

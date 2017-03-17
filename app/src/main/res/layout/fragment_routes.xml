@@ -111,6 +111,7 @@
         tools:layout_conversion_absoluteY="0dp" />
 
     <ProgressBar
+        style="@android:style/Widget.ProgressBar.Inverse"
 
         android:id="@+id/progress_routes"
         android:layout_width="wrap_content"

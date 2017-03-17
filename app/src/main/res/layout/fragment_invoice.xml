@@ -85,6 +85,8 @@
         android:id="@+id/progress_invoice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+        style="@android:style/Widget.ProgressBar.Inverse"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
         android:visibility="gone" />
 </RelativeLayout>
