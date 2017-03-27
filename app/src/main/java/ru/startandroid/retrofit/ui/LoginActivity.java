@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -12,11 +13,20 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.birbit.android.jobqueue.JobManager;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ru.startandroid.retrofit.AppJobManager;
 import ru.startandroid.retrofit.Const;
 import ru.startandroid.retrofit.Model.login.LoginResponse;
 import ru.startandroid.retrofit.R;
+import ru.startandroid.retrofit.events.AccessTokenEvent;
+import ru.startandroid.retrofit.jobs.GetAccessTokenJob;
 import ru.startandroid.retrofit.presenter.LoginPresenter;
 import ru.startandroid.retrofit.presenter.LoginPresenterImpl;
 import ru.startandroid.retrofit.view.LoginView;
@@ -52,6 +62,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
     private LoginPresenter loginPresenter;
     private String mLogin;
     private String mPassword;
+    private JobManager jobManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,24 +71,46 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         setContentView(R.layout.layout);
         ButterKnife.bind(this);
 
+        jobManager = AppJobManager.getJobManager();
+        jobManager.addJobInBackground(new GetAccessTokenJob());
+        progressBar.setVisibility(View.VISIBLE);
+
+
+
         loginPresenter = new LoginPresenterImpl(this);
         pref1 = getApplicationContext().getSharedPreferences(TOKEN_SHARED_PREF, 0); // 0 - for private mode
         btnLogin.setOnClickListener(v -> Login());
 
-        if (pref1.contains(REFRESH_TOKEN)) {
-            Intent intent = new Intent(LoginActivity.this, NavigationActivity.class);
-            Const.Token = "Bearer " + pref1.getString(ACCESS_TOKEN, "empty");
-            startActivity(intent);
-            finish();
-        }
+      //  if (pref1.contains(REFRESH_TOKEN)) {
+//            Intent intent = new Intent(LoginActivity.this, NavigationActivity.class);
+//            Const.Token = "Bearer " + pref1.getString(REFRESH_TOKEN, "empty");
+//            startActivity(intent);
+//            finish();
+//        }
     }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onAccessTokenEvent(AccessTokenEvent accessTokenEvent) {
+        progressBar.setVisibility(View.INVISIBLE);
+
+        AccessTokenConst = accessTokenEvent.getLoginResponse().getAccessToken();
+        Log.d("Access2", AccessTokenConst);
+        Intent intent = new Intent(LoginActivity.this, NavigationActivity.class);
+        startActivity(intent);
+        finish();
+
+//        jobManager.addJobInBackground(new GetHistoryJob());
+    }
+
+
+
 
     private void startAuth(String mLogin, String mPassword) {
         loginPresenter.postLogin(mLogin, mPassword);
     }
 
     public void Login() {
-
 
         mLogin = userNameET.getText().toString().trim();
         mPassword = passwordET.getText().toString().trim();
@@ -90,30 +123,13 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         } else if (mPassword.isEmpty()) {
             usernameWrapper.setErrorEnabled(false);
             passwordWrapper.setError("Пустое поле пароль");
-
             passwordET.setText("");
 
         } else {
-
-
             progressBar.setVisibility(View.VISIBLE);
             startAuth(mLogin, mPassword);
-
         }
 
-        /*} else if (mLogin.equals("Demo") && mPassword.equals("1111")) {
-            startActivity(new Intent(this, NavigationActivity.class));
-            this.finish();
-        } else {
-            Toast.makeText(this, "Неверный логин или пароль", Toast.LENGTH_SHORT).show();
-//            passwordET.setText("");
-//            userNameET.setText("");
-
-            usernameWrapper.setErrorEnabled(false);
-            passwordWrapper.setErrorEnabled(false);
-
-        }
-*/
     }
 
 
@@ -162,5 +178,17 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
 
 //        Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
 
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
     }
 }

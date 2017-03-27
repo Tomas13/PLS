@@ -54,9 +54,9 @@ public class Const {
 
     public static int fake = 0;
 
-    public static final int COLLATE_PRIORITY = 5;
-    public static final int CREATE_INVOICE_PRIORITY = 5;
-    public static final int ACCEPT_INVOICE_PRIORITY = 5;
+    public static final int COLLATE_PRIORITY = 40;
+    public static final int CREATE_INVOICE_PRIORITY = 30;
+    public static final int ACCEPT_INVOICE_PRIORITY = 50;
     public static final int LOAD_INVOICE_PRIORITY = 5;
     public static final int LOAD_ROUTES_PRIORITY = 5;
 

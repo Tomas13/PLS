@@ -29,11 +29,18 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.birbit.android.jobqueue.JobManager;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
+import ru.startandroid.retrofit.AppJobManager;
 import ru.startandroid.retrofit.Model.Datum;
 import ru.startandroid.retrofit.Model.Member;
 import ru.startandroid.retrofit.Model.login.LoginResponse;
@@ -41,6 +48,9 @@ import ru.startandroid.retrofit.Model.routes.Entry;
 import ru.startandroid.retrofit.Model.routes.Flight;
 import ru.startandroid.retrofit.Model.routes.Routes;
 import ru.startandroid.retrofit.R;
+import ru.startandroid.retrofit.events.AccessTokenEvent;
+import ru.startandroid.retrofit.jobs.GetAccessTokenJob;
+import ru.startandroid.retrofit.jobs.GetHistoryJob;
 import ru.startandroid.retrofit.presenter.LoginPresenter;
 import ru.startandroid.retrofit.presenter.LoginPresenterImpl;
 import ru.startandroid.retrofit.presenter.NavigationPresenterImpl;
@@ -87,6 +97,7 @@ public class NavigationActivity extends AppCompatActivity
     private LoginPresenter loginPresenter;
     private String accessToken;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,15 +105,19 @@ public class NavigationActivity extends AppCompatActivity
 
         pref1 = getApplicationContext().getSharedPreferences(TOKEN_SHARED_PREF, 0);
 
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setTitle("PLS");
 
+        navProgressBar = (ProgressBar) findViewById(R.id.activity_navigation_progressbar);
+
         loginPresenter = new LoginPresenterImpl(this);
+//        Login();
+
 
         routesPresenter = new RoutesPresenterImpl(this);
         navPresenter = new NavigationPresenterImpl(this);
-        navProgressBar = (ProgressBar) findViewById(R.id.activity_navigation_progressbar);
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -125,7 +140,8 @@ public class NavigationActivity extends AppCompatActivity
             Log.d("Main", "fetching membership info");
             navProgressBar.setVisibility(View.VISIBLE);
 
-            navPresenter.loadMembershipInfo(AccessTokenConst);
+            if (AccessTokenConst != null)
+                navPresenter.loadMembershipInfo(AccessTokenConst);
 
         } else {
 
@@ -152,7 +168,8 @@ public class NavigationActivity extends AppCompatActivity
 
         if (!pref.contains(FLIGHT_POS)) {
 //            navProgressBar.setVisibility(View.VISIBLE);
-            routesPresenter.loadRoutes(AccessTokenConst);
+            if (AccessTokenConst != null)
+                routesPresenter.loadRoutes(AccessTokenConst);
 
         } else {
 
@@ -170,10 +187,8 @@ public class NavigationActivity extends AppCompatActivity
 
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
 
+    private void Login(){
         String username = pref1.getString(USERNAME, "mLogin");
         String password = pref1.getString(PASSWORD, "mPassword");
         usernameConst = username;
@@ -181,6 +196,21 @@ public class NavigationActivity extends AppCompatActivity
 
         showProgress();
         loginPresenter.postLogin(username, password);   //get access token
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onAccessTokenEvent(AccessTokenEvent accessTokenEvent) {
+        AccessTokenConst = accessTokenEvent.getLoginResponse().getAccessToken();
+        Log.d("Access2", AccessTokenConst);
+//        jobManager.addJobInBackground(new GetHistoryJob());
     }
 
 
@@ -553,4 +583,5 @@ public class NavigationActivity extends AppCompatActivity
     public void showLoginError(Throwable throwable) {
         Toast.makeText(this, "Неверный логин", Toast.LENGTH_SHORT).show();
     }
+
 }
