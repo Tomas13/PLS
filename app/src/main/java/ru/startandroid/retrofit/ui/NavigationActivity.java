@@ -94,7 +94,7 @@ public class NavigationActivity extends AppCompatActivity
     private NavitationPresenter navPresenter;
     private Realm realm;
     SharedPreferences pref1;
-    private LoginPresenter loginPresenter;
+//    private LoginPresenter loginPresenter;
     private String accessToken;
 
 
@@ -105,6 +105,8 @@ public class NavigationActivity extends AppCompatActivity
 
         pref1 = getApplicationContext().getSharedPreferences(TOKEN_SHARED_PREF, 0);
 
+        Log.d("NavFuck", "onCreateCalled");
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -112,7 +114,7 @@ public class NavigationActivity extends AppCompatActivity
 
         navProgressBar = (ProgressBar) findViewById(R.id.activity_navigation_progressbar);
 
-        loginPresenter = new LoginPresenterImpl(this);
+//        loginPresenter = new LoginPresenterImpl(this);
 //        Login();
 
 
@@ -175,6 +177,8 @@ public class NavigationActivity extends AppCompatActivity
 
             Log.d("MainNav", "no request getroutesinfo");
             startFragment(new HistoryFragment());
+            Log.d("NavFuck", "line  178");
+
 
         }
 
@@ -188,15 +192,15 @@ public class NavigationActivity extends AppCompatActivity
     }
 
 
-    private void Login(){
+   /* private void Login(){
         String username = pref1.getString(USERNAME, "mLogin");
         String password = pref1.getString(PASSWORD, "mPassword");
         usernameConst = username;
         passwordConst = password;
 
         showProgress();
-        loginPresenter.postLogin(username, password);   //get access token
-    }
+//        loginPresenter.postLogin(username, password);   //get access token
+    }*/
 
 
     @Override
@@ -206,11 +210,22 @@ public class NavigationActivity extends AppCompatActivity
 
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onAccessTokenEvent(AccessTokenEvent accessTokenEvent) {
         AccessTokenConst = accessTokenEvent.getLoginResponse().getAccessToken();
-        Log.d("Access2", AccessTokenConst);
-//        jobManager.addJobInBackground(new GetHistoryJob());
+        Log.d("lol", AccessTokenConst);
     }
 
 
@@ -301,6 +316,8 @@ public class NavigationActivity extends AppCompatActivity
                 flightDialog.dismiss();
 
                 startFragment(new HistoryFragment());
+                Log.d("NavFuck", "line 305");
+
 
             } else {
                 Toast.makeText(NavigationActivity.this, "Необходимо выбрать путь следования", Toast.LENGTH_SHORT).show();
@@ -349,6 +366,8 @@ public class NavigationActivity extends AppCompatActivity
 
         if (id == R.id.nav_last_actions) {
             startFragment(new HistoryFragment());
+            Log.d("NavFuck", "line 355");
+
         } else if (id == R.id.nav_volumes) {
 
             startFragment(new VolumesFragment());
@@ -458,6 +477,8 @@ public class NavigationActivity extends AppCompatActivity
     public void startFragment(Fragment fragment) {
         getSupportFragmentManager().beginTransaction().replace(R.id.content_navigation_container,
                 fragment).commit();
+
+        Log.d("NavActivit", "replace");
     }
 
 
@@ -526,6 +547,7 @@ public class NavigationActivity extends AppCompatActivity
 
                 realm.executeTransaction(realm -> realm.insert(routes));
 
+                Log.d("NavFuck", "line 530");
                 startFragment(new HistoryFragment());
 
             } else {
@@ -549,6 +571,8 @@ public class NavigationActivity extends AppCompatActivity
         tvRouteHeader.setText("");
         showErrorDialog(getString(R.string.empty_routes));
         startFragment(new HistoryFragment());
+        Log.d("NavFuck", "line 560");
+
     }
 
     @Override

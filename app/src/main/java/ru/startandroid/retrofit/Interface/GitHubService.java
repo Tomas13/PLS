@@ -22,7 +22,6 @@ import ru.startandroid.retrofit.Model.LastActions;
 import ru.startandroid.retrofit.Model.Member;
 import ru.startandroid.retrofit.Model.acceptgen.Example;
 import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
-import ru.startandroid.retrofit.Model.destinationlist.ResponseDestinationList;
 import ru.startandroid.retrofit.Model.geninvoice.InvoiceMain;
 import ru.startandroid.retrofit.Model.login.LoginResponse;
 import ru.startandroid.retrofit.Model.routes.Routes;
@@ -91,9 +90,9 @@ public interface GitHubService {
 
 
     //    Получение списка s накладных, которые уже извлекли из О
-    @GET("/api/mobile/destination-lists")
-    Observable<ResponseDestinationList> getDestionationLists(
-    );
+//    @GET("/api/mobile/destination-lists")
+//    Observable<ResponseDestinationList> getDestionationLists(
+//    );
 
 
     @POST("/api/mobile/collate-destination-lists")

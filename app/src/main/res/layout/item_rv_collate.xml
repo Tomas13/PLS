@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/ll_rv_collate"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="@dimen/margin_top_bottom_item_rv"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="@dimen/margin_top_bottom_item_rv"
+        android:layout_weight="3">
+
+        <CheckBox
+            android:id="@+id/checkbox_collate"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_marginTop="3dp"
+            android:layout_weight="0.1"
+            android:scaleX="1.2"
+            android:scaleY="1.2" />
+
+        <TextView
+            android:id="@+id/tv_list_id_collate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            android:layout_marginStart="4dp"
+            android:layout_weight="1.3"
+            android:text="O2016182183939111" />
+
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/tv_to_dept_name_collate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:text="012010" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="[" />
+
+            <TextView
+                android:id="@+id/tv_to_dept_name_ru_collate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Тест-19" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="]" />
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>

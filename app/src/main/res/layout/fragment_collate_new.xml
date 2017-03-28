@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ru.startandroid.retrofit.ui.CollateFragment">
+    tools:context="ru.startandroid.retrofit.ui.CollateNewFragment">
 
     <!-- TODO: Update blank fragment layout -->
 
@@ -14,26 +14,61 @@
 
         <EditText
             android:id="@+id/et_scan"
-            android:hint="@string/enter_code"
             android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:layout_height="wrap_content" />
+            android:hint="@string/enter_code" />
 
         <Button
             android:id="@+id/btn_scan"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="@string/btn_scan_text"/>
+            android:layout_weight="1"
+            android:text="@string/btn_scan_text" />
     </LinearLayout>
 
 
-
-    <ListView
+    <LinearLayout
+        android:id="@+id/ll_caption_collate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@id/ll_fragment_accept"
-        android:id="@+id/list_view_accept_gen"
+        android:layout_marginBottom="8dp"
+        android:weightSum="2">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/number_caption"
+            android:textAlignment="center"
+            android:textStyle="bold" />
+
+       <!-- <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/from_caption"
+            android:textAlignment="center"
+            android:textStyle="bold" />-->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/where_caption"
+            android:textAlignment="center"
+            android:textStyle="bold" />
+
+
+    </LinearLayout>
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_collate_new"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/ll_caption_collate"
         android:layout_marginBottom="60dp"
         android:textAlignment="center" />
 

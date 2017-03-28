@@ -73,7 +73,7 @@ public class GetAccessTokenJob extends Job {
                 .subscribe(
                         response -> {
 
-                            EventBus.getDefault().postSticky(new AccessTokenEvent(response));
+                            EventBus.getDefault().post(new AccessTokenEvent(response));
 
 
                         },
@@ -81,7 +81,7 @@ public class GetAccessTokenJob extends Job {
 
                             if (throwable.getMessage().equals("HTTP 401 Unauthorized")) {
 
-                                EventBus.getDefault().postSticky(new AccessTokenErrorEvent(throwable.getMessage()));
+                                EventBus.getDefault().post(new AccessTokenErrorEvent(throwable.getMessage()));
 
                             }
 

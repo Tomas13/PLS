@@ -29,7 +29,6 @@ import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmQuery;
-import io.realm.RealmResults;
 import ru.startandroid.retrofit.Model.BodyForCreateInvoice;
 import ru.startandroid.retrofit.Model.RealmLong;
 import ru.startandroid.retrofit.Model.SendInvoice;
@@ -37,7 +36,7 @@ import ru.startandroid.retrofit.Model.acceptgen.LabelList;
 import ru.startandroid.retrofit.Model.acceptgen.PacketList;
 import ru.startandroid.retrofit.Model.routes.Entry;
 import ru.startandroid.retrofit.R;
-import ru.startandroid.retrofit.adapter.CollateRVAdapter;
+import ru.startandroid.retrofit.adapter.VolumesRVAdapter;
 import ru.startandroid.retrofit.view.VolumesView;
 
 import static ru.startandroid.retrofit.Const.CURRENT_ROUTE_POSITION;
@@ -80,7 +79,7 @@ public class VolumesFragment extends Fragment implements VolumesView {
     private ArrayList<String> flightName;
     private BodyForCreateInvoice body;
     private ArrayList<Object> objects;
-    private CollateRVAdapter collateRVAdapter;
+    private VolumesRVAdapter volumesRVAdapter;
     ArrayList<Object> chosen;
 
     public VolumesFragment() {
@@ -166,11 +165,11 @@ public class VolumesFragment extends Fragment implements VolumesView {
         objects = new ArrayList<>();
         objects.addAll(label);
         objects.addAll(packet);
-        collateRVAdapter = createAdapter();
+        volumesRVAdapter = createAdapter();
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recyclerViewVolumes.setLayoutManager(mLayoutManager);
-        recyclerViewVolumes.setAdapter(collateRVAdapter);
+        recyclerViewVolumes.setAdapter(volumesRVAdapter);
 
     }
 
@@ -324,13 +323,13 @@ public class VolumesFragment extends Fragment implements VolumesView {
             objects.remove(chosen.get(i));
         }
 
-        collateRVAdapter.notifyDataSetChanged();
+        volumesRVAdapter.notifyDataSetChanged();
     }
 
 
-    private CollateRVAdapter createAdapter() {
+    private VolumesRVAdapter createAdapter() {
 
-        return new CollateRVAdapter(getActivity(), objects, (childView, isChecked, childPosition) -> {
+        return new VolumesRVAdapter(getActivity(), objects, (childView, isChecked, childPosition) -> {
 
             if (isChecked) {
 

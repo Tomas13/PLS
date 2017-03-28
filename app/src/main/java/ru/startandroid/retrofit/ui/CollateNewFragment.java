@@ -1,12 +1,14 @@
 package ru.startandroid.retrofit.ui;
 
+
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,13 +42,12 @@ import ru.startandroid.retrofit.Model.acceptgen.Destination;
 import ru.startandroid.retrofit.Model.acceptgen.Example;
 import ru.startandroid.retrofit.Model.acceptgen.LabelList;
 import ru.startandroid.retrofit.Model.acceptgen.PacketList;
-import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.R;
+import ru.startandroid.retrofit.adapter.CollateRVAdapter;
 import ru.startandroid.retrofit.events.AccessTokenEvent;
 import ru.startandroid.retrofit.events.CollateEvent;
 import ru.startandroid.retrofit.jobs.CollateJob;
 import ru.startandroid.retrofit.jobs.GetAccessTokenJob;
-import ru.startandroid.retrofit.jobs.LoadRoutesJob;
 import ru.startandroid.retrofit.view.CollateView;
 
 import static ru.startandroid.retrofit.Const.AccessTokenConst;
@@ -55,10 +55,11 @@ import static ru.startandroid.retrofit.Const.AccessTokenConst;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CollateFragment extends Fragment implements CollateView {
+public class CollateNewFragment extends Fragment implements CollateView {
 
-    @BindView(R.id.list_view_accept_gen)
-    ListView listViewAcceptGen;
+
+    @BindView(R.id.rv_collate_new)
+    RecyclerView recyclerView;
 
     @BindView(R.id.btn_scan)
     Button btnScan;
@@ -78,19 +79,19 @@ public class CollateFragment extends Fragment implements CollateView {
     private List<Long> ids;
     private List<Long> chosenIds;
     private Realm realm;
-    private ArrayAdapter<String> listAdapter;
     private List<String> generalInvoiceIdsList = new ArrayList<>();
-    int count = 0;
     private RealmQuery<Destination> queryDestination;
     private JobManager jobManager;
     private IdsCollate idsCol;
+    ArrayList<Destination> destinationsList = new ArrayList<>();
+    CollateRVAdapter collateRVAdapter;
 
-    public CollateFragment() {
+    public CollateNewFragment() {
         // Required empty public constructor
     }
 
     private void init() {
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Список S-накладных");
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Отдельные накладные");
 
         ids = new ArrayList<>();
         realm = Realm.getDefaultInstance();
@@ -98,6 +99,7 @@ public class CollateFragment extends Fragment implements CollateView {
         chosenIds = new ArrayList<>();
 
         for (int i = 0; i < queryDestination.findAll().size(); i++) {
+            destinationsList.add(queryDestination.findAll().get(i));
             generalInvoiceIdsList.add(queryDestination.findAll().get(i).getDestinationListId());
             ids.add(queryDestination.findAll().get(i).getId());
         }
@@ -106,108 +108,38 @@ public class CollateFragment extends Fragment implements CollateView {
     }
 
 
-    private void addTextChangeListener() {
-        editTextScan.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-                for (int i = 0; i < generalInvoiceIdsList.size(); i++) {
-
-                    if (listViewAcceptGen.getChildAt(count - 1) != null) {
-                        if (generalInvoiceIdsList.get(i).equals(s.toString())) {
-
-                            count++;
-                            String temp = generalInvoiceIdsList.get(i);
-                            generalInvoiceIdsList.remove(i);
-                            generalInvoiceIdsList.add(0, temp);
-                            listAdapter.notifyDataSetChanged();
-                            listViewAcceptGen.getChildAt(0).setBackgroundColor(Color.GREEN);
-                            listViewAcceptGen.setItemChecked(0, true);
-
-                            editTextScan.setText("");
-                            chosenIds.add(ids.get(i));
-                        }
-
-                    } else {
-                        if (generalInvoiceIdsList.get(i).equals(s.toString())) {
-
-                            count++;
-                            String temp = generalInvoiceIdsList.get(i);
-                            generalInvoiceIdsList.remove(i);
-                            generalInvoiceIdsList.add(0, temp);
-                            listAdapter.notifyDataSetChanged();
-                            listViewAcceptGen.getChildAt(count - 1).setBackgroundColor(Color.GREEN);
-                            listViewAcceptGen.setItemChecked(count - 1, true);
-
-                            editTextScan.setText("");
-                            chosenIds.add(ids.get(i));
-                        }
-
-                    }
-                }
-            }
-        });
-
-    }
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the login_new for this fragment
-        View view = inflater.inflate(R.layout.fragment_collate, container, false);
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_collate_new, container, false);
         ButterKnife.bind(this, view);
         init();
-
-//        showProgress();
-        //  presenter.loadDestinationList();
 
         loadSRealm();
 
         addTextChangeListener();
-
         btnCollate.setOnClickListener(v -> onButtonCollateClick());
         btnScan.setOnClickListener(v -> startScanActivity());
 
-        listAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_multiple_choice, generalInvoiceIdsList);
+        collateRVAdapter = new CollateRVAdapter(getActivity(), destinationsList, (isChecked, position) -> {
 
-        listViewAcceptGen.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-
-//        ArrayList<String> pickedNames = new ArrayList<>();
-
-        listViewAcceptGen.setOnItemClickListener((parent, view1, position, id1) -> {
-
-            int j = position - listViewAcceptGen.getFirstVisiblePosition();
-            if (listViewAcceptGen.getChildAt(j) != null) {
-//                if (pickedNames.contains(generalInvoiceIdsList.get(j)) && !listViewAcceptGen.isItemChecked(position)) {
-                if (!listViewAcceptGen.isItemChecked(position)) {
-                    listViewAcceptGen.getChildAt(j).setBackgroundColor(Color.TRANSPARENT);
-//                    pickedNames.remove(generalInvoiceIdsList.get(j));
-                    listViewAcceptGen.setItemChecked(j, false);
-
-                    chosenIds.remove(ids.get(position));
-                } else if (listViewAcceptGen.isItemChecked(position)) {
-//                    pickedNames.add(generalInvoiceIdsList.get(j));
-
-                    listViewAcceptGen.setItemChecked(j, true);
-                    listViewAcceptGen.getChildAt(j).setBackgroundColor(Color.GREEN);
-                    chosenIds.add(ids.get(position));
-
-                }
+            if (isChecked) {
+                chosenIds.add(ids.get(position));
+            } else {
+                chosenIds.remove(ids.get(position));
             }
         });
 
-        listViewAcceptGen.setAdapter(listAdapter);
+
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+
+        recyclerView.setAdapter(collateRVAdapter);
+
 
         return view;
+
     }
 
     private void onButtonCollateClick() {
@@ -222,13 +154,13 @@ public class CollateFragment extends Fragment implements CollateView {
                         setLabelsAndPacketsCollated(i);
 
                         generalInvoiceIdsList.remove(queryDestination.findAll().get(i).getDestinationListId());
-                        listAdapter.notifyDataSetChanged();
+//                        listAdapter.notifyDataSetChanged();
 
                         int k = i;
                         realm.executeTransaction(realm -> {
                             queryDestination.findAll().get(k).deleteFromRealm();
-                            if (!realm.where(Example.class).findAll().isEmpty())
-                                realm.where(Example.class).findAll().get(k).deleteFromRealm();  //17.02.17
+//                            if (!realm.where(Example.class).findAll().isEmpty())
+//                                realm.where(Example.class).findAll().get(k).deleteFromRealm();  //17.02.17
                         });
                     }
                 }
@@ -236,12 +168,9 @@ public class CollateFragment extends Fragment implements CollateView {
 
             ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
 
-
             jobManager.addJobInBackground(new GetAccessTokenJob());
 
-
             hideProgress();
-
         } else {
             Toast.makeText(getContext(), "Нечего сличать", Toast.LENGTH_SHORT).show();
         }
@@ -254,6 +183,7 @@ public class CollateFragment extends Fragment implements CollateView {
         Log.d("Access2Collate", AccessTokenConst);
         jobManager.addJobInBackground(new CollateJob(idsCol));
     }
+
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onCollateEvent(CollateEvent collateEvent) {
@@ -288,6 +218,73 @@ public class CollateFragment extends Fragment implements CollateView {
         ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
     }
 
+
+    CollateRVAdapter.OnItemClickListener listener;
+
+    private void addTextChangeListener() {
+        editTextScan.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                for (int i = 0; i < generalInvoiceIdsList.size(); i++) {
+
+//                    if (listViewAcceptGen.getChildAt(count - 1) != null) {
+                    if (generalInvoiceIdsList.get(i).equals(s.toString())) {
+
+//                        count++;
+                        String temp = generalInvoiceIdsList.get(i);
+                        generalInvoiceIdsList.remove(i);
+                        generalInvoiceIdsList.add(0, temp);
+
+                        Destination desTemp = destinationsList.get(i);
+                        destinationsList.remove(i);
+                        destinationsList.add(0, desTemp);
+//                        listener.onCheckedChanged(true, 0);
+
+                        collateRVAdapter.notifyDataSetChanged();
+                        recyclerView.getChildAt(0).setBackgroundColor(Color.GREEN);
+
+
+//                        listAdapter.notifyDataSetChanged();
+//                        listViewAcceptGen.getChildAt(0).setBackgroundColor(Color.GREEN);
+//                        listViewAcceptGen.setItemChecked(0, true);
+
+
+                        editTextScan.setText("");
+                        chosenIds.add(ids.get(i));
+                    }
+/*
+
+                    } else {
+                        if (generalInvoiceIdsList.get(i).equals(s.toString())) {
+
+                            count++;
+                            String temp = generalInvoiceIdsList.get(i);
+                            generalInvoiceIdsList.remove(i);
+                            generalInvoiceIdsList.add(0, temp);
+                            listAdapter.notifyDataSetChanged();
+                            listViewAcceptGen.getChildAt(count - 1).setBackgroundColor(Color.GREEN);
+                            listViewAcceptGen.setItemChecked(count - 1, true);
+
+                            editTextScan.setText("");
+                            chosenIds.add(ids.get(i));
+                        }
+
+                    }
+*/
+                }
+            }
+        });
+
+    }
 
     private void setLabelsAndPacketsCollated(int k) {
         Destination destination = queryDestination.findAll().get(k);
@@ -336,63 +333,6 @@ public class CollateFragment extends Fragment implements CollateView {
     }
 
 
-    private void startScanActivity() {
-        Intent intent = new Intent(getContext(), CaptureActivity.class);
-        intent.putExtra(ZXingConstants.ScanIsShowHistory, true);
-        startActivityForResult(intent, ZXingConstants.ScanRequestCode);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (data == null) {
-            return;
-        }
-        switch (requestCode) {
-            case ZXingConstants.ScanRequestCode:
-                if (resultCode == ZXingConstants.ScanRequestCode) {
-                    String result = data.getStringExtra(ZXingConstants.ScanResult);
-                    editTextScan.setText(result);
-                } else if (resultCode == ZXingConstants.ScanHistoryResultCode) {
-                    String resultHistory = data.getStringExtra(ZXingConstants.ScanHistoryResult);
-//                    if (!TextUtils.isEmpty(resultHistory)) {
-//                        startActivity(new Intent(MainActivity.this,HistoryActivity.class));
-//                    }
-                }
-                break;
-        }
-    }
-
-
-
-/*    @Override
-    public void showCollateResponse(CollateResponse collateResponse) {
-
-        ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
-    }
-
-    @Override
-    public void showVolumesData(CollateResponse collateResponse) {
-
-        ArrayList<PacketList> packetsArrayList = new ArrayList<>();
-        packetsArrayList.addAll(collateResponse.getDto().getPackets());
-
-        ArrayList<LabelList> labelsArrayList = new ArrayList<>();
-        labelsArrayList.addAll(collateResponse.getDto().getLabels());
-
-        ArrayList<Object> objects = new ArrayList<Object>();
-        objects.addAll(packetsArrayList);
-        objects.addAll(labelsArrayList);
-
-        realm.executeTransaction(realm -> {
-            realm.insert(labelsArrayList);
-            realm.insert(packetsArrayList);
-        });
-
-        ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
-    }*/
-
-
     @Override
     public void showRoutesEmptyData() {
         hideProgress();
@@ -423,6 +363,33 @@ public class CollateFragment extends Fragment implements CollateView {
         progressAccept.setVisibility(View.GONE);
     }
 
+    private void startScanActivity() {
+        Intent intent = new Intent(getContext(), CaptureActivity.class);
+        intent.putExtra(ZXingConstants.ScanIsShowHistory, true);
+        startActivityForResult(intent, ZXingConstants.ScanRequestCode);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data == null) {
+            return;
+        }
+        switch (requestCode) {
+            case ZXingConstants.ScanRequestCode:
+                if (resultCode == ZXingConstants.ScanRequestCode) {
+                    String result = data.getStringExtra(ZXingConstants.ScanResult);
+                    editTextScan.setText(result);
+                } else if (resultCode == ZXingConstants.ScanHistoryResultCode) {
+                    String resultHistory = data.getStringExtra(ZXingConstants.ScanHistoryResult);
+//                    if (!TextUtils.isEmpty(resultHistory)) {
+//                        startActivity(new Intent(MainActivity.this,HistoryActivity.class));
+//                    }
+                }
+                break;
+        }
+    }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -434,6 +401,4 @@ public class CollateFragment extends Fragment implements CollateView {
         EventBus.getDefault().unregister(this);
         super.onStop();
     }
-
-
 }

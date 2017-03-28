@@ -1,4 +1,4 @@
-package ru.startandroid.retrofit.adapter;
+package ru.startandroid.retrofit.events;
 
 /**
  * Created by root on 2/9/17.

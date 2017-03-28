@@ -119,7 +119,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     }
 
     private void init() {
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Накладные");
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Общие накладные");
 
         sendInvoiceList = new ArrayList<>();
         realm = Realm.getDefaultInstance();
@@ -219,14 +219,13 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onAccessTokenEvent(AccessTokenEvent accessTokenEvent){
+    public void onAccessTokenEvent(AccessTokenEvent accessTokenEvent) {
         AccessTokenConst = accessTokenEvent.getLoginResponse().getAccessToken();
-            Log.d("Access2", AccessTokenConst);
-                presenter.loadGeneralInvoice(AccessTokenConst);
+        Log.d("Access2", AccessTokenConst);
+        presenter.loadGeneralInvoice(AccessTokenConst);
 
 //        jobManager.addJobInBackground(new LoadGeneralInvoiceJob());
     }
-
 
 
     private void removeSentPacketsAndLabels() {
@@ -253,7 +252,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             }
         }
 
-        if (labelIds.size() >= 1){
+        if (labelIds.size() >= 1) {
             for (int w = labelIds.size() - 1; w >= 0; w--) {
                 int j = labelIds.get(w);
                 realm.executeTransaction(realm -> realm.where(LabelList.class).findAll().get(j).deleteFromRealm());
@@ -282,7 +281,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
         }
 
-        if (packetIds.size() >= 1){
+        if (packetIds.size() >= 1) {
             for (int w = packetIds.size() - 1; w >= 0; w--) {
                 int j = packetIds.get(w);
                 realm.executeTransaction(realm -> realm.where(PacketList.class).findAll().get(j).deleteFromRealm());
@@ -459,9 +458,9 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             String toDeptIndex = "InvoiceFrag 434";
             String fromDeptIndex = "FromDep 435";
 
-            if (entries.size() == currentRoutePosition){
-                    toDeptIndex = entries.get(currentRoutePosition - 1).getDept().getName();
-                    fromDeptIndex = entries.get(currentRoutePosition - 2).getDept().getName();
+            if (entries.size() == currentRoutePosition) {
+                toDeptIndex = entries.get(currentRoutePosition - 1).getDept().getName();
+                fromDeptIndex = entries.get(currentRoutePosition - 2).getDept().getName();
 
             } else if (entries.size() > currentRoutePosition + 1) {
 
@@ -469,7 +468,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
                     toDeptIndex = entries.get(currentRoutePosition + 1).getDept().getName();
                     fromDeptIndex = entries.get(currentRoutePosition).getDept().getName();
 
-                } else  {
+                } else {
                     toDeptIndex = entries.get(currentRoutePosition).getDept().getName();
                     fromDeptIndex = entries.get(currentRoutePosition - 1).getDept().getName();
                 }
@@ -538,7 +537,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     }
 
     private void startCollateFragment() {
-        Fragment fragment = new CollateFragment();
+        Fragment fragment = new CollateNewFragment();
         ((NavigationActivity) getActivity()).startFragment(fragment);
     }
 

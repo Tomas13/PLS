@@ -1,18 +1,14 @@
 package ru.startandroid.retrofit.presenter;
 
-import java.util.concurrent.TimeUnit;
-
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.LastActions;
-import ru.startandroid.retrofit.models.NetworkService;
 import ru.startandroid.retrofit.view.HistoryView;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 import static ru.startandroid.retrofit.Const.AccessTokenConst;
@@ -27,11 +23,9 @@ public class HistoryPresenterImpl implements HistoryPresenter {
 
     Subscription subscription;
     private HistoryView view;
-    private NetworkService service;
 
-    public HistoryPresenterImpl(HistoryView view, NetworkService service) {
+    public HistoryPresenterImpl(HistoryView view) {
         this.view = view;
-        this.service = service;
     }
 
     @Override

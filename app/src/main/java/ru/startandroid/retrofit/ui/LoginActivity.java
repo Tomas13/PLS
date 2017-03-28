@@ -62,7 +62,6 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
     private LoginPresenter loginPresenter;
     private String mLogin;
     private String mPassword;
-    private JobManager jobManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,47 +70,29 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         setContentView(R.layout.layout);
         ButterKnife.bind(this);
 
-        jobManager = AppJobManager.getJobManager();
+        JobManager jobManager = AppJobManager.getJobManager();
         jobManager.addJobInBackground(new GetAccessTokenJob());
-        progressBar.setVisibility(View.VISIBLE);
-
-
 
         loginPresenter = new LoginPresenterImpl(this);
         pref1 = getApplicationContext().getSharedPreferences(TOKEN_SHARED_PREF, 0); // 0 - for private mode
         btnLogin.setOnClickListener(v -> Login());
 
-      //  if (pref1.contains(REFRESH_TOKEN)) {
-//            Intent intent = new Intent(LoginActivity.this, NavigationActivity.class);
-//            Const.Token = "Bearer " + pref1.getString(REFRESH_TOKEN, "empty");
-//            startActivity(intent);
-//            finish();
-//        }
+
+        if (pref1.contains(REFRESH_TOKEN)) {
+            Intent intent = new Intent(LoginActivity.this, NavigationActivity.class);
+            Const.Token = "Bearer " + pref1.getString(REFRESH_TOKEN, "empty");
+            startActivity(intent);
+            finish();
+        }
     }
-
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onAccessTokenEvent(AccessTokenEvent accessTokenEvent) {
-        progressBar.setVisibility(View.INVISIBLE);
-
-        AccessTokenConst = accessTokenEvent.getLoginResponse().getAccessToken();
-        Log.d("Access2", AccessTokenConst);
-        Intent intent = new Intent(LoginActivity.this, NavigationActivity.class);
-        startActivity(intent);
-        finish();
-
-//        jobManager.addJobInBackground(new GetHistoryJob());
-    }
-
-
 
 
     private void startAuth(String mLogin, String mPassword) {
         loginPresenter.postLogin(mLogin, mPassword);
     }
 
-    public void Login() {
 
+    public void Login() {
         mLogin = userNameET.getText().toString().trim();
         mPassword = passwordET.getText().toString().trim();
 
@@ -129,9 +110,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
             progressBar.setVisibility(View.VISIBLE);
             startAuth(mLogin, mPassword);
         }
-
     }
-
 
     @Override
     public void showLoginData(LoginResponse loginResponse) {
@@ -141,9 +120,8 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
 
         String refreshToken = loginResponse.getRefreshToken();
 
-        pref1.edit().putString(ACCESS_TOKEN, refreshToken).apply();
+        pref1.edit().putString(ACCESS_TOKEN, loginResponse.getAccessToken()).apply();
         pref1.edit().putString(REFRESH_TOKEN, refreshToken).apply();
-
 
         AccessTokenConst = loginResponse.getAccessToken();
 
@@ -151,8 +129,6 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
 
         startActivity(new Intent(this, NavigationActivity.class));
         this.finish();
-
-
     }
 
     @Override
@@ -180,15 +156,5 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
 
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
 
-    @Override
-    public void onStop() {
-        EventBus.getDefault().unregister(this);
-        super.onStop();
-    }
 }
