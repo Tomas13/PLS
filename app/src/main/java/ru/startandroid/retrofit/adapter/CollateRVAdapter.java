@@ -85,6 +85,11 @@ public class CollateRVAdapter extends RecyclerView.Adapter<CollateRVAdapter.View
         holder.tvToDeptName1.setText(destination.getToDeNewp().getName());
         holder.tvToDeptNameRu1.setText(destination.getToDeNewp().getNameRu());
 
+       /* if (destination.getChecked()){
+            holder.checkBox.setChecked(true);
+        }else{
+            holder.checkBox.setChecked(false);
+        }*/
 //        viewHolder1.checkBox.setChecked(destination.getAddedToInvoice());
         holder.checkBox.setOnCheckedChangeListener(
                 (buttonView, isChecked) -> {

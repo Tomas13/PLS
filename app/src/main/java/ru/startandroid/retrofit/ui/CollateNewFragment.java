@@ -117,6 +117,7 @@ public class CollateNewFragment extends Fragment implements CollateView {
         ButterKnife.bind(this, view);
         init();
 
+        Log.d("CollateNew", "onCreateView Called");
         jobManager.addJobInBackground(new GetAccessTokenJob());
 
         loadSRealm();
@@ -129,8 +130,16 @@ public class CollateNewFragment extends Fragment implements CollateView {
 
             if (isChecked) {
                 chosenIds.add(ids.get(position));
+
+//                destinationsList.get(position).setChecked(true);
+//                collateRVAdapter.notifyDataSetChanged();
+
             } else {
                 chosenIds.remove(ids.get(position));
+
+//                destinationsList.get(position).setChecked(false);
+//                collateRVAdapter.notifyDataSetChanged();
+
             }
         });
 

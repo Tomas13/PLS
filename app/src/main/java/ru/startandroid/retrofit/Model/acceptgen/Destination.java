@@ -28,7 +28,17 @@ public class Destination extends RealmObject{
     @Expose
     private RealmList<LabelList> labelList = null;
 
-    public Long getId() {
+
+   /* private Boolean isChecked = false;
+
+    public Boolean getChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(Boolean checked) {
+        isChecked = checked;
+    }
+*/    public Long getId() {
         return id;
     }
 

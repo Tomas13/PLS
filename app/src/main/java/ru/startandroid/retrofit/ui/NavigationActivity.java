@@ -554,10 +554,12 @@ public class NavigationActivity extends AppCompatActivity
 
                 flights = new ArrayList<>();
                 for (int i = 0; i < routes.getFlights().size(); i++) {
-                    flights.add(i, routes.getFlights().get(i).getFlight().getName());
+                    flights.add(i, routes.getFlights().get(i).getTransportListId());
                 }
 
                 flightArrayList = routes.getFlights();
+
+
 
                 createDialog();
             }
