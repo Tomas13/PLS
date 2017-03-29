@@ -44,6 +44,7 @@ import ru.startandroid.retrofit.Model.acceptgen.LabelList;
 import ru.startandroid.retrofit.Model.acceptgen.PacketList;
 import ru.startandroid.retrofit.R;
 import ru.startandroid.retrofit.adapter.CollateRVAdapter;
+import ru.startandroid.retrofit.events.AccessTokenCollateEvent;
 import ru.startandroid.retrofit.events.AccessTokenEvent;
 import ru.startandroid.retrofit.events.CollateEvent;
 import ru.startandroid.retrofit.jobs.CollateJob;
@@ -116,6 +117,8 @@ public class CollateNewFragment extends Fragment implements CollateView {
         ButterKnife.bind(this, view);
         init();
 
+        jobManager.addJobInBackground(new GetAccessTokenJob());
+
         loadSRealm();
 
         addTextChangeListener();
@@ -165,10 +168,11 @@ public class CollateNewFragment extends Fragment implements CollateView {
                     }
                 }
             }
+            jobManager.addJobInBackground(new CollateJob(idsCol));
 
             ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
 
-            jobManager.addJobInBackground(new GetAccessTokenJob());
+//            jobManager.addJobInBackground(new GetAccessTokenJob());
 
             hideProgress();
         } else {
@@ -178,10 +182,10 @@ public class CollateNewFragment extends Fragment implements CollateView {
 
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onAccessTokenEvent(AccessTokenEvent accessTokenEvent) {
+    public void onAccessTokenEvent(AccessTokenCollateEvent accessTokenEvent) {
         AccessTokenConst = accessTokenEvent.getLoginResponse().getAccessToken();
-        Log.d("Access2Collate", AccessTokenConst);
-        jobManager.addJobInBackground(new CollateJob(idsCol));
+        Log.d("GetTokCollate", AccessTokenConst);
+//        jobManager.addJobInBackground(new CollateJob(idsCol));
     }
 
 

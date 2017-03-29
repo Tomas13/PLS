@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,16 +37,15 @@ import io.realm.RealmQuery;
 import ru.startandroid.retrofit.AppJobManager;
 import ru.startandroid.retrofit.Model.IdsCollate;
 import ru.startandroid.retrofit.Model.acceptgen.Destination;
-import ru.startandroid.retrofit.Model.acceptgen.Example;
 import ru.startandroid.retrofit.Model.acceptgen.LabelList;
 import ru.startandroid.retrofit.Model.acceptgen.PacketList;
-import ru.startandroid.retrofit.Model.collatedestination.CollateResponse;
 import ru.startandroid.retrofit.R;
+import ru.startandroid.retrofit.events.AccessTokenCollateEvent;
 import ru.startandroid.retrofit.events.AccessTokenEvent;
 import ru.startandroid.retrofit.events.CollateEvent;
 import ru.startandroid.retrofit.jobs.CollateJob;
+import ru.startandroid.retrofit.jobs.GetAccessTokenCollateJob;
 import ru.startandroid.retrofit.jobs.GetAccessTokenJob;
-import ru.startandroid.retrofit.jobs.LoadRoutesJob;
 import ru.startandroid.retrofit.view.CollateView;
 
 import static ru.startandroid.retrofit.Const.AccessTokenConst;
@@ -167,6 +165,8 @@ public class CollateFragment extends Fragment implements CollateView {
         ButterKnife.bind(this, view);
         init();
 
+        jobManager.addJobInBackground(new GetAccessTokenJob());
+
 //        showProgress();
         //  presenter.loadDestinationList();
 
@@ -227,8 +227,8 @@ public class CollateFragment extends Fragment implements CollateView {
                         int k = i;
                         realm.executeTransaction(realm -> {
                             queryDestination.findAll().get(k).deleteFromRealm();
-                            if (!realm.where(Example.class).findAll().isEmpty())
-                                realm.where(Example.class).findAll().get(k).deleteFromRealm();  //17.02.17
+//                            if (!realm.where(Example.class).findAll().isEmpty())
+//                                realm.where(Example.class).findAll().get(k).deleteFromRealm();  //17.02.17
                         });
                     }
                 }
@@ -237,8 +237,9 @@ public class CollateFragment extends Fragment implements CollateView {
             ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
 
 
-            jobManager.addJobInBackground(new GetAccessTokenJob());
+//            jobManager.addJobInBackground(new GetAccessTokenCollateJob());
 
+            jobManager.addJobInBackground(new CollateJob(idsCol));
 
             hideProgress();
 
@@ -247,12 +248,19 @@ public class CollateFragment extends Fragment implements CollateView {
         }
     }
 
+  /*  @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onAccessTokenCollateEvent(AccessTokenCollateEvent accessTokenEvent) {
+        AccessTokenConst = accessTokenEvent.getLoginResponse().getAccessToken();
+        Log.d("GetTokCollate", AccessTokenConst);
+        jobManager.addJobInBackground(new CollateJob(idsCol));
+    }*/
+
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onAccessTokenEvent(AccessTokenEvent accessTokenEvent) {
         AccessTokenConst = accessTokenEvent.getLoginResponse().getAccessToken();
-        Log.d("Access2Collate", AccessTokenConst);
-        jobManager.addJobInBackground(new CollateJob(idsCol));
+        Log.d("onAccessCollate", AccessTokenConst);
+//        jobManager.addJobInBackground(new CollateJob(idsCol));
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)

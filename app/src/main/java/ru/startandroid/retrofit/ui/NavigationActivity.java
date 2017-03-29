@@ -377,7 +377,7 @@ public class NavigationActivity extends AppCompatActivity
             startFragment(new InvoiceFragment());
         } else if (id == R.id.nav_dest_list) {
 
-            startFragment(new CollateFragment());
+            startFragment(new CollateNewFragment());
 
         } else if (id == R.id.nav_routes) {
 
