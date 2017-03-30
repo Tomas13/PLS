@@ -29,16 +29,16 @@ public class Destination extends RealmObject{
     private RealmList<LabelList> labelList = null;
 
 
-   /* private Boolean isChecked = false;
+    private Boolean isChecked = false;
 
-    public Boolean getChecked() {
+    public Boolean getIsChecked() {
         return isChecked;
     }
 
-    public void setChecked(Boolean checked) {
+    public void setIsChecked(Boolean checked) {
         isChecked = checked;
     }
-*/    public Long getId() {
+    public Long getId() {
         return id;
     }
 

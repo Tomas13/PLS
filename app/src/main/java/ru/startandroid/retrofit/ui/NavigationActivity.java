@@ -87,6 +87,7 @@ public class NavigationActivity extends AppCompatActivity
     private ArrayList<Routes> routesList = new ArrayList<>();
     private ArrayAdapter<String> adapter;
     private ArrayList<String> flights;
+    private ArrayList<String> flightNames;
     private int posReturn = -1;
     private List<Entry> entries;
     private List<Flight> flightArrayList;
@@ -291,7 +292,8 @@ public class NavigationActivity extends AppCompatActivity
             //Save Flight Id to shared preferences
             SharedPreferences pref1 = getApplicationContext().getSharedPreferences(NAV_SHARED_PREF, 0); // 0 - for private mode
             SharedPreferences.Editor editor1 = pref1.edit();
-            editor1.putString(FLIGHT_NAME, flights.get(position));
+//            editor1.putString(FLIGHT_NAME, flights.get(position));
+            editor1.putString(FLIGHT_NAME, flightNames.get(position));
             editor1.apply();
 
             tvRouteHeader.setText(pref1.getString(FLIGHT_NAME, "Путь"));
@@ -558,6 +560,12 @@ public class NavigationActivity extends AppCompatActivity
                 }
 
                 flightArrayList = routes.getFlights();
+
+
+                flightNames = new ArrayList<>();
+                for (int i = 0; i < routes.getFlights().size(); i++) {
+                    flightNames.add(i, routes.getFlights().get(i).getFlight().getName());
+                }
 
 
 

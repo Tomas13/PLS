@@ -126,29 +126,37 @@ public class CollateNewFragment extends Fragment implements CollateView {
         btnCollate.setOnClickListener(v -> onButtonCollateClick());
         btnScan.setOnClickListener(v -> startScanActivity());
 
-        collateRVAdapter = new CollateRVAdapter(getActivity(), destinationsList, (isChecked, position) -> {
 
+        collateRVAdapter = new CollateRVAdapter(getActivity(), destinationsList, (isChecked, position) -> {
             if (isChecked) {
                 chosenIds.add(ids.get(position));
 
-//                destinationsList.get(position).setChecked(true);
+                realm.executeTransaction(realm -> {
+
+                    queryDestination.findAll().get(position).setIsChecked(true);
+                    destinationsList.get(position).setIsChecked(true);
+                });
+
 //                collateRVAdapter.notifyDataSetChanged();
 
             } else {
                 chosenIds.remove(ids.get(position));
 
-//                destinationsList.get(position).setChecked(false);
+                realm.executeTransaction(realm -> {
+                    queryDestination.findAll().get(position).setIsChecked(false);
+
+                    destinationsList.get(position).setIsChecked(false);
+                });
+
+
 //                collateRVAdapter.notifyDataSetChanged();
 
             }
         });
 
-
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
-
         recyclerView.setAdapter(collateRVAdapter);
-
 
         return view;
 
@@ -189,14 +197,12 @@ public class CollateNewFragment extends Fragment implements CollateView {
         }
     }
 
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onAccessTokenEvent(AccessTokenCollateEvent accessTokenEvent) {
         AccessTokenConst = accessTokenEvent.getLoginResponse().getAccessToken();
         Log.d("GetTokCollate", AccessTokenConst);
 //        jobManager.addJobInBackground(new CollateJob(idsCol));
     }
-
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onCollateEvent(CollateEvent collateEvent) {
@@ -231,9 +237,6 @@ public class CollateNewFragment extends Fragment implements CollateView {
         ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
     }
 
-
-    CollateRVAdapter.OnItemClickListener listener;
-
     private void addTextChangeListener() {
         editTextScan.addTextChangedListener(new TextWatcher() {
             @Override
@@ -252,6 +255,14 @@ public class CollateNewFragment extends Fragment implements CollateView {
 //                    if (listViewAcceptGen.getChildAt(count - 1) != null) {
                     if (generalInvoiceIdsList.get(i).equals(s.toString())) {
 
+                        int y = i;
+                        realm.executeTransaction(realm -> {
+
+                            queryDestination.findAll().get(y).setIsChecked(true);
+                            destinationsList.get(y).setIsChecked(true);
+                        });
+
+
 //                        count++;
                         String temp = generalInvoiceIdsList.get(i);
                         generalInvoiceIdsList.remove(i);
@@ -260,16 +271,9 @@ public class CollateNewFragment extends Fragment implements CollateView {
                         Destination desTemp = destinationsList.get(i);
                         destinationsList.remove(i);
                         destinationsList.add(0, desTemp);
-//                        listener.onCheckedChanged(true, 0);
 
                         collateRVAdapter.notifyDataSetChanged();
-                        recyclerView.getChildAt(0).setBackgroundColor(Color.GREEN);
-
-
-//                        listAdapter.notifyDataSetChanged();
-//                        listViewAcceptGen.getChildAt(0).setBackgroundColor(Color.GREEN);
-//                        listViewAcceptGen.setItemChecked(0, true);
-
+//                        recyclerView.getChildAt(0).setBackgroundColor(Color.GREEN);
 
                         editTextScan.setText("");
                         chosenIds.add(ids.get(i));

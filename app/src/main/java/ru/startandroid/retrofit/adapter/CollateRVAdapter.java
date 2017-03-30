@@ -10,10 +10,15 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.BooleanSupplier;
 
 import ru.startandroid.retrofit.Model.acceptgen.Destination;
 import ru.startandroid.retrofit.R;
@@ -28,9 +33,11 @@ public class CollateRVAdapter extends RecyclerView.Adapter<CollateRVAdapter.View
     private Activity activity;
     private GestureDetector mGestureDetector;
     private CollateRVAdapter.OnItemClickListener listener;
-
-
     private List<Destination> items;
+
+
+    private HashMap<Integer, Boolean> isChecked = new HashMap<>();
+
 
     public CollateRVAdapter(Activity activity, List<Destination> items, CollateRVAdapter.OnItemClickListener listener) {
         this.context = activity.getBaseContext();
@@ -46,6 +53,9 @@ public class CollateRVAdapter extends RecyclerView.Adapter<CollateRVAdapter.View
         });
     }
 
+    private Map<Destination, Boolean> checkBoxStates = new HashMap<>();
+
+
     public class ViewHolder1 extends RecyclerView.ViewHolder {
 
         private TextView tvListId1, tvFromDeptName1, tvFromDeptNameRu1, tvToDeptName1, tvToDeptNameRu1;
@@ -56,11 +66,13 @@ public class CollateRVAdapter extends RecyclerView.Adapter<CollateRVAdapter.View
 
         public ViewHolder1(View v) {
             super(v);
-            tvListId1 = (TextView) itemView.findViewById(R.id.tv_list_id_collate);
-            tvToDeptName1 = (TextView) itemView.findViewById(R.id.tv_to_dept_name_collate);
-            tvToDeptNameRu1 = (TextView) itemView.findViewById(R.id.tv_to_dept_name_ru_collate);
+//            tvListId1 = (TextView) itemView.findViewById(R.id.tv_list_id_collate);
+//            tvToDeptName1 = (TextView) itemView.findViewById(R.id.tv_to_dept_name_collate);
+//            tvToDeptNameRu1 = (TextView) itemView.findViewById(R.id.tv_to_dept_name_ru_collate);
             checkBox = (CheckBox) itemView.findViewById(R.id.checkbox_collate);
-
+            checkBox.setOnCheckedChangeListener((compoundButton, b) -> {
+                isChecked.put(getAdapterPosition(), b);
+            });
             linearLayout = (LinearLayout) itemView.findViewById(R.id.ll_rv_collate);
         }
     }
@@ -73,28 +85,41 @@ public class CollateRVAdapter extends RecyclerView.Adapter<CollateRVAdapter.View
         return new ViewHolder1(view);
     }
 
+    Boolean flag;
+
+    // call this when the checked state is changed
+    private void onCheckChanged(int position, boolean checked) {
+        final Destination item = items.get(position);
+        if (item == null) {
+            return;
+        }
+        checkBoxStates.put(item, checked);
+    }
+
     @Override
     public void onBindViewHolder(ViewHolder1 holder, int position) {
 
 //        CollateRVAdapter.ViewHolder1 viewHolder1 = (CollateRVAdapter.ViewHolder1) holder;
 
         Destination destination = items.get(position);
-        holder.tvListId1.setText(destination.getDestinationListId());
+        holder.checkBox.setText(destination.getDestinationListId() + "\t\t\t\t\t\t\t\t\t\t" +  destination.getToDeNewp().getNameRu() + " ["
+                + destination.getToDeNewp().getName() + "]");
+//        holder.tvListId1.setText(destination.getDestinationListId());
 //        holder.tvFromDeptName1.setText(destination.getFromDep().getName());
 //        holder.tvFromDeptNameRu1.setText(destination.getFromDep().getNameRu());
-        holder.tvToDeptName1.setText(destination.getToDeNewp().getName());
-        holder.tvToDeptNameRu1.setText(destination.getToDeNewp().getNameRu());
+//        holder.tvToDeptName1.setText(destination.getToDeNewp().getName());
+//        holder.tvToDeptNameRu1.setText(destination.getToDeNewp().getNameRu());
 
-       /* if (destination.getChecked()){
-            holder.checkBox.setChecked(true);
-        }else{
-            holder.checkBox.setChecked(false);
-        }*/
-//        viewHolder1.checkBox.setChecked(destination.getAddedToInvoice());
+
+
+
+
+//        Boolean checkedState = checkBoxStates.get(position);
+//        holder.checkBox.setChecked(checkedState == null ? false : checkedState);
+
         holder.checkBox.setOnCheckedChangeListener(
                 (buttonView, isChecked) -> {
                     listener.onCheckedChanged(isChecked, position);
-                    medf(holder, position);
                     if (isChecked) {
                         holder.linearLayout.setBackgroundColor(Color.GREEN);
                     } else {
@@ -102,6 +127,17 @@ public class CollateRVAdapter extends RecyclerView.Adapter<CollateRVAdapter.View
                     }
                 }
         );
+
+
+        if (destination.getIsChecked()) {
+            flag = true;
+            holder.checkBox.setChecked(true);
+        } else {
+            flag = false;
+            holder.checkBox.setChecked(false);
+        }
+
+
     }
 
     @Override
@@ -137,14 +173,10 @@ public class CollateRVAdapter extends RecyclerView.Adapter<CollateRVAdapter.View
 
     }
 
-    public void setChecked(boolean isChecked, int pos){
+    public void setChecked(boolean isChecked, int pos) {
         listener.onCheckedChanged(isChecked, pos);
 
 
     }
 
-    ViewHolder1 medf(ViewHolder1 holder1, int position){
-
-        return  holder1;
-    }
 }
