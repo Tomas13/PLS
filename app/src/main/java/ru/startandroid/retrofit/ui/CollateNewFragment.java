@@ -105,7 +105,17 @@ public class CollateNewFragment extends Fragment implements CollateView {
             ids.add(queryDestination.findAll().get(i).getId());
         }
 
+        initChosenIds();
+
         jobManager = AppJobManager.getJobManager();
+    }
+
+    private void initChosenIds() {
+        for (int i = 0; i < queryDestination.findAll().size(); i++) {
+            if (queryDestination.findAll().get(i).getIsChecked()){
+                chosenIds.add(queryDestination.findAll().get(i).getId());
+            }
+        }
     }
 
 
@@ -237,6 +247,8 @@ public class CollateNewFragment extends Fragment implements CollateView {
         ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
     }
 
+    int y = 0;
+
     private void addTextChangeListener() {
         editTextScan.addTextChangedListener(new TextWatcher() {
             @Override
@@ -250,58 +262,48 @@ public class CollateNewFragment extends Fragment implements CollateView {
             @Override
             public void afterTextChanged(Editable s) {
 
-                for (int i = 0; i < generalInvoiceIdsList.size(); i++) {
-
-//                    if (listViewAcceptGen.getChildAt(count - 1) != null) {
-                    if (generalInvoiceIdsList.get(i).equals(s.toString())) {
-
-                        int y = i;
-                        realm.executeTransaction(realm -> {
-
-                            queryDestination.findAll().get(y).setIsChecked(true);
-                            destinationsList.get(y).setIsChecked(true);
-                        });
-
-
-//                        count++;
-                        String temp = generalInvoiceIdsList.get(i);
-                        generalInvoiceIdsList.remove(i);
-                        generalInvoiceIdsList.add(0, temp);
-
-                        Destination desTemp = destinationsList.get(i);
-                        destinationsList.remove(i);
-                        destinationsList.add(0, desTemp);
-
-                        collateRVAdapter.notifyDataSetChanged();
-//                        recyclerView.getChildAt(0).setBackgroundColor(Color.GREEN);
-
-                        editTextScan.setText("");
-                        chosenIds.add(ids.get(i));
-                    }
-/*
-
-                    } else {
+                if (!s.toString().isEmpty()) {
+                    for (int i = 0; i < generalInvoiceIdsList.size(); i++) {
                         if (generalInvoiceIdsList.get(i).equals(s.toString())) {
+                            y = i;
+//                            addToChosenIds(y);
+//                            putToFirstPosition(y);
+                            setSChecked(y);
 
-                            count++;
-                            String temp = generalInvoiceIdsList.get(i);
-                            generalInvoiceIdsList.remove(i);
-                            generalInvoiceIdsList.add(0, temp);
-                            listAdapter.notifyDataSetChanged();
-                            listViewAcceptGen.getChildAt(count - 1).setBackgroundColor(Color.GREEN);
-                            listViewAcceptGen.setItemChecked(count - 1, true);
-
-                            editTextScan.setText("");
-                            chosenIds.add(ids.get(i));
+                            collateRVAdapter.notifyDataSetChanged();
                         }
-
                     }
-*/
                 }
             }
         });
 
     }
+
+    private void setSChecked(int y) {
+        realm.executeTransaction(realm -> queryDestination.findAll().get(y).setIsChecked(true));
+    }
+
+    private void addToChosenIds(int y) {
+        if (!chosenIds.contains(ids.get(y))){
+            Log.d("shosen", "add");
+            chosenIds.add(ids.get(y));
+        }
+    }
+
+    private void putToFirstPosition(int y) {
+        String temp = generalInvoiceIdsList.get(y);
+        generalInvoiceIdsList.remove(y);
+        generalInvoiceIdsList.add(0, temp);
+
+
+        Destination desTemp = destinationsList.get(y);
+        destinationsList.remove(y);
+        destinationsList.add(0, desTemp);
+
+        collateRVAdapter.notifyDataSetChanged();
+
+    }
+
 
     private void setLabelsAndPacketsCollated(int k) {
         Destination destination = queryDestination.findAll().get(k);

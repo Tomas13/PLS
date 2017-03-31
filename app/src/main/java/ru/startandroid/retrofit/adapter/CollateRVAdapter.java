@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -53,9 +54,6 @@ public class CollateRVAdapter extends RecyclerView.Adapter<CollateRVAdapter.View
         });
     }
 
-    private Map<Destination, Boolean> checkBoxStates = new HashMap<>();
-
-
     public class ViewHolder1 extends RecyclerView.ViewHolder {
 
         private TextView tvListId1, tvFromDeptName1, tvFromDeptNameRu1, tvToDeptName1, tvToDeptNameRu1;
@@ -85,24 +83,13 @@ public class CollateRVAdapter extends RecyclerView.Adapter<CollateRVAdapter.View
         return new ViewHolder1(view);
     }
 
-    Boolean flag;
-
-    // call this when the checked state is changed
-    private void onCheckChanged(int position, boolean checked) {
-        final Destination item = items.get(position);
-        if (item == null) {
-            return;
-        }
-        checkBoxStates.put(item, checked);
-    }
-
     @Override
     public void onBindViewHolder(ViewHolder1 holder, int position) {
 
 //        CollateRVAdapter.ViewHolder1 viewHolder1 = (CollateRVAdapter.ViewHolder1) holder;
 
         Destination destination = items.get(position);
-        holder.checkBox.setText(destination.getDestinationListId() + "\t\t\t\t\t\t\t\t\t\t" +  destination.getToDeNewp().getNameRu() + " ["
+        holder.checkBox.setText(destination.getDestinationListId() + "\t\t\t\t\t\t\t\t\t\t" + destination.getToDeNewp().getNameRu() + " ["
                 + destination.getToDeNewp().getName() + "]");
 //        holder.tvListId1.setText(destination.getDestinationListId());
 //        holder.tvFromDeptName1.setText(destination.getFromDep().getName());
@@ -111,11 +98,13 @@ public class CollateRVAdapter extends RecyclerView.Adapter<CollateRVAdapter.View
 //        holder.tvToDeptNameRu1.setText(destination.getToDeNewp().getNameRu());
 
 
+        holder.checkBox.setChecked(destination.getIsChecked());
 
-
-
-//        Boolean checkedState = checkBoxStates.get(position);
-//        holder.checkBox.setChecked(checkedState == null ? false : checkedState);
+        if (holder.checkBox.isChecked()) {
+            holder.linearLayout.setBackgroundColor(Color.GREEN);
+        } else {
+            holder.linearLayout.setBackgroundColor(Color.TRANSPARENT);
+        }
 
         holder.checkBox.setOnCheckedChangeListener(
                 (buttonView, isChecked) -> {
@@ -127,15 +116,6 @@ public class CollateRVAdapter extends RecyclerView.Adapter<CollateRVAdapter.View
                     }
                 }
         );
-
-
-        if (destination.getIsChecked()) {
-            flag = true;
-            holder.checkBox.setChecked(true);
-        } else {
-            flag = false;
-            holder.checkBox.setChecked(false);
-        }
 
 
     }
@@ -175,8 +155,6 @@ public class CollateRVAdapter extends RecyclerView.Adapter<CollateRVAdapter.View
 
     public void setChecked(boolean isChecked, int pos) {
         listener.onCheckedChanged(isChecked, pos);
-
-
     }
 
 }
