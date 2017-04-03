@@ -16,7 +16,6 @@ import ru.startandroid.retrofit.Interface.GitHubService;
 import ru.startandroid.retrofit.Model.LastActions;
 import ru.startandroid.retrofit.events.HistoryErrorEvent;
 import ru.startandroid.retrofit.events.HistoryEvent;
-import ru.startandroid.retrofit.models.NetworkService;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;

@@ -57,22 +57,20 @@ import ru.startandroid.retrofit.events.AccessTokenEvent;
 import ru.startandroid.retrofit.events.InvoiceEvent;
 import ru.startandroid.retrofit.events.ShowGeneralInvoiceEvent;
 import ru.startandroid.retrofit.jobs.GetAccessTokenJob;
-import ru.startandroid.retrofit.jobs.LoadGeneralInvoiceJob;
 import ru.startandroid.retrofit.jobs.PostCreateInvoiceJob;
-import ru.startandroid.retrofit.models.NetworkService;
 import ru.startandroid.retrofit.presenter.InvoicePresenter;
 import ru.startandroid.retrofit.presenter.InvoicePresenterImpl;
 import ru.startandroid.retrofit.view.InvoiceView;
 
 import static ru.startandroid.retrofit.Const.AccessTokenConst;
 import static ru.startandroid.retrofit.Const.CURRENT_ROUTE_POSITION;
+import static ru.startandroid.retrofit.Const.FAKE;
 import static ru.startandroid.retrofit.Const.FLIGHT_ID;
 import static ru.startandroid.retrofit.Const.FLIGHT_SHARED_PREF;
 import static ru.startandroid.retrofit.Const.INVOICE_NAME;
 import static ru.startandroid.retrofit.Const.INVOICE_PREF;
 import static ru.startandroid.retrofit.Const.NUMBER_OF_CITIES;
 import static ru.startandroid.retrofit.Const.TRANSPONST_LIST_ID;
-import static ru.startandroid.retrofit.Const.fake;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -107,6 +105,8 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     private AlertDialog alertDialog;
     private RealmQuery<BodyForCreateInvoice> queryBody;
     private int currentRoutePosition;
+    private int fake = 0;
+
     private int maxRouteNumber;
     private SharedPreferences pref;
     private BodyForCreateInvoiceWithout body;
@@ -507,7 +507,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         int current = pref.getInt(CURRENT_ROUTE_POSITION, 0);
 
         fake++;
-        pref.edit().putInt("FAKE", fake).apply();
+        pref.edit().putInt(FAKE, fake).apply();
 
         current++;
         currentRoutePosition++;

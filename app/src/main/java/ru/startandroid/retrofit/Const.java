@@ -36,6 +36,7 @@ public class Const {
     public static final String USERNAME = "USERNAME";
     public static final String PASSWORD = "PASSWORD";
     public static final String FLIGHT_SHARED_PREF = "FLIGHT_PREF";
+    public static final String FAKE = "FAKE";
     public static final String FLIGHT_NAME = "FLIGHT_NAME";
     public static final String FLIGHT_ID = "FLIGHT_ID";
     public static final String TRANSPONST_LIST_ID = "TRANSPONST_LIST_ID";
@@ -51,8 +52,6 @@ public class Const {
     public static String AccessTokenConst;
 
 
-
-    public static int fake = 0;
 
     public static final int COLLATE_PRIORITY = 40;
     public static final int CREATE_INVOICE_PRIORITY = 30;

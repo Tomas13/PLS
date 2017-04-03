@@ -37,7 +37,7 @@ public class Singleton {
 
     public static OkHttpClient getUserClient(){
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        httpClient.addNetworkInterceptor(new StethoInterceptor()); //подключаю Stetho
+//        httpClient.addNetworkInterceptor(new StethoInterceptor()); //подключаю Stetho
         httpClient.readTimeout(60, TimeUnit.SECONDS);
         httpClient.connectTimeout(60, TimeUnit.SECONDS);
        /* httpClient.addInterceptor(chain -> {

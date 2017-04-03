@@ -19,6 +19,7 @@ import ru.startandroid.retrofit.Model.routes.Entry;
 import ru.startandroid.retrofit.R;
 
 import static ru.startandroid.retrofit.Const.CURRENT_ROUTE_POSITION;
+import static ru.startandroid.retrofit.Const.FAKE;
 import static ru.startandroid.retrofit.Const.FLIGHT_SHARED_PREF;
 
 /**
@@ -91,7 +92,7 @@ public class RoutesRVAdapter extends RecyclerView.Adapter<RoutesRVAdapter.Routes
         Entry flight = mRoutes.get(position);
 
         SharedPreferences pref = context.getSharedPreferences(FLIGHT_SHARED_PREF, Context.MODE_PRIVATE);
-        int currentPos = pref.getInt("FAKE", 0);
+        int currentPos = pref.getInt(FAKE, 0);
 
 
 
