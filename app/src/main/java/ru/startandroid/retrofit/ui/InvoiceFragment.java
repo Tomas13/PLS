@@ -11,6 +11,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -95,6 +98,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     @BindString(R.string.last_point)
     String lastPoint;
 
+
     private InvoiceRVAdapter invoiceRVAdapter;
     private InvoicePresenter presenter;
     private Realm realm;
@@ -105,7 +109,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     private AlertDialog alertDialog;
     private RealmQuery<BodyForCreateInvoice> queryBody;
     private int currentRoutePosition;
-    private int fake = 0;
+    private int fake;
 
     private int maxRouteNumber;
     private SharedPreferences pref;
@@ -137,6 +141,9 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         maxRouteNumber = pref.getInt(NUMBER_OF_CITIES, 0);
         currentRoutePosition = pref.getInt(CURRENT_ROUTE_POSITION, 1);
 
+
+        fake = pref.getInt(FAKE, 0);
+
         jobManager = AppJobManager.getJobManager();
 
         //FOR SENDING
@@ -156,6 +163,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         for (int i = 0; i < queryBody.findAll().size(); i++) {
             bodyRealm = queryBody.findAll().last();
         }
+
     }
 
     @Override
@@ -166,6 +174,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         ButterKnife.bind(this, viewRoot);
         init();
 
+        setHasOptionsMenu(true);
         if (queryBody.findAll().size() == 0) prepareBodyForPost();
 
         if (!sendInvoiceList.isEmpty()) {
@@ -642,6 +651,27 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     }
 
 
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        inflater.inflate(R.menu.invoice, menu);
+
+
+    }
+
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        int id = item.getItemId();
+//
+//        //noinspection SimplifiableIfStatement
+//        if (id == R.id.action_settings) {
+//            return true;
+//        }
+//        return super.onOptionsItemSelected(item);
+//
+//    }
 
     /*  @Override
       public void getPostResponse(CreateResponse createResponse) {

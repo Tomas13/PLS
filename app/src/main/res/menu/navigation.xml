@@ -9,8 +9,12 @@
 
 
     <item
-        android:title="Icon"
-        app:showAsAction="always"
         android:icon="@drawable/ic_sort"
-        />
+        android:title="Icon"
+        app:showAsAction="always" />
+
+    <item
+        android:icon="@drawable/ic_restart"
+        android:title="Refresh"
+        app:showAsAction="always"/>
 </menu>
