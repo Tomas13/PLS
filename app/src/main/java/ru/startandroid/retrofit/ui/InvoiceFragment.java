@@ -141,9 +141,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         maxRouteNumber = pref.getInt(NUMBER_OF_CITIES, 0);
         currentRoutePosition = pref.getInt(CURRENT_ROUTE_POSITION, 1);
 
-//        copyRoutePosition = pref.getInt(FAKE, 0);
-
-
         fake = pref.getInt(FAKE, 0);
 
         jobManager = AppJobManager.getJobManager();
@@ -189,7 +186,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
     private void createConfigAdapterSend() {
 
-        Log.d("InvoiceFragment", "createConfig");
 
         if (queryBody.findAll().size() == 0) prepareBodyForPost();
 
@@ -332,6 +328,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
     private void createEmptyInvoice() {
 
+
         if (flightName.size() >= fake + 1) {
 
             SendInvoice sendInvoice;
@@ -358,6 +355,8 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
             if (currentRoutePosition > 0 && currentRoutePosition < maxRouteNumber) {
                 currentRoutePosition++;
+                Log.d("InvoiceFragment", " currentRoutePos  createEmpty " + currentRoutePosition);
+
                 pref.edit().putInt(CURRENT_ROUTE_POSITION, currentRoutePosition).apply();
             }
 
@@ -491,7 +490,9 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             String toDeptIndex = "InvoiceFrag 434";
             String fromDeptIndex = "FromDep 435";
 
-            Log.d("prepareBody", currentRoutePosition + " pos");
+            Log.d("InvoiceFragment", " prepareBody pos " + currentRoutePosition);
+            Log.d("InvoiceFragment", " prepareBody fake " + fake);
+
 
             if (entries.size() == currentRoutePosition) {
                 toDeptIndex = entries.get(currentRoutePosition - 1).getDept().getName();
@@ -539,18 +540,20 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
 
     private void updateCurrentRoutePosition() {
-        int current = pref.getInt(CURRENT_ROUTE_POSITION, 0);
+//        int current = pref.getInt(CURRENT_ROUTE_POSITION, 0);
 
         fake++;
         pref.edit().putInt(FAKE, fake).apply();
 
-        current++;
-//        currentRoutePosition++;
+//        current++;
+        currentRoutePosition++;
 
+        Log.d("InvoiceFragment", " currentRoutePos " + currentRoutePosition);
 //        copyRoutePosition++;
 
 
-        pref.edit().putInt(CURRENT_ROUTE_POSITION, current).apply();
+//        pref.edit().putInt(CURRENT_ROUTE_POSITION, current).apply();
+        pref.edit().putInt(CURRENT_ROUTE_POSITION, currentRoutePosition).apply();
 
     }
 
