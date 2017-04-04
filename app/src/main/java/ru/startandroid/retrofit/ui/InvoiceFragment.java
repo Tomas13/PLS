@@ -166,6 +166,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -173,8 +174,8 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         View viewRoot = inflater.inflate(R.layout.fragment_invoice, container, false);
         ButterKnife.bind(this, viewRoot);
         init();
-
         setHasOptionsMenu(true);
+
         if (queryBody.findAll().size() == 0) prepareBodyForPost();
 
         if (!sendInvoiceList.isEmpty()) {
@@ -222,7 +223,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 //        presenter.loadGeneralInvoice();
 
         jobManager.addJobInBackground(new GetAccessTokenJob());
-
 
         return viewRoot;
     }
@@ -319,7 +319,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
     private void createEmptyInvoice() {
 
-
         if (flightName.size() >= currentRoutePosition + 1) {
 
             SendInvoice sendInvoice;
@@ -333,7 +332,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 //            sendInvoice.setBodyForCreateInvoice(bodyRealm);
 
             } else {
-
 
                 String toName = flightName.get(currentRoutePosition + 1);
                 String fromName = flightName.get(currentRoutePosition);
@@ -591,12 +589,8 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
                     dismissDialog();
                 }).create();
 
-
         alertDialog.show();
-
         hideProgress();
-
-
     }
 
     private void dismissDialog() {
@@ -618,6 +612,29 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
         startCollateFragment();
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.invoice, menu);
+//        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.menu_refresh) {
+            refreshDataOnFragment();
+        }
+        return super.onOptionsItemSelected(item);
+
+    }
+
+    private void refreshDataOnFragment() {
+        jobManager.addJobInBackground(new GetAccessTokenJob());
+    }
+
 
     @Override
     public void onStart() {
@@ -649,29 +666,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         presenter.unSubscribe();
         if (!realm.isClosed()) realm.close();
     }
-
-
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-
-        inflater.inflate(R.menu.invoice, menu);
-
-
-    }
-
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-//        return super.onOptionsItemSelected(item);
-//
-//    }
 
     /*  @Override
       public void getPostResponse(CreateResponse createResponse) {
