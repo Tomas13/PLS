@@ -66,6 +66,7 @@ import ru.startandroid.retrofit.presenter.InvoicePresenterImpl;
 import ru.startandroid.retrofit.view.InvoiceView;
 
 import static ru.startandroid.retrofit.Const.AccessTokenConst;
+import static ru.startandroid.retrofit.Const.COPY_ROUTE;
 import static ru.startandroid.retrofit.Const.CURRENT_ROUTE_POSITION;
 import static ru.startandroid.retrofit.Const.FAKE;
 import static ru.startandroid.retrofit.Const.FLIGHT_ID;
@@ -104,7 +105,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     private Realm realm;
     private List<SendInvoice> sendInvoiceList;
     private List<Entry> entries = new ArrayList<>();
-    private RealmQuery<Entry> queryData;
     private ArrayList<String> flightName = new ArrayList<>();
     private AlertDialog alertDialog;
     private RealmQuery<BodyForCreateInvoice> queryBody;
@@ -141,13 +141,15 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         maxRouteNumber = pref.getInt(NUMBER_OF_CITIES, 0);
         currentRoutePosition = pref.getInt(CURRENT_ROUTE_POSITION, 1);
 
+//        copyRoutePosition = pref.getInt(FAKE, 0);
+
 
         fake = pref.getInt(FAKE, 0);
 
         jobManager = AppJobManager.getJobManager();
 
         //FOR SENDING
-        queryData = realm.where(Entry.class);
+        RealmQuery<Entry> queryData = realm.where(Entry.class);
         if (!queryData.findAll().isEmpty()) {
             for (int i = 0; i < queryData.findAll().distinct("index").size(); i++) {
                 entries.add(queryData.findAll().get(i));
@@ -175,6 +177,19 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         ButterKnife.bind(this, viewRoot);
         init();
         setHasOptionsMenu(true);
+
+        createConfigAdapterSend();
+
+//        presenter.loadGeneralInvoice();
+
+        jobManager.addJobInBackground(new GetAccessTokenJob());
+
+        return viewRoot;
+    }
+
+    private void createConfigAdapterSend() {
+
+        Log.d("InvoiceFragment", "createConfig");
 
         if (queryBody.findAll().size() == 0) prepareBodyForPost();
 
@@ -220,11 +235,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         }
 
 
-//        presenter.loadGeneralInvoice();
 
-        jobManager.addJobInBackground(new GetAccessTokenJob());
-
-        return viewRoot;
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -317,15 +328,17 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         }
     }
 
+
+
     private void createEmptyInvoice() {
 
-        if (flightName.size() >= currentRoutePosition + 1) {
+        if (flightName.size() >= fake + 1) {
 
             SendInvoice sendInvoice;
 
-            if (flightName.size() == currentRoutePosition + 1) {
-                String toName = flightName.get(currentRoutePosition);
-                String fromName = flightName.get(currentRoutePosition - 1);
+            if (flightName.size() == fake + 1) {
+                String toName = flightName.get(fake);
+                String fromName = flightName.get(fake - 1);
                 sendInvoice = new SendInvoice();
                 sendInvoice.setTo(toName);
                 sendInvoice.setFrom(fromName);
@@ -333,8 +346,8 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
             } else {
 
-                String toName = flightName.get(currentRoutePosition + 1);
-                String fromName = flightName.get(currentRoutePosition);
+                String toName = flightName.get(fake + 1);
+                String fromName = flightName.get(fake);
                 sendInvoice = new SendInvoice();
                 sendInvoice.setTo(toName);
                 sendInvoice.setFrom(fromName);
@@ -378,22 +391,14 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
                 generalInvoiceList.remove(childAdapterPosition);
                 invoiceRVAdapter.notifyDataSetChanged();
 
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS", Locale.FRANCE);
-                Date now = new Date();
-                String timeOfEvent = simpleDateFormat.format(now);
+
+                getAndSaveCurrentTimeForInvoiceName();
 
 
-                SharedPreferences ref = getActivity().getSharedPreferences(INVOICE_PREF, Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = ref.edit();
-                editor.putString(INVOICE_NAME, timeOfEvent);
-                editor.apply();
             } else {
-                Snackbar snackbar = Snackbar.make(rvInvoice, lastPoint, Snackbar.LENGTH_LONG);
 
-                View snackbarView = snackbar.getView();
-                TextView textView = (TextView) snackbarView.findViewById(android.support.design.R.id.snackbar_text);
-                textView.setMaxLines(2);  // show multiple line
-                snackbar.show();
+                showLastPointSnackBar();
+
             }
             //startCollateFragment();
         });
@@ -403,6 +408,27 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         rvInvoice.setAdapter(invoiceRVAdapter);
 
 
+    }
+
+
+    private void showLastPointSnackBar() {
+        Snackbar snackbar = Snackbar.make(rvInvoice, lastPoint, Snackbar.LENGTH_LONG);
+
+        View snackbarView = snackbar.getView();
+        TextView textView = (TextView) snackbarView.findViewById(android.support.design.R.id.snackbar_text);
+        textView.setMaxLines(2);  // show multiple line
+        snackbar.show();
+    }
+
+    private void getAndSaveCurrentTimeForInvoiceName() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS", Locale.FRANCE);
+        Date now = new Date();
+        String timeOfEvent = simpleDateFormat.format(now);
+
+        SharedPreferences ref = getActivity().getSharedPreferences(INVOICE_PREF, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = ref.edit();
+        editor.putString(INVOICE_NAME, timeOfEvent);
+        editor.apply();
     }
 
 
@@ -465,6 +491,8 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             String toDeptIndex = "InvoiceFrag 434";
             String fromDeptIndex = "FromDep 435";
 
+            Log.d("prepareBody", currentRoutePosition + " pos");
+
             if (entries.size() == currentRoutePosition) {
                 toDeptIndex = entries.get(currentRoutePosition - 1).getDept().getName();
                 fromDeptIndex = entries.get(currentRoutePosition - 2).getDept().getName();
@@ -517,7 +545,11 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         pref.edit().putInt(FAKE, fake).apply();
 
         current++;
-        currentRoutePosition++;
+//        currentRoutePosition++;
+
+//        copyRoutePosition++;
+
+
         pref.edit().putInt(CURRENT_ROUTE_POSITION, current).apply();
 
     }

@@ -94,10 +94,13 @@ public class RoutesRVAdapter extends RecyclerView.Adapter<RoutesRVAdapter.Routes
         SharedPreferences pref = context.getSharedPreferences(FLIGHT_SHARED_PREF, Context.MODE_PRIVATE);
         int currentPos = pref.getInt(FAKE, 0);
 
-        int current = pref.getInt(CURRENT_ROUTE_POSITION, 0);
+//        int current = pref.getInt(CURRENT_ROUTE_POSITION, 0);
 
 
-        if (position == current) {
+//        int cu = current - 1;
+
+
+        if (position == currentPos) {
             holder.tvNumber.setTextColor(Color.BLUE);
             holder.tvIndex.setTextColor(Color.BLUE);
             holder.tvArrival.setTextColor(Color.BLUE);

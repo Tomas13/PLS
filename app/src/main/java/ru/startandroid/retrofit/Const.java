@@ -42,6 +42,7 @@ public class Const {
     public static final String TRANSPONST_LIST_ID = "TRANSPONST_LIST_ID";
     public static final String NUMBER_OF_CITIES = "NUMBER_OF_CITIES";
     public static final String CURRENT_ROUTE_POSITION = "CURRENT_ROUTE_POSITION";
+    public static final String COPY_ROUTE= "COPY_ROUTE";
     public static final String FLIGHT_POS = "FLIGHT_POS";
     public static final String LOGIN_PREF = "LOGIN_PREF";
     public static final String LOGIN_BOOL = "LOGIN_BOOL";
