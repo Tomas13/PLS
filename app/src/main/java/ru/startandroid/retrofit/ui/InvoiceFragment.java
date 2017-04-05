@@ -375,7 +375,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
         invoiceRVAdapter = new InvoiceRVAdapter(getActivity(), generalInvoiceList, (childView, childAdapterPosition) -> {
 
-            if (currentRoutePosition < flightName.size()) {    //if all current route points are passed, we can't accept new O-invoice
+            if (currentRoutePosition + 1 < flightName.size()) {    //if all current route points are passed, we can't accept new O-invoice
 
                 Long generalInvoiceId = generalInvoiceList.get(childAdapterPosition).getId();
                 presenter.retrofitAcceptGeneralInvoice(generalInvoiceId, AccessTokenConst);
