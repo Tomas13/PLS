@@ -186,7 +186,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
     private void createConfigAdapterSend() {
 
-
         if (queryBody.findAll().size() == 0) prepareBodyForPost();
 
         if (!sendInvoiceList.isEmpty()) {
@@ -327,7 +326,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
 
 
     private void createEmptyInvoice() {
-
 
         if (flightName.size() >= fake + 1) {
 
@@ -546,14 +544,17 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         pref.edit().putInt(FAKE, fake).apply();
 
 //        current++;
-        currentRoutePosition++;
 
-        Log.d("InvoiceFragment", " currentRoutePos " + currentRoutePosition);
+        if (currentRoutePosition == 0){
+
+            currentRoutePosition++;
+            pref.edit().putInt(CURRENT_ROUTE_POSITION, currentRoutePosition).apply();
+        }
+
 //        copyRoutePosition++;
 
 
 //        pref.edit().putInt(CURRENT_ROUTE_POSITION, current).apply();
-        pref.edit().putInt(CURRENT_ROUTE_POSITION, currentRoutePosition).apply();
 
     }
 
