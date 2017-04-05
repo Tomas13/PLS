@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ru.startandroid.retrofit.ui.CollateFragment">
+    tools:context="kz.kazpost.toolpar.ui.CollateFragment">
 
     <!-- TODO: Update blank fragment layout -->
 

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ru.startandroid.retrofit.ui.VolumesFragment">
+    tools:context="kz.kazpost.toolpar.ui.VolumesFragment">
 
     <LinearLayout
         android:id="@+id/ll_btn_hint"
