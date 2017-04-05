@@ -496,7 +496,7 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
                 toDeptIndex = entries.get(currentRoutePosition - 1).getDept().getName();
                 fromDeptIndex = entries.get(currentRoutePosition - 2).getDept().getName();
 
-            } else if (entries.size() > currentRoutePosition + 1) {
+            } else if (entries.size() > currentRoutePosition) {
 
                 if (currentRoutePosition == 0) {
                     toDeptIndex = entries.get(currentRoutePosition + 1).getDept().getName();
@@ -540,8 +540,10 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     private void updateCurrentRoutePosition() {
 //        int current = pref.getInt(CURRENT_ROUTE_POSITION, 0);
 
-        fake++;
-        pref.edit().putInt(FAKE, fake).apply();
+        if (fake < maxRouteNumber){
+            fake++;
+            pref.edit().putInt(FAKE, fake).apply();
+        }
 
 //        current++;
 
