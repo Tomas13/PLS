@@ -107,7 +107,6 @@ public class NavigationActivity extends AppCompatActivity
 //        loginPresenter = new LoginPresenterImpl(this);
 //        Login();
 
-
         routesPresenter = new RoutesPresenterImpl(this);
         navPresenter = new NavigationPresenterImpl(this);
 
