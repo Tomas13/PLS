@@ -84,7 +84,7 @@ public class CollateRVAdapter extends RecyclerView.Adapter<CollateRVAdapter.View
 //        CollateRVAdapter.ViewHolder1 viewHolder1 = (CollateRVAdapter.ViewHolder1) holder;
 
         Destination destination = items.get(position);
-        holder.checkBox.setText(destination.getDestinationListId() + "\t\t\t\t\t\t\t\t\t\t" + destination.getToDeNewp().getNameRu() + " ["
+        holder.checkBox.setText(destination.getDestinationListId() + "\t\t\t\t\t" + destination.getToDeNewp().getNameRu() + " ["
                 + destination.getToDeNewp().getName() + "]");
 //        holder.tvListId1.setText(destination.getDestinationListId());
 //        holder.tvFromDeptName1.setText(destination.getFromDep().getName());

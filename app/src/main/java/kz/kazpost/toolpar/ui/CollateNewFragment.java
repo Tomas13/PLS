@@ -174,6 +174,7 @@ public class CollateNewFragment extends Fragment implements CollateView {
             idsCol = new IdsCollate(chosenIds);
 //            presenter.postCollate(idsCol);
 
+
             for (int i = 0; i < queryDestination.findAll().size(); i++) {
                 for (int j = 0; j < chosenIds.size(); j++) {
                     if (queryDestination.findAll().get(i).getId().equals(chosenIds.get(j))) {
@@ -183,14 +184,22 @@ public class CollateNewFragment extends Fragment implements CollateView {
 //                        listAdapter.notifyDataSetChanged();
 
                         int k = i;
+
+
+                        final int z = j;
+
                         realm.executeTransaction(realm -> {
+
+                            Log.d("collatenew", "k is " + k);
                             queryDestination.findAll().get(k).deleteFromRealm();
+
 //                            if (!realm.where(Example.class).findAll().isEmpty())
 //                                realm.where(Example.class).findAll().get(k).deleteFromRealm();  //17.02.17
                         });
                     }
                 }
             }
+
             jobManager.addJobInBackground(new CollateJob(idsCol));
 
             ((NavigationActivity) getActivity()).startFragment(new VolumesFragment());
