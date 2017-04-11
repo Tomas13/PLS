@@ -229,7 +229,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
         }
 
 
-
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -321,7 +320,6 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             }
         }
     }
-
 
 
     private void createEmptyInvoice() {
@@ -539,14 +537,14 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     private void updateCurrentRoutePosition() {
 //        int current = pref.getInt(CURRENT_ROUTE_POSITION, 0);
 
-        if (fake < maxRouteNumber){
+        if (fake < maxRouteNumber) {
             fake++;
             pref.edit().putInt(FAKE, fake).apply();
         }
 
 //        current++;
 
-        if (currentRoutePosition == 0){
+        if (currentRoutePosition == 0) {
 
             currentRoutePosition++;
             pref.edit().putInt(CURRENT_ROUTE_POSITION, currentRoutePosition).apply();
@@ -689,11 +687,19 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
     @Override
     public void showProgress() {
         progressInvoice.setVisibility(View.VISIBLE);
+        setRVclickable(false);
     }
 
     @Override
     public void hideProgress() {
         progressInvoice.setVisibility(View.GONE);
+        setRVclickable(true);
+    }
+
+
+    private void setRVclickable(boolean clickBool) {
+        rvInvoice.setClickable(clickBool);
+        rvSendInvoice.setClickable(clickBool);
     }
 
 

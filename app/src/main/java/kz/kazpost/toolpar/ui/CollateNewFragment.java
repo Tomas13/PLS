@@ -175,8 +175,41 @@ public class CollateNewFragment extends Fragment implements CollateView {
 //            presenter.postCollate(idsCol);
 
 
-            for (int i = 0; i < queryDestination.findAll().size(); i++) {
+            for (int i = 0; i < chosenIds.size(); i++) {
+
+                for (int j = 0; j < queryDestination.findAll().size(); j++) {
+                    if (queryDestination.findAll().get(j).getId().equals(chosenIds.get(i))) {
+                        setLabelsAndPacketsCollated(j);
+
+                        generalInvoiceIdsList.remove(queryDestination.findAll().get(j).getDestinationListId());
+//                        listAdapter.notifyDataSetChanged();
+
+                        int k = j;
+
+
+                        realm.executeTransaction(realm -> {
+
+                            Log.d("collatenew", "k is " + k);
+                            Log.d("collatenew", "removing " + queryDestination.findAll().get(k).getId());
+                            queryDestination.findAll().get(k).deleteFromRealm();
+
+//                            if (!realm.where(Example.class).findAll().isEmpty())
+//                                realm.where(Example.class).findAll().get(k).deleteFromRealm();  //17.02.17
+                        });
+                    }
+                }
+            }
+
+
+
+           /* for (int i = 0; i < queryDestination.findAll().size(); i++) {
+
+                Log.d("collatefor", "i = " + i);
+
                 for (int j = 0; j < chosenIds.size(); j++) {
+                    Log.d("collatefor", "i = " + i + " j = " + j +
+                    " chose " + chosenIds.get(j));
+
                     if (queryDestination.findAll().get(i).getId().equals(chosenIds.get(j))) {
                         setLabelsAndPacketsCollated(i);
 
@@ -188,9 +221,12 @@ public class CollateNewFragment extends Fragment implements CollateView {
 
                         final int z = j;
 
+                        j = 0;
+
                         realm.executeTransaction(realm -> {
 
                             Log.d("collatenew", "k is " + k);
+                            Log.d("collatenew", "removing " + queryDestination.findAll().get(k).getId());
                             queryDestination.findAll().get(k).deleteFromRealm();
 
 //                            if (!realm.where(Example.class).findAll().isEmpty())
@@ -198,7 +234,7 @@ public class CollateNewFragment extends Fragment implements CollateView {
                         });
                     }
                 }
-            }
+            }*/
 
             jobManager.addJobInBackground(new CollateJob(idsCol));
 

@@ -56,54 +56,36 @@ public class ScannerSelectionBarcodeActivity extends Activity implements
         barcodeList = (ListView) findViewById(R.id.listViewBarcodeData);
 
         mSwitchScannersButton = (Button) findViewById(R.id.buttonSwitchScanners);
-        mSwitchScannersButton.setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    scannerSelection(mAidcManager.listConnectedBarcodeDevices());
-                }
-                return true;
+        mSwitchScannersButton.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                scannerSelection(mAidcManager.listConnectedBarcodeDevices());
             }
+            return true;
         });
 
         /*
          * Get new AidcManager
          */
-        AidcManager.create(this, new CreatedCallback() {
-
-            @Override
-            public void onCreated(AidcManager aidcManager) {
-                mAidcManager = aidcManager;
-                mAidcManager.addBarcodeDeviceListener(new BarcodeDeviceListener() {
-
-                    @Override
-                    public void onBarcodeDeviceConnectionEvent(BarcodeDeviceConnectionEvent event) {
-                        // Could use this to call scannerSelection like when
-                        // press switch scanner button.
-                        // Here we just use it to notify the user when a scanner
-                        // is attached or detached and
-                        // give a toast.
-                        String connected;
-                        if (event.getConnectionStatus() == AidcManager.BARCODE_DEVICE_DISCONNECTED) {
-                            connected = "Disconnected";
-                        } else {
-                            connected = "Connected";
-                        }
-                        final String message = "Scanner: "
-                                + event.getBarcodeReaderInfo().getFriendlyName() + " is "
-                                + connected;
-                        ((Activity) mContext).runOnUiThread(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
-                            }
-
-                        });
-                    }
-                });
-                initialize();
-            }
+        AidcManager.create(this, aidcManager -> {
+            mAidcManager = aidcManager;
+            mAidcManager.addBarcodeDeviceListener(event -> {
+                // Could use this to call scannerSelection like when
+                // press switch scanner button.
+                // Here we just use it to notify the user when a scanner
+                // is attached or detached and
+                // give a toast.
+                String connected;
+                if (event.getConnectionStatus() == AidcManager.BARCODE_DEVICE_DISCONNECTED) {
+                    connected = "Disconnected";
+                } else {
+                    connected = "Connected";
+                }
+                final String message = "Scanner: "
+                        + event.getBarcodeReaderInfo().getFriendlyName() + " is "
+                        + connected;
+                ((Activity) mContext).runOnUiThread(() -> Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show());
+            });
+            initialize();
         });
     }
 
@@ -113,23 +95,20 @@ public class ScannerSelectionBarcodeActivity extends Activity implements
 
     @Override
     public void onBarcodeEvent(final BarcodeReadEvent event) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                // update UI to reflect the data
-                List<String> list = new ArrayList<String>();
-                list.add("Barcode data: " + event.getBarcodeData());
-                list.add("Character Set: " + event.getCharset());
-                list.add("Code ID: " + event.getCodeId());
-                list.add("AIM ID: " + event.getAimId());
-                list.add("Timestamp: " + event.getTimestamp());
+        runOnUiThread(() -> {
+            // update UI to reflect the data
+            List<String> list = new ArrayList<String>();
+            list.add("Barcode data: " + event.getBarcodeData());
+            list.add("Character Set: " + event.getCharset());
+            list.add("Code ID: " + event.getCodeId());
+            list.add("AIM ID: " + event.getAimId());
+            list.add("Timestamp: " + event.getTimestamp());
 
-                final ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(
-                        ScannerSelectionBarcodeActivity.this, android.R.layout.simple_list_item_1,
-                        list);
+            final ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(
+                    ScannerSelectionBarcodeActivity.this, android.R.layout.simple_list_item_1,
+                    list);
 
-                barcodeList.setAdapter(dataAdapter);
-            }
+            barcodeList.setAdapter(dataAdapter);
         });
     }
 
@@ -196,54 +175,41 @@ public class ScannerSelectionBarcodeActivity extends Activity implements
 
     private void scannerSelection(final List<BarcodeReaderInfo> scanners) {
         Handler h = new Handler(Looper.getMainLooper());
-        h.post(new Runnable() {
-            @Override
-            public void run() {
-                final Dialog scannerSelectDialog = new Dialog(mContext);
-                scannerSelectDialog.setContentView(R.layout.scanner_select_dialog);
-                Button dialogButton = (Button) scannerSelectDialog
-                        .findViewById(R.id.dialogButtonOK);
+        h.post(() -> {
+            final Dialog scannerSelectDialog = new Dialog(mContext);
+            scannerSelectDialog.setContentView(R.layout.scanner_select_dialog);
+            Button dialogButton = (Button) scannerSelectDialog
+                    .findViewById(R.id.dialogButtonOK);
 
-                // If there are scanners, just show the list, must select one
-                if (scanners.size() > 0) {
-                    scannerSelectDialog.setTitle("Select Scanner");
-                    dialogButton.setVisibility(Button.INVISIBLE);
-                    final Map<String, String> scannerNames = new HashMap<String, String>();
-                    for (BarcodeReaderInfo i : scanners) {
-                        scannerNames.put(i.getFriendlyName(), i.getName());
-                    }
-
-                    final ListView list = (ListView) scannerSelectDialog
-                            .findViewById(R.id.listScanners);
-                    ArrayAdapter<String> scannerNameAdapter = new ArrayAdapter<String>(mContext,
-                            android.R.layout.simple_list_item_1, android.R.id.text1,
-                            new ArrayList<String>(scannerNames.keySet()));
-                    list.setAdapter(scannerNameAdapter);
-
-                    list.setOnItemClickListener(new OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> myAdapter, View myView, int pos,
-                                                long mylng) {
-                            String selectedScanner = (String) list.getItemAtPosition(pos);
-                            createBarcodeReaderConnection(scannerNames.get(selectedScanner));
-                            scannerSelectDialog.dismiss();
-                        }
-
-                    });
-
-                } else { // Show an ok button to close dialog
-                    scannerSelectDialog.setTitle("No Scanners Connected");
-                    dialogButton.setOnClickListener(new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            scannerSelectDialog.dismiss();
-                        }
-                    });
+            // If there are scanners, just show the list, must select one
+            if (scanners.size() > 0) {
+                scannerSelectDialog.setTitle("Select Scanner");
+                dialogButton.setVisibility(Button.INVISIBLE);
+                final Map<String, String> scannerNames = new HashMap<String, String>();
+                for (BarcodeReaderInfo i : scanners) {
+                    scannerNames.put(i.getFriendlyName(), i.getName());
                 }
 
-                scannerSelectDialog.setCancelable(false);
-                scannerSelectDialog.show();
+                final ListView list = (ListView) scannerSelectDialog
+                        .findViewById(R.id.listScanners);
+                ArrayAdapter<String> scannerNameAdapter = new ArrayAdapter<String>(mContext,
+                        android.R.layout.simple_list_item_1, android.R.id.text1,
+                        new ArrayList<String>(scannerNames.keySet()));
+                list.setAdapter(scannerNameAdapter);
+
+                list.setOnItemClickListener((myAdapter, myView, pos, mylng) -> {
+                    String selectedScanner = (String) list.getItemAtPosition(pos);
+                    createBarcodeReaderConnection(scannerNames.get(selectedScanner));
+                    scannerSelectDialog.dismiss();
+                });
+
+            } else { // Show an ok button to close dialog
+                scannerSelectDialog.setTitle("No Scanners Connected");
+                dialogButton.setOnClickListener(v -> scannerSelectDialog.dismiss());
             }
+
+            scannerSelectDialog.setCancelable(false);
+            scannerSelectDialog.show();
         });
     }
 
