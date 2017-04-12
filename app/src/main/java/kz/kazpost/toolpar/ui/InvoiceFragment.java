@@ -489,19 +489,22 @@ public class InvoiceFragment extends Fragment implements InvoiceView {
             Log.d("InvoiceFragment", " prepareBody fake " + fake);
 
 
-            if (entries.size() == currentRoutePosition) {
-                toDeptIndex = entries.get(currentRoutePosition - 1).getDept().getName();
-                fromDeptIndex = entries.get(currentRoutePosition - 2).getDept().getName();
+            if (entries.size() > 0){
 
-            } else if (entries.size() > currentRoutePosition) {
+                if (entries.size() == currentRoutePosition) {
+                    toDeptIndex = entries.get(currentRoutePosition - 1).getDept().getName();
+                    fromDeptIndex = entries.get(currentRoutePosition - 2).getDept().getName();
 
-                if (currentRoutePosition == 0) {
-                    toDeptIndex = entries.get(currentRoutePosition + 1).getDept().getName();
-                    fromDeptIndex = entries.get(currentRoutePosition).getDept().getName();
+                } else if (entries.size() > currentRoutePosition) {
 
-                } else {
-                    toDeptIndex = entries.get(currentRoutePosition).getDept().getName();
-                    fromDeptIndex = entries.get(currentRoutePosition - 1).getDept().getName();
+                    if (currentRoutePosition == 0) {
+                        toDeptIndex = entries.get(currentRoutePosition + 1).getDept().getName();
+                        fromDeptIndex = entries.get(currentRoutePosition).getDept().getName();
+
+                    } else {
+                        toDeptIndex = entries.get(currentRoutePosition).getDept().getName();
+                        fromDeptIndex = entries.get(currentRoutePosition - 1).getDept().getName();
+                    }
                 }
             }
 

@@ -42,7 +42,6 @@ public class Application extends MultiDexApplication {
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
 
-
         Realm.init(this);
 
         realmConfiguration = new RealmConfiguration.Builder()
@@ -57,7 +56,6 @@ public class Application extends MultiDexApplication {
                         .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
                         .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
                         .build());
-
 
     }
 

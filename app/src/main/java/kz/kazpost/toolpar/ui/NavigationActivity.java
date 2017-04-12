@@ -70,7 +70,7 @@ import static kz.kazpost.toolpar.Const.TRANSPONST_LIST_ID;
 public class NavigationActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, RoutesView, NavigationActView, LoginView {
 
-    private ProgressBar navProgressBar;
+//    private ProgressBar navProgressBar;
     private TextView tvFirstName;
     private TextView tvLastName, tvRoleName, tvRouteHeader;
     private ArrayList<Routes> routesList = new ArrayList<>();
@@ -102,7 +102,7 @@ public class NavigationActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
         setTitle("PLS");
 
-        navProgressBar = (ProgressBar) findViewById(R.id.activity_navigation_progressbar);
+//        navProgressBar = (ProgressBar) findViewById(R.id.activity_navigation_progressbar);
 
 //        loginPresenter = new LoginPresenterImpl(this);
 //        Login();
@@ -129,14 +129,14 @@ public class NavigationActivity extends AppCompatActivity
         //if we don't have data of user
         if (queryData.findAll().size() == 0) {
             Log.d("Main", "fetching membership info");
-            navProgressBar.setVisibility(View.VISIBLE);
+//            navProgressBar.setVisibility(View.VISIBLE);
 
             if (AccessTokenConst != null)
                 navPresenter.loadMembershipInfo(AccessTokenConst);
 
         } else {
 
-            navProgressBar.setVisibility(View.GONE);
+//            navProgressBar.setVisibility(View.GONE);
 
             Log.d("Main", "no fetching " + "size = " + queryData.findAll().size());
 
@@ -488,12 +488,12 @@ public class NavigationActivity extends AppCompatActivity
 
     @Override
     public void showProgress() {
-        navProgressBar.setVisibility(View.VISIBLE);
+//        navProgressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideProgress() {
-        navProgressBar.setVisibility(View.GONE);
+//        navProgressBar.setVisibility(View.GONE);
     }
 
     @Override

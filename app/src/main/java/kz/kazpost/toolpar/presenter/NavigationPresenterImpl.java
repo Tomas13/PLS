@@ -33,7 +33,7 @@ public class NavigationPresenterImpl implements NavitationPresenter {
 
     @Override
     public void loadMembershipInfo(String accessToken) {
-        view.showProgress();
+//        view.showProgress();
 
         Retrofit retrofitRoutes = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
@@ -55,15 +55,15 @@ public class NavigationPresenterImpl implements NavitationPresenter {
                         response -> {
                             if (response.getStatus().equals("ok")) {
                                 view.getMembershipData(response);
-                                view.hideProgress();
+//                                view.hideProgress();
                             } else {
                                 view.showMemberEmptyData();
-                                view.hideProgress();
+//                                view.hideProgress();
                             }
                         },
                         throwable -> {
                             view.showMemberError(throwable);
-                            view.hideProgress();
+//                            view.hideProgress();
                         });
 
     }
