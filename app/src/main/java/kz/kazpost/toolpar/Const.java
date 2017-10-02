@@ -12,6 +12,8 @@ import kz.kazpost.toolpar.Model.routes.Flight;
 public class Const {
     public static final int ScannerSelectionBarcodeActivity = 1;
     public static final String CACHE_FILE_NAME = "PLS_FILE";
+    public static final String PREF_NAME =  "pls_pref";
+    ;
     public static String Token = "";
     public static String FLIGHT_ROUTES = "";
     public static Boolean isConnected = false;

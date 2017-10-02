@@ -51,5 +51,6 @@
     <string name="loginbtn">ВОЙТИ</string>
     <string name="surname">Фамилия</string>
     <string name="firstname">Имя</string>
+    <string name="some_error">Some Error Occurred!</string>
 
 </resources>

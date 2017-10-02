@@ -40,6 +40,7 @@ import kz.kazpost.toolpar.Model.acceptgen.Destination;
 import kz.kazpost.toolpar.Model.acceptgen.LabelList;
 import kz.kazpost.toolpar.Model.acceptgen.PacketList;
 import kz.kazpost.toolpar.R;
+import kz.kazpost.toolpar.base.BaseFragment;
 import kz.kazpost.toolpar.events.AccessTokenEvent;
 import kz.kazpost.toolpar.events.CollateEvent;
 import kz.kazpost.toolpar.jobs.CollateJob;
@@ -51,7 +52,7 @@ import static kz.kazpost.toolpar.Const.AccessTokenConst;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CollateFragment extends Fragment implements CollateView {
+public class CollateFragment extends BaseFragment implements CollateView {
 
     @BindView(R.id.list_view_accept_gen)
     ListView listViewAcceptGen;

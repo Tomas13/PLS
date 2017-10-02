@@ -8,5 +8,8 @@
     <color name="red">#ec3f3f</color>
 
     <color name="colorSelector">#e95db6df</color>
+    <color name="black_effective">#2a2a2a</color>
+    <color name="white">#ffffff</color>
+    <color name="colorBlue">#3f72b5</color>
 
 </resources>

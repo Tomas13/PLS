@@ -12,8 +12,14 @@ import com.uphyca.stetho_realm.RealmInspectorModulesProvider;
 
 import java.io.File;
 
+import javax.inject.Inject;
+
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import kz.kazpost.toolpar.data.DataManager;
+import kz.kazpost.toolpar.di.component.ApplicationComponent;
+import kz.kazpost.toolpar.di.component.DaggerApplicationComponent;
+import kz.kazpost.toolpar.di.module.ApplicationModule;
 import rx.Subscription;
 
 /**
@@ -26,11 +32,15 @@ public class Application extends MultiDexApplication {
 
     private FirebaseAnalytics mFirebaseAnalytics;
 
+    private ApplicationComponent mApplicationComponent;
+
     @Override
     protected void attachBaseContext(Context base) {
         MultiDex.install(this);
         super.attachBaseContext(base);
     }
+
+
 
     @Override
     public void onCreate() {
@@ -40,6 +50,11 @@ public class Application extends MultiDexApplication {
 
         // Obtain the FirebaseAnalytics instance.
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
+        mApplicationComponent = DaggerApplicationComponent.builder()
+                .applicationModule(new ApplicationModule(this)).build();
+
+        mApplicationComponent.inject(this);
 
 
         Realm.init(this);
@@ -57,6 +72,10 @@ public class Application extends MultiDexApplication {
                         .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
                         .build());
 
+    }
+
+    public ApplicationComponent getComponent() {
+        return mApplicationComponent;
     }
 
 

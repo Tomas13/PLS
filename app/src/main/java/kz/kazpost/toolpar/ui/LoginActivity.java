@@ -20,6 +20,7 @@ import kz.kazpost.toolpar.AppJobManager;
 import kz.kazpost.toolpar.Const;
 import kz.kazpost.toolpar.Model.login.LoginResponse;
 import kz.kazpost.toolpar.R;
+import kz.kazpost.toolpar.base.BaseActivity;
 import kz.kazpost.toolpar.jobs.GetAccessTokenJob;
 import kz.kazpost.toolpar.presenter.LoginPresenter;
 import kz.kazpost.toolpar.presenter.LoginPresenterImpl;
@@ -32,7 +33,7 @@ import static kz.kazpost.toolpar.Const.REFRESH_TOKEN;
 import static kz.kazpost.toolpar.Const.TOKEN_SHARED_PREF;
 import static kz.kazpost.toolpar.Const.USERNAME;
 
-public class LoginActivity extends AppCompatActivity implements LoginView {
+public class LoginActivity extends BaseActivity implements LoginView {
 
     @BindView(R.id.edit_text_username)
     EditText userNameET;

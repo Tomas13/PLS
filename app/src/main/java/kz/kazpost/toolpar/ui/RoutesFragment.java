@@ -31,6 +31,7 @@ import kz.kazpost.toolpar.Model.routes.Entry;
 import kz.kazpost.toolpar.Model.routes.Routes;
 import kz.kazpost.toolpar.R;
 import kz.kazpost.toolpar.adapter.RoutesRVAdapter;
+import kz.kazpost.toolpar.base.BaseFragment;
 import kz.kazpost.toolpar.events.AccessTokenEvent;
 import kz.kazpost.toolpar.events.LoadRoutesEvent;
 import kz.kazpost.toolpar.events.RoutesEventError;
@@ -45,7 +46,7 @@ import static kz.kazpost.toolpar.Const.FLIGHT_SHARED_PREF;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RoutesFragment extends Fragment implements RoutesView {
+public class RoutesFragment extends BaseFragment implements RoutesView {
 
     @BindView(R.id.rv_routes)
     RecyclerView rvRoutes;

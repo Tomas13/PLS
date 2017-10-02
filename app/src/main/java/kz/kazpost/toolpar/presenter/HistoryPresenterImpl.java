@@ -1,5 +1,9 @@
 package kz.kazpost.toolpar.presenter;
 
+import javax.inject.Inject;
+
+import kz.kazpost.toolpar.base.BasePresenter;
+import kz.kazpost.toolpar.data.DataManager;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -19,25 +23,31 @@ import static kz.kazpost.toolpar.utils.Singleton.getUserClient;
  * Created by root on 1/16/17.
  */
 
-public class HistoryPresenterImpl implements HistoryPresenter {
+public class HistoryPresenterImpl<V extends HistoryView> extends BasePresenter<V> implements HistoryPresenter<V> {
 
     Subscription subscription;
-    private HistoryView view;
+//    private HistoryView getMvpView();
 
-    public HistoryPresenterImpl(HistoryView view) {
-        this.view = view;
+    @Inject
+    public HistoryPresenterImpl(DataManager dataManager) {
+        super(dataManager);
     }
 
-    @Override
+    /*public HistoryPresenterImpl(HistoryView getMvpView()) {
+        super();
+        this.getMvpView() = getMvpView();
+    }
+*/
+    /*@Override
     public void onDestroy() {
-        view = null;
+        getMvpView() = null;
     }
-
+*/
 
     @Override
     public void loadHistory() {
 
-        view.showProgress();
+        getMvpView().showProgress();
 
 
         Retrofit retrofitRoutes = new Retrofit.Builder()
@@ -60,26 +70,23 @@ public class HistoryPresenterImpl implements HistoryPresenter {
                 .subscribe(
                         response -> {
                             if (response.getStatus().equals("success")) {
-                                view.showHistoryData(response);
-                                view.hideProgress();
-
+                                getMvpView().showHistoryData(response);
+                                getMvpView().hideProgress();
                             } else {
-                                view.showHistoryEmptyData();
-                                view.hideProgress();
-
+                                getMvpView().showHistoryEmptyData();
+                                getMvpView().hideProgress();
                             }
                         },
                         throwable -> {
-
-                            view.showHistoryError(throwable);
-                            view.hideProgress();
+                            getMvpView().showHistoryError(throwable);
+                            getMvpView().hideProgress();
                         });
 
     }
 
     @Override
     public void unSubscribe() {
-        if (subscription != null && !subscription.isUnsubscribed()){
+        if (subscription != null && !subscription.isUnsubscribed()) {
             subscription.unsubscribe();
         }
 

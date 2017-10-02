@@ -37,6 +37,7 @@ import kz.kazpost.toolpar.Model.acceptgen.PacketList;
 import kz.kazpost.toolpar.Model.routes.Entry;
 import kz.kazpost.toolpar.R;
 import kz.kazpost.toolpar.adapter.VolumesRVAdapter;
+import kz.kazpost.toolpar.base.BaseFragment;
 import kz.kazpost.toolpar.view.VolumesView;
 
 import static kz.kazpost.toolpar.Const.CURRENT_ROUTE_POSITION;
@@ -49,7 +50,7 @@ import static kz.kazpost.toolpar.Const.TRANSPONST_LIST_ID;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class VolumesFragment extends Fragment implements VolumesView {
+public class VolumesFragment extends BaseFragment implements VolumesView {
 
     @BindView(R.id.ll)
     LinearLayout ll;

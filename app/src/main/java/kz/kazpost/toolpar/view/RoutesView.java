@@ -1,12 +1,13 @@
 package kz.kazpost.toolpar.view;
 
 import kz.kazpost.toolpar.Model.routes.Routes;
+import kz.kazpost.toolpar.base.MvpView;
 
 /**
  * Created by root on 1/16/17.
  */
 
-public interface RoutesView {
+public interface RoutesView extends MvpView {
 
     void showProgress();
 

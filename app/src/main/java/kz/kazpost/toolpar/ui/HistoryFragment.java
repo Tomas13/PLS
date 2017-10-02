@@ -30,6 +30,7 @@ import kz.kazpost.toolpar.Model.History;
 import kz.kazpost.toolpar.Model.LastActions;
 import kz.kazpost.toolpar.R;
 import kz.kazpost.toolpar.adapter.HistoryRVAdapter;
+import kz.kazpost.toolpar.base.BaseFragment;
 import kz.kazpost.toolpar.events.AccessTokenEvent;
 import kz.kazpost.toolpar.events.HistoryEvent;
 import kz.kazpost.toolpar.jobs.GetAccessTokenJob;
@@ -41,7 +42,7 @@ import static kz.kazpost.toolpar.Const.AccessTokenConst;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class HistoryFragment extends Fragment implements HistoryView {
+public class HistoryFragment extends BaseFragment implements HistoryView {
 
     @BindView(R.id.rv_fragment_history)
     RecyclerView rvHistory;

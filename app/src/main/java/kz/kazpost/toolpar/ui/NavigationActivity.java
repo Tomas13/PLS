@@ -45,6 +45,7 @@ import kz.kazpost.toolpar.Model.routes.Entry;
 import kz.kazpost.toolpar.Model.routes.Flight;
 import kz.kazpost.toolpar.Model.routes.Routes;
 import kz.kazpost.toolpar.R;
+import kz.kazpost.toolpar.base.BaseActivity;
 import kz.kazpost.toolpar.events.AccessTokenEvent;
 import kz.kazpost.toolpar.presenter.NavigationPresenterImpl;
 import kz.kazpost.toolpar.presenter.NavitationPresenter;
@@ -67,7 +68,7 @@ import static kz.kazpost.toolpar.Const.NUMBER_OF_CITIES;
 import static kz.kazpost.toolpar.Const.TOKEN_SHARED_PREF;
 import static kz.kazpost.toolpar.Const.TRANSPONST_LIST_ID;
 
-public class NavigationActivity extends AppCompatActivity
+public class NavigationActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, RoutesView, NavigationActView, LoginView {
 
 //    private ProgressBar navProgressBar;

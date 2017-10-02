@@ -54,6 +54,7 @@ import kz.kazpost.toolpar.Model.routes.Entry;
 import kz.kazpost.toolpar.R;
 import kz.kazpost.toolpar.adapter.InvoiceRVAdapter;
 import kz.kazpost.toolpar.adapter.InvoiceRVAdapterSend;
+import kz.kazpost.toolpar.base.BaseFragment;
 import kz.kazpost.toolpar.events.AcceptEmptyEvent;
 import kz.kazpost.toolpar.events.AcceptGenInvoiceEvent;
 import kz.kazpost.toolpar.events.AccessTokenEvent;
@@ -78,7 +79,7 @@ import static kz.kazpost.toolpar.Const.TRANSPONST_LIST_ID;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class InvoiceFragment extends Fragment implements InvoiceView {
+public class InvoiceFragment extends BaseFragment implements InvoiceView {
 
     @BindView(R.id.tv_no_data_invoice)
     TextView tvNoDataInvoice;
