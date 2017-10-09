@@ -1,12 +1,16 @@
 package kz.kazpost.toolpar.presenter;
 
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
+import javax.inject.Inject;
+
 import kz.kazpost.toolpar.Interface.GitHubService;
 import kz.kazpost.toolpar.Model.acceptgen.Example;
 import kz.kazpost.toolpar.Model.geninvoice.InvoiceMain;
+import kz.kazpost.toolpar.base.BasePresenter;
+import kz.kazpost.toolpar.data.DataManager;
 import kz.kazpost.toolpar.view.InvoiceView;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -19,19 +23,19 @@ import static kz.kazpost.toolpar.utils.Singleton.getUserClient;
  * Created by root on 1/17/17.
  */
 
-public class InvoicePresenterImpl implements InvoicePresenter {
+public class InvoicePresenterImpl<V extends InvoiceView> extends BasePresenter<V> implements InvoicePresenter<V> {
 
     private Subscription subscription;
-    private InvoiceView view;
 
-    public InvoicePresenterImpl(InvoiceView view) {
-        this.view = view;
+    @Inject
+    public InvoicePresenterImpl(DataManager dataManager) {
+        super(dataManager);
     }
 
     @Override
     public void loadGeneralInvoice(String accessToken) {
 
-        view.showProgress();
+        getMvpView().showProgress();
 
         Retrofit retrofitRoutes = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
@@ -43,7 +47,6 @@ public class InvoicePresenterImpl implements InvoicePresenter {
         GitHubService gitHubServ = retrofitRoutes.create(GitHubService.class);
 
 
-
         Observable<InvoiceMain> callEdges =
                 gitHubServ.getGeneralInvoice();
 
@@ -53,23 +56,23 @@ public class InvoicePresenterImpl implements InvoicePresenter {
                 .subscribe(
                         response -> {
                             if (response.getStatus().equals("success")) {
-                                view.showGeneralInvoice(response);
-                                view.hideProgress();
+                                getMvpView().showGeneralInvoice(response);
+                                getMvpView().hideProgress();
                             } else {
-                                view.showRoutesEmptyData();
-                                view.hideProgress();
+                                getMvpView().showRoutesEmptyData();
+                                getMvpView().hideProgress();
                             }
                         },
                         throwable -> {
-                            view.showRoutesError(throwable);
-                            view.hideProgress();
+                            getMvpView().showRoutesError(throwable);
+                            getMvpView().hideProgress();
                         });
 
     }
 
     @Override
     public void retrofitAcceptGeneralInvoice(Long generalInvoiceId, String accessToken) {
-        view.showProgress();
+        getMvpView().showProgress();
 
         Retrofit retrofitRoutes = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
@@ -87,21 +90,25 @@ public class InvoicePresenterImpl implements InvoicePresenter {
         subscription = acceptGeneralInvoice.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         response -> {
-                            if (response.getStatus().equals("success")) {
-                                view.hideProgress();
-                                view.showGeneralInvoiceId(response);
-                            } else if (response.getStatus().equals("list-empty")){
-                                view.hideProgress();
-                                view.showEmptyToast("В данной общей накладной нет S-накладных");
-                            } else{
+                            switch (response.getStatus()) {
+                                case "success":
+                                    getMvpView().hideProgress();
+                                    getMvpView().showGeneralInvoiceId(response);
+                                    break;
+                                case "list-empty":
+                                    getMvpView().hideProgress();
+                                    getMvpView().showEmptyToast("В данной общей накладной нет S-накладных");
+                                    break;
+                                default:
 
-                                view.showRoutesEmptyData();
+                                    getMvpView().showRoutesEmptyData();
 
+                                    break;
                             }
                         },
                         throwable -> {
-                            view.showRoutesError(throwable);
-                            view.hideProgress();
+                            getMvpView().showRoutesError(throwable);
+                            getMvpView().hideProgress();
                         });
     }
 
@@ -143,7 +150,7 @@ public class InvoicePresenterImpl implements InvoicePresenter {
     public String handleStatus(String message) {
         String status = message;
 
-        switch (message){
+        switch (message) {
             case "pl-not-found":
                 status = "количество присланных B-накладных и обработанных не совпадает";
                 break;
@@ -178,8 +185,4 @@ public class InvoicePresenterImpl implements InvoicePresenter {
         return status;
     }
 
-    @Override
-    public void onDestroy() {
-        view = null;
-    }
 }

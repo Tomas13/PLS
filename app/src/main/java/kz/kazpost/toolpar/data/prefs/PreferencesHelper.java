@@ -5,4 +5,15 @@ package kz.kazpost.toolpar.data.prefs;
  */
 
 public interface PreferencesHelper {
+
+    void savePassword(String password);
+    void saveUsername(String username);
+    void saveAccessToken(String accessToken);
+    void saveRefreshToken(String refreshToken);
+    String getAccessToken();
+    String getRefreshToken();
+    String getUsername();
+    String getPassword();
+
+    boolean hasRefreshToken();
 }

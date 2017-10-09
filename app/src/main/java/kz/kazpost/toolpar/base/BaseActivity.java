@@ -48,6 +48,7 @@ public abstract class BaseActivity extends AppCompatActivity implements MvpView,
         return mActivityComponent;
     }
 
+
     @Override
     public void showLoading() {
         hideLoading();

@@ -25,24 +25,12 @@ import static kz.kazpost.toolpar.utils.Singleton.getUserClient;
 
 public class HistoryPresenterImpl<V extends HistoryView> extends BasePresenter<V> implements HistoryPresenter<V> {
 
-    Subscription subscription;
-//    private HistoryView getMvpView();
+    private Subscription subscription;
 
     @Inject
-    public HistoryPresenterImpl(DataManager dataManager) {
+    HistoryPresenterImpl(DataManager dataManager) {
         super(dataManager);
     }
-
-    /*public HistoryPresenterImpl(HistoryView getMvpView()) {
-        super();
-        this.getMvpView() = getMvpView();
-    }
-*/
-    /*@Override
-    public void onDestroy() {
-        getMvpView() = null;
-    }
-*/
 
     @Override
     public void loadHistory() {
@@ -91,6 +79,5 @@ public class HistoryPresenterImpl<V extends HistoryView> extends BasePresenter<V
         }
 
     }
-
 
 }

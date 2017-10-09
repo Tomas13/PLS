@@ -80,7 +80,6 @@ public class CollateFragment extends BaseFragment implements CollateView {
     int count = 0;
     private RealmQuery<Destination> queryDestination;
     private JobManager jobManager;
-    private IdsCollate idsCol;
 
     public CollateFragment() {
         // Required empty public constructor
@@ -212,7 +211,7 @@ public class CollateFragment extends BaseFragment implements CollateView {
     private void onButtonCollateClick() {
         if (!chosenIds.isEmpty()) {
             progressAccept.setVisibility(View.VISIBLE);
-            idsCol = new IdsCollate(chosenIds);
+            IdsCollate idsCol = new IdsCollate(chosenIds);
 //            presenter.postCollate(idsCol);
 
             for (int i = 0; i < queryDestination.findAll().size(); i++) {

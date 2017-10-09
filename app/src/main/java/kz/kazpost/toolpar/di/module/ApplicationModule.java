@@ -34,6 +34,7 @@ import kz.kazpost.toolpar.data.network.AppApiHelper;
 import kz.kazpost.toolpar.data.network.NetworkService;
 import kz.kazpost.toolpar.data.prefs.AppPreferencesHelper;
 import kz.kazpost.toolpar.data.prefs.PreferencesHelper;
+import kz.kazpost.toolpar.data.realm.RealmHelper;
 import kz.kazpost.toolpar.di.ApplicationContext;
 import kz.kazpost.toolpar.di.PreferenceInfo;
 import okhttp3.Cache;
@@ -82,11 +83,11 @@ public class ApplicationModule {
         return appDataManager;
     }
 
-//    @Provides
-//    @Singleton
-//    RealmHelper provideRealmHelper(RealmHelper appRealmHelper) {
-//        return appRealmHelper;
-//    }
+    @Provides
+    @Singleton
+    RealmHelper provideRealmHelper(RealmHelper appRealmHelper) {
+        return appRealmHelper;
+    }
 
     @Provides
     @Singleton

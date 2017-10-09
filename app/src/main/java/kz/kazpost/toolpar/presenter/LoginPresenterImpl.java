@@ -1,5 +1,9 @@
 package kz.kazpost.toolpar.presenter;
 
+import javax.inject.Inject;
+
+import kz.kazpost.toolpar.base.BasePresenter;
+import kz.kazpost.toolpar.data.DataManager;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -17,14 +21,23 @@ import static kz.kazpost.toolpar.utils.Singleton.getUserClient;
  * Created by root on 3/7/17.
  */
 
-public class LoginPresenterImpl implements LoginPresenter {
+public class LoginPresenterImpl<V extends LoginView> extends BasePresenter<V> implements LoginPresenter<V> {
 
-    private LoginView loginView;
-
-    public LoginPresenterImpl(LoginView view) {
-        loginView = view;
+    @Inject
+    public LoginPresenterImpl(DataManager dataManager) {
+        super(dataManager);
     }
 
+
+    @Override
+    public String getAccessToken() {
+        return getDataManager().getAccessToken();
+    }
+
+    @Override
+    public String getRefreshToken() {
+        return getDataManager().getRefreshToken();
+    }
 
     @Override
     public void postLogin(String username, String password) {
@@ -52,18 +65,11 @@ public class LoginPresenterImpl implements LoginPresenter {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        response -> {
-
-                            loginView.showLoginData(response);
-
-                        },
+                        response -> getMvpView().showLoginData(response),
                         throwable -> {
-
-                            if (throwable.getMessage().equals("HTTP 401 Unauthorized")){
-
-                                loginView.showLoginError(throwable);
+                            if (throwable.getMessage().equals("HTTP 401 Unauthorized")) {
+                                getMvpView().showLoginError(throwable);
                             }
-
                         });
 
     }
@@ -74,9 +80,30 @@ public class LoginPresenterImpl implements LoginPresenter {
     }
 
     @Override
-    public void onDestroy() {
-
+    public void saveUsername(String mLogin) {
+        getDataManager().saveUsername(mLogin);
     }
+
+    @Override
+    public void savePassword(String mPassword) {
+        getDataManager().savePassword(mPassword);
+    }
+
+    @Override
+    public boolean hasRefreshToken() {
+        return getDataManager().hasRefreshToken();
+    }
+
+    @Override
+    public void saveRefreshToken(String refreshToken) {
+        getDataManager().saveRefreshToken(refreshToken);
+    }
+
+    @Override
+    public void saveAccessToken(String accessToken) {
+        getDataManager().saveAccessToken(accessToken);
+    }
+
 
 }
 

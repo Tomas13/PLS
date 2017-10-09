@@ -40,7 +40,8 @@ public class Application extends MultiDexApplication {
         super.attachBaseContext(base);
     }
 
-
+    @Inject
+    DataManager dataManager;
 
     @Override
     public void onCreate() {

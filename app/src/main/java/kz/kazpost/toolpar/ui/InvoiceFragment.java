@@ -33,6 +33,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -101,7 +103,7 @@ public class InvoiceFragment extends BaseFragment implements InvoiceView {
 
 
     private InvoiceRVAdapter invoiceRVAdapter;
-    private InvoicePresenter presenter;
+//    private InvoicePresenter presenter;
     private Realm realm;
     private List<SendInvoice> sendInvoiceList;
     private List<Entry> entries = new ArrayList<>();
@@ -118,12 +120,16 @@ public class InvoiceFragment extends BaseFragment implements InvoiceView {
     private JobManager jobManager;
     private InvoiceRVAdapterSend adapterSend;
 
+    @Inject
+    InvoicePresenter<InvoiceView> presenter;
+
     public InvoiceFragment() {
         // Required empty public constructor
     }
 
     private void init() {
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Общие накладные");
+        getBaseActivity().setTitle("Общие накладные");
+//        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Общие накладные");
 
         sendInvoiceList = new ArrayList<>();
         realm = Realm.getDefaultInstance();
@@ -135,7 +141,7 @@ public class InvoiceFragment extends BaseFragment implements InvoiceView {
 //            sendInvoiceList.add(realmResults.get(i));
 //        }
 
-        presenter = new InvoicePresenterImpl(this);
+//        presenter = new InvoicePresenterImpl(this);
 
         pref = getActivity().getApplicationContext().getSharedPreferences(FLIGHT_SHARED_PREF, 0); // 0 - for private mode
         maxRouteNumber = pref.getInt(NUMBER_OF_CITIES, 0);

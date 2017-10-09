@@ -46,6 +46,51 @@ public class AppDataManager implements DataManager {
         return mPreferencesHelper;
     }
 
+    @Override
+    public void savePassword(String password) {
+        mPreferencesHelper.savePassword(password);
+    }
+
+    @Override
+    public void saveUsername(String username) {
+        mPreferencesHelper.saveUsername(username);
+    }
+
+    @Override
+    public void saveAccessToken(String accessToken) {
+        mPreferencesHelper.saveAccessToken(accessToken);
+    }
+
+    @Override
+    public void saveRefreshToken(String refreshToken) {
+        mPreferencesHelper.saveRefreshToken(refreshToken);
+    }
+
+    @Override
+    public String getAccessToken() {
+        return mPreferencesHelper.getAccessToken();
+    }
+
+    @Override
+    public String getRefreshToken() {
+        return mPreferencesHelper.getRefreshToken();
+    }
+
+    @Override
+    public String getUsername() {
+        return mPreferencesHelper.getUsername();
+    }
+
+    @Override
+    public String getPassword() {
+        return mPreferencesHelper.getPassword();
+    }
+
+    @Override
+    public boolean hasRefreshToken() {
+        return mPreferencesHelper.hasRefreshToken();
+    }
+
 
 /*
     @Override

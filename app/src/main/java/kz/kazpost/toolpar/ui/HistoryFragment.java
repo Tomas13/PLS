@@ -112,9 +112,7 @@ public class HistoryFragment extends BaseFragment implements HistoryView {
 
         final List<History> lastActionsList = new ArrayList<>();
 
-        for (int i = 0; i < lastActions.getHistory().size(); i++) {
-            lastActionsList.add(lastActions.getHistory().get(i));
-        }
+        lastActionsList.addAll(lastActions.getHistory());
 
         HistoryRVAdapter historyAdapter = new HistoryRVAdapter(lastActionsList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());

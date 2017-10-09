@@ -23,7 +23,15 @@ import dagger.Provides;
 import kz.kazpost.toolpar.di.ActivityContext;
 import kz.kazpost.toolpar.di.PerActivity;
 import kz.kazpost.toolpar.presenter.HistoryPresenter;
+import kz.kazpost.toolpar.presenter.HistoryPresenterImpl;
+import kz.kazpost.toolpar.presenter.InvoicePresenter;
+import kz.kazpost.toolpar.presenter.InvoicePresenterImpl;
+import kz.kazpost.toolpar.presenter.LoginPresenter;
+import kz.kazpost.toolpar.presenter.LoginPresenterImpl;
+import kz.kazpost.toolpar.ui.LoginActivity;
 import kz.kazpost.toolpar.view.HistoryView;
+import kz.kazpost.toolpar.view.InvoiceView;
+import kz.kazpost.toolpar.view.LoginView;
 
 /**
  * Created by janisharali on 27/01/17.
@@ -51,14 +59,19 @@ public class ActivityModule {
 
     @Provides
     @PerActivity
-    HistoryPresenter<HistoryView> provideHistoryPresenter(HistoryPresenter<HistoryView> presenter) {
+    HistoryPresenter<HistoryView> provideHistoryPresenter(HistoryPresenterImpl<HistoryView> presenter) {
         return presenter;
     }
 
+    @Provides
+    @PerActivity
+    InvoicePresenter<InvoiceView> provideInvoicePresenter(InvoicePresenterImpl<InvoiceView> presenter){
+        return presenter;
+    }
 
-//    @Provides
-//    @PerActivity
-//    ChooseIndexMvpPresenter<ChooseIndexMvpView> provideChooseIndexPresenter(ChooseIndexPresenter<ChooseIndexMvpView> presenter) {
-//        return presenter;
-//    }
+    @Provides
+    @PerActivity
+    LoginPresenter<LoginView> provideLoginPresenter(LoginPresenterImpl<LoginView> presenter){
+        return presenter;
+    }
 }

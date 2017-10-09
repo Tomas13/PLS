@@ -1,10 +1,8 @@
 package kz.kazpost.toolpar.ui;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -13,6 +11,8 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.birbit.android.jobqueue.JobManager;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -23,17 +23,14 @@ import kz.kazpost.toolpar.R;
 import kz.kazpost.toolpar.base.BaseActivity;
 import kz.kazpost.toolpar.jobs.GetAccessTokenJob;
 import kz.kazpost.toolpar.presenter.LoginPresenter;
-import kz.kazpost.toolpar.presenter.LoginPresenterImpl;
 import kz.kazpost.toolpar.view.LoginView;
 
 import static kz.kazpost.toolpar.Const.AccessTokenConst;
-import static kz.kazpost.toolpar.Const.PASSWORD;
-import static kz.kazpost.toolpar.Const.ACCESS_TOKEN;
-import static kz.kazpost.toolpar.Const.REFRESH_TOKEN;
-import static kz.kazpost.toolpar.Const.TOKEN_SHARED_PREF;
-import static kz.kazpost.toolpar.Const.USERNAME;
 
 public class LoginActivity extends BaseActivity implements LoginView {
+
+    @Inject
+    LoginPresenter<LoginView> loginPresenter;
 
     @BindView(R.id.edit_text_username)
     EditText userNameET;
@@ -53,8 +50,6 @@ public class LoginActivity extends BaseActivity implements LoginView {
     @BindView(R.id.passwordWrapper)
     TextInputLayout passwordWrapper;
 
-    private SharedPreferences pref1;
-    private LoginPresenter loginPresenter;
     private String mLogin;
     private String mPassword;
 
@@ -65,22 +60,21 @@ public class LoginActivity extends BaseActivity implements LoginView {
         setContentView(R.layout.layout);
         ButterKnife.bind(this);
 
+        getActivityComponent().inject(this);
+        loginPresenter.onAttach(LoginActivity.this);
+
         JobManager jobManager = AppJobManager.getJobManager();
         jobManager.addJobInBackground(new GetAccessTokenJob());
 
-        loginPresenter = new LoginPresenterImpl(this);
-        pref1 = getApplicationContext().getSharedPreferences(TOKEN_SHARED_PREF, 0); // 0 - for private mode
         btnLogin.setOnClickListener(v -> Login());
 
-
-        if (pref1.contains(REFRESH_TOKEN)) {
+        if (loginPresenter.hasRefreshToken()){
             Intent intent = new Intent(LoginActivity.this, NavigationActivity.class);
-            Const.Token = "Bearer " + pref1.getString(REFRESH_TOKEN, "empty");
+            Const.Token = "Bearer " + loginPresenter.getRefreshToken();
             startActivity(intent);
             finish();
         }
     }
-
 
     private void startAuth(String mLogin, String mPassword) {
         loginPresenter.postLogin(mLogin, mPassword);
@@ -110,13 +104,11 @@ public class LoginActivity extends BaseActivity implements LoginView {
     @Override
     public void showLoginData(LoginResponse loginResponse) {
 
-        pref1.edit().putString(USERNAME, mLogin).apply();
-        pref1.edit().putString(PASSWORD, mPassword).apply();
+        loginPresenter.saveUsername(mLogin);
+        loginPresenter.savePassword(mPassword);
 
-        String refreshToken = loginResponse.getRefreshToken();
-
-        pref1.edit().putString(ACCESS_TOKEN, loginResponse.getAccessToken()).apply();
-        pref1.edit().putString(REFRESH_TOKEN, refreshToken).apply();
+        loginPresenter.saveAccessToken(loginResponse.getAccessToken());
+        loginPresenter.saveRefreshToken(loginResponse.getRefreshToken());
 
         AccessTokenConst = loginResponse.getAccessToken();
 
@@ -150,6 +142,4 @@ public class LoginActivity extends BaseActivity implements LoginView {
 //        Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
 
     }
-
-
 }

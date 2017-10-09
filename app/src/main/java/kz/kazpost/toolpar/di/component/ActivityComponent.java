@@ -20,6 +20,8 @@ import dagger.Component;
 import kz.kazpost.toolpar.di.PerActivity;
 import kz.kazpost.toolpar.di.module.ActivityModule;
 import kz.kazpost.toolpar.ui.HistoryFragment;
+import kz.kazpost.toolpar.ui.LoginActivity;
+import kz.kazpost.toolpar.view.LoginView;
 
 /**
  * Created by janisharali on 27/01/17.
@@ -30,6 +32,8 @@ import kz.kazpost.toolpar.ui.HistoryFragment;
 public interface ActivityComponent {
 
     void inject(HistoryFragment fragment);
+
+    void inject(LoginActivity loginActivity);
 
 //    void inject(ChooseIndexActivity activity);
 
